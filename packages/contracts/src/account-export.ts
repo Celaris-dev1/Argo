@@ -2,7 +2,7 @@ import * as z from "zod";
 import { Id, IsoDate } from "./ids.js";
 
 /**
- * A whole account as one zip, to move between Rakazo installs (Cloud to self-hosted and back).
+ * A whole account as one zip, to move between Argo installs (Cloud to self-hosted and back).
  *
  * - `manifest.json` comes first: the format, version and the exported spaces.
  * - `spaces/<spaceId>/records.jsonl`: one `AccountExportRecord` per line. A record only refers to
@@ -16,7 +16,7 @@ import { Id, IsoDate } from "./ids.js";
  * rewrites references, including ids inside message blocks. Credentials, integrations, runs,
  * billing and computers are not exported: they belong to the source install.
  */
-export const ACCOUNT_EXPORT_FORMAT = "rakazo-account-export";
+export const ACCOUNT_EXPORT_FORMAT = "argo-account-export";
 export const ACCOUNT_EXPORT_VERSION = 1;
 export const ACCOUNT_EXPORT_MANIFEST_PATH = "manifest.json";
 /** Larger workspace files stay behind, matching the workspace export limit elsewhere. */

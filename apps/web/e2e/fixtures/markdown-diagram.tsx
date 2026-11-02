@@ -1,4 +1,4 @@
-import { ChatMarkdown } from "@rakazo/chat-ui/web";
+import { ChatMarkdown } from "@argo/chat-ui/web";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "../../src/styles.css";

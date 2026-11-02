@@ -1,21 +1,21 @@
 import { randomUUID } from "node:crypto";
-import type { JobPublisher } from "@rakazo/adapter-kit";
-import { callExpireJob } from "@rakazo/adapter-kit";
-import type { MessageBlock } from "@rakazo/contracts";
-import type { CallRequestBlock } from "@rakazo/core";
+import type { JobPublisher } from "@argo/adapter-kit";
+import { callExpireJob } from "@argo/adapter-kit";
+import type { MessageBlock } from "@argo/contracts";
+import type { CallRequestBlock } from "@argo/core";
 import {
   CALL_CLIENT_NONCE_PREFIX,
   callIdFromClientNonce,
   callRequestBlock,
   callRequestClientNonce,
   phoneCallSettings,
-} from "@rakazo/core";
-import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
+} from "@argo/core";
+import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
 import {
   appendEventInTransaction,
   createThreadMessageInTransaction,
   runAsSystem,
-} from "@rakazo/db";
+} from "@argo/db";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { isUniqueViolation, publishMessage, runLeaseFor } from "./run-messages.js";
 

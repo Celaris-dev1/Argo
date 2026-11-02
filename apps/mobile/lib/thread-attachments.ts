@@ -1,6 +1,6 @@
 import type { MenuAction } from "@expo/ui/community/menu";
-import { attachmentMaxBytes, attachmentMaxCount } from "@rakazo/contracts";
-import { attachmentsForThread } from "@rakazo/core";
+import { attachmentMaxBytes, attachmentMaxCount } from "@argo/contracts";
+import { attachmentsForThread } from "@argo/core";
 import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { ThreadComposerHandle } from "../components/thread-composer";

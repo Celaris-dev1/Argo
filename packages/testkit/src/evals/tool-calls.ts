@@ -1,4 +1,4 @@
-import type { AgentRunRequest, AgentRuntime } from "@rakazo/adapter-kit";
+import type { AgentRunRequest, AgentRuntime } from "@argo/adapter-kit";
 
 export type ObservedToolCall = { runId: string; name: string; args: Record<string, unknown> };
 /** What the model was offered on a run's first call: tool count and serialized definition size. */

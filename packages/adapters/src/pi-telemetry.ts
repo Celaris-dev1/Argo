@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { SpanAttributes, TelemetryContext, TelemetrySpan } from "@earendil-works/pi-telemetry";
-import type { AgentRunRequest } from "@rakazo/adapter-kit";
+import type { AgentRunRequest } from "@argo/adapter-kit";
 
 const current = new AsyncLocalStorage<TelemetryContext>();
 let exporter: Promise<{ context: TelemetryContext; shutdown(): Promise<void> }> | undefined;
@@ -23,11 +23,11 @@ export async function withPiTelemetry<T>(
   }
   return telemetry.startSpan(
     {
-      name: "rakazo.agent.run",
+      name: "argo.agent.run",
       attributes: {
-        "rakazo.bot.id": request.botId,
-        "rakazo.run.id": request.runId,
-        "rakazo.routine.id": request.routineId ?? undefined,
+        "argo.bot.id": request.botId,
+        "argo.run.id": request.runId,
+        "argo.routine.id": request.routineId ?? undefined,
       },
     },
     (span) => current.run(span, () => work(span)),

@@ -15,8 +15,8 @@ set -euo pipefail
 
 WG_DIR=/etc/wireguard
 WG_IF=wg0
-WG_PORT="${RAKAZO_WG_PORT:-51820}"
-WG_NET="${RAKAZO_WG_NET:-10.77.0}"   # /24, server is .1
+WG_PORT="${ARGO_WG_PORT:-51820}"
+WG_NET="${ARGO_WG_NET:-10.77.0}"   # /24, server is .1
 
 need_root() { [ "$(id -u)" = 0 ] || { echo "Run as root." >&2; exit 1; }; }
 install_wg() {

@@ -4,8 +4,8 @@ import type {
   AutoReviewRequest,
   ConnectorCall,
   ToolBatch,
-} from "@rakazo/adapter-kit";
-import { runContinueJob } from "@rakazo/adapter-kit";
+} from "@argo/adapter-kit";
+import { runContinueJob } from "@argo/adapter-kit";
 import {
   applyJudgeDecision,
   approvalModeFromPreference,
@@ -25,12 +25,12 @@ import {
   toolRequiresApproval,
   toolRequiresExplicitApproval,
   unattendedTriggerToolRequiresApproval,
-} from "@rakazo/core";
-import { normalizedHttpUrl, urlSite } from "@rakazo/core/egress";
-import { approvalEffectKey, toolEffectIdempotencyKey } from "@rakazo/core/node/approval-effect-key";
-import type { AuditEventInput } from "@rakazo/db";
-import { recordAuditEvent, runSecretKind } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/core";
+import { normalizedHttpUrl, urlSite } from "@argo/core/egress";
+import { approvalEffectKey, toolEffectIdempotencyKey } from "@argo/core/node/approval-effect-key";
+import type { AuditEventInput } from "@argo/db";
+import { recordAuditEvent, runSecretKind } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import type { FleetCardSummary } from "./approval-ask.js";
 import { buildApprovalAskBlock, MAX_FETCH_URL_LENGTH, SITE_SENDING_TOOLS } from "./approval-ask.js";
 import {

@@ -7,7 +7,7 @@
 // unmerged schema changes never reach the shared one.
 //
 // The database is `.env`'s DATABASE_URL when it accepts a connection. Otherwise a local
-// Postgres container (`rakazo-dev-postgres`) is started and reused by every checkout.
+// Postgres container (`argo-dev-postgres`) is started and reused by every checkout.
 // Setting WEB_PORT or API_PORT, in the shell or `.env`, turns off port selection. A relative
 // DATA_DIR resolves in the main checkout, so checkouts sharing the database share its files.
 // Branch databases, and their copied files, are dropped once the branch is deleted or merged.
@@ -37,14 +37,14 @@ const dotenv = require("dotenv");
 const DEFAULT_PORTS = { web: 5173, api: 3100, supervisor: 7091 };
 const PORT_STEP = 10;
 const MANAGED = {
-  container: "rakazo-dev-postgres",
+  container: "argo-dev-postgres",
   image: "postgres:18",
   port: 54318,
-  owner: "rakazo",
-  runtime: "rakazo_dev",
-  database: "rakazo",
+  owner: "argo",
+  runtime: "argo_dev",
+  database: "argo",
 };
-const SERVICES = ["@rakazo/api", "@rakazo/worker", "@rakazo/web", "@rakazo/sandbox-supervisor"];
+const SERVICES = ["@argo/api", "@argo/worker", "@argo/web", "@argo/sandbox-supervisor"];
 
 const fileEnv = existsSync(path.join(root, ".env"))
   ? dotenv.parse(readFileSync(path.join(root, ".env")))
@@ -218,7 +218,7 @@ function branchMigrations(branch) {
 }
 
 // Marks a finished branch database and records which repository and branch own it.
-const BRANCH_DATABASE_COMMENT = "rakazo dev branch: ";
+const BRANCH_DATABASE_COMMENT = "argo dev branch: ";
 
 function branchDatabaseComment(branch) {
   return BRANCH_DATABASE_COMMENT + JSON.stringify({ repo: repositoryId(), branch });
@@ -246,7 +246,7 @@ function branchDatabaseName(sharedName, branch) {
 
 /** A branch database's files, kept apart so deleting one never removes a file main still uses. */
 function branchDataDir(sharedDataDir, name) {
-  return path.join(path.dirname(sharedDataDir), ".rakazo-dev-branches", name, "data");
+  return path.join(path.dirname(sharedDataDir), ".argo-dev-branches", name, "data");
 }
 
 async function branchDatabase(shared, sharedDataDir) {
@@ -356,7 +356,7 @@ function generateClientIfStale(env) {
   const schema = path.join(dbPackage, "prisma/schema.prisma");
   if (existsSync(client) && statSync(client).mtimeMs >= statSync(schema).mtimeMs) return;
   log("Generating the Prisma client");
-  runPnpm(["--filter", "@rakazo/db", "generate"], {
+  runPnpm(["--filter", "@argo/db", "generate"], {
     cwd: root,
     env,
     stdio: "inherit",
@@ -397,7 +397,7 @@ generateClientIfStale(env);
 const migrationLock = new Client({ connectionString: shared.migrationUrl });
 await migrationLock.connect();
 try {
-  await migrationLock.query("SELECT pg_advisory_lock(hashtext('rakazo dev migrate'))");
+  await migrationLock.query("SELECT pg_advisory_lock(hashtext('argo dev migrate'))");
   runPnpm(["db:migrate"], { cwd: root, env, stdio: "inherit" });
 } finally {
   await migrationLock.end();

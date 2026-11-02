@@ -1,13 +1,13 @@
-import type { AgentRunRequest, ComputerRef, SemanticMemoryProvider } from "@rakazo/adapter-kit";
+import type { AgentRunRequest, ComputerRef, SemanticMemoryProvider } from "@argo/adapter-kit";
 import {
   DEFAULT_CONTEXT_STRATEGY,
   isModelCredentialRejected,
   runContinueJob,
   SandboxUnavailableError,
   SandboxUnresponsiveError,
-} from "@rakazo/adapter-kit";
-import type { MessageBlock, ModelRoleChoice, RunStatus } from "@rakazo/contracts";
-import { disabledBuiltinToolSet } from "@rakazo/contracts";
+} from "@argo/adapter-kit";
+import type { MessageBlock, ModelRoleChoice, RunStatus } from "@argo/contracts";
+import { disabledBuiltinToolSet } from "@argo/contracts";
 import {
   assertTransition,
   botMessageAllowsSilence,
@@ -30,7 +30,7 @@ import {
   renderBotDirectory,
   userRunError,
   userTurnMessageForRun,
-} from "@rakazo/core";
+} from "@argo/core";
 import {
   effectiveMemoryScope,
   isPartialReplyClientNonce,
@@ -43,9 +43,9 @@ import {
   recordUsage,
   settleReleasedTakeoverCards,
   spaceHasModelAccess,
-} from "@rakazo/db";
-import { enrichLogContext, getLogger } from "@rakazo/logging";
-import { sanitizedError } from "@rakazo/logging/monitoring";
+} from "@argo/db";
+import { enrichLogContext, getLogger } from "@argo/logging";
+import { sanitizedError } from "@argo/logging/monitoring";
 import { formatAgentEnvironmentInstruction } from "./agent-environment.js";
 import { createApprovedEffectReplayQueue } from "./approval-effect.js";
 import { PARTIAL_REPLY_NOTE } from "./automated-messages.js";
@@ -1063,7 +1063,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const graphicalToolsAllowed = graphical && acceptsImages && !heldForTakeover;
         const pageBrowserAllowed =
           graphical && browser.describe().capabilities.page && !heldForTakeover;
-        // Small models get a core tool set (RAKAZO_SMALL_MODELS); everyone else keeps the bot's list.
+        // Small models get a core tool set (ARGO_SMALL_MODELS); everyone else keeps the bot's list.
         const runDisabledBuiltinTools = withSmallModelDisabledTools(
           bot.disabledBuiltinTools,
           runModelProvider,
@@ -1747,7 +1747,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           redactSecrets(text, runSecrets),
         );
         // An outage at the computer provider is retried like any setup failure, but is not a
-        // Rakazo bug to report.
+        // Argo bug to report.
         const providerOutage =
           setupError instanceof SandboxUnavailableError ||
           setupError instanceof SandboxUnresponsiveError;

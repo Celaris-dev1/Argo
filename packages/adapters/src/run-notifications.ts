@@ -1,15 +1,15 @@
-import type { NotificationMessage } from "@rakazo/adapter-kit";
-import type { MessageBlock } from "@rakazo/contracts";
+import type { NotificationMessage } from "@argo/adapter-kit";
+import type { MessageBlock } from "@argo/contracts";
 import {
   isBackgroundRunTrigger,
   plainTextFromMarkdown,
   redactSecrets,
   truncatedPlainText,
   truncatePlainText,
-} from "@rakazo/core";
-import type { PrismaClient } from "@rakazo/db";
-import { countUnreadInboxChats } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/core";
+import type { PrismaClient } from "@argo/db";
+import { countUnreadInboxChats } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import type { ExecutorDeps } from "./executor-deps.js";
 
 export async function runNotificationsEnabled(

@@ -1,6 +1,6 @@
-import type { SpaceBot, SpaceGroup } from "@rakazo/contracts";
-import { isRunWorking } from "@rakazo/core";
-import { botColors } from "@rakazo/ui-tokens";
+import type { SpaceBot, SpaceGroup } from "@argo/contracts";
+import { isRunWorking } from "@argo/core";
+import { botColors } from "@argo/ui-tokens";
 import type { ReactNode } from "react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";

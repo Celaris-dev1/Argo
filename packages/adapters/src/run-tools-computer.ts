@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import type { SandboxProvider } from "@rakazo/adapter-kit";
-import type { ComputerCommand } from "@rakazo/contracts";
-import { COMPUTER_COMMAND_OUTPUT_MAX_CHARS } from "@rakazo/contracts";
-import { redactSecrets, sandboxCommandTimeoutMs } from "@rakazo/core";
-import { RunHistoryWriteError } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+import type { SandboxProvider } from "@argo/adapter-kit";
+import type { ComputerCommand } from "@argo/contracts";
+import { COMPUTER_COMMAND_OUTPUT_MAX_CHARS } from "@argo/contracts";
+import { redactSecrets, sandboxCommandTimeoutMs } from "@argo/core";
+import { RunHistoryWriteError } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import { redactShellStreams } from "./agent-environment.js";
 import { resolveLoginFill, shellCommandEnvironment } from "./bot-secrets.js";
 import {
@@ -375,7 +375,7 @@ export const computerTools: ToolHandlers = {
                   "bash",
                   "-c",
                   BACKGROUND_WORK_LAUNCH,
-                  "rakazo-background-launch",
+                  "argo-background-launch",
                   // Marker id must match sleepComputerIfIdle's probe (DB id), not ComputerRef.id
                   // (providerRef via toComputerRef). Scope launches to this run for cancel teardown.
                   ctx.computer.stored.id,

@@ -1,4 +1,4 @@
-import type { MessageBlock } from "@rakazo/contracts";
+import type { MessageBlock } from "@argo/contracts";
 
 export type ImageSize = { width: number; height: number };
 

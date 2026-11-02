@@ -1,6 +1,6 @@
-import type { LoginFieldInput } from "@rakazo/contracts";
-import { isSecretAskBlock } from "@rakazo/core";
-import { fontWeight, typeScale } from "@rakazo/ui-tokens";
+import type { LoginFieldInput } from "@argo/contracts";
+import { isSecretAskBlock } from "@argo/core";
+import { fontWeight, typeScale } from "@argo/ui-tokens";
 import { useRef, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import type { MobileMessage } from "../../lib/api";

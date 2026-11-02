@@ -7,22 +7,22 @@ import { UI_LOCALES } from "./ui-locale";
 const resources = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "..",
-  "modules/rakazo-notifications/android/src/main/res",
+  "modules/argo-notifications/android/src/main/res",
 );
 const keys = [
-  "rakazo_channel_live",
-  "rakazo_channel_messages",
-  "rakazo_channel_scheduled",
-  "rakazo_channel_attention",
-  "rakazo_live_one",
-  "rakazo_live_many",
-  "rakazo_live_working",
-  "rakazo_scheduled_title",
-  "rakazo_replied_group",
-  "rakazo_replied",
-  "rakazo_attention_failed",
-  "rakazo_attention_takeover",
-  "rakazo_attention_input",
+  "argo_channel_live",
+  "argo_channel_messages",
+  "argo_channel_scheduled",
+  "argo_channel_attention",
+  "argo_live_one",
+  "argo_live_many",
+  "argo_live_working",
+  "argo_scheduled_title",
+  "argo_replied_group",
+  "argo_replied",
+  "argo_attention_failed",
+  "argo_attention_takeover",
+  "argo_attention_input",
 ];
 
 const resourceDirectories = {

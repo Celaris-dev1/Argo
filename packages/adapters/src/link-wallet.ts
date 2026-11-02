@@ -14,9 +14,9 @@ import type {
   PurchaseRequest,
   PurchaseSnapshot,
   PurchaseStatus,
-} from "@rakazo/adapter-kit";
-import { PaymentWalletDisconnected, PaymentWalletRequestRejected } from "@rakazo/adapter-kit";
-import { abortableDelay } from "@rakazo/core";
+} from "@argo/adapter-kit";
+import { PaymentWalletDisconnected, PaymentWalletRequestRejected } from "@argo/adapter-kit";
+import { abortableDelay } from "@argo/core";
 import Link, { getDuplicateSpendRequest, LinkApiError } from "@stripe/link-sdk";
 import {
   readStripeChargeChallenge,

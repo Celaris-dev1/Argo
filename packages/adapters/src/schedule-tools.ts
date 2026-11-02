@@ -1,7 +1,7 @@
-import type { ConnectorProvider, JobPublisher } from "@rakazo/adapter-kit";
-import { routineJobKey, routineWakeupJob } from "@rakazo/adapter-kit";
-import type { RoutineWatch } from "@rakazo/contracts";
-import { RoutineWatchSchema, TimeZoneSchema } from "@rakazo/contracts";
+import type { ConnectorProvider, JobPublisher } from "@argo/adapter-kit";
+import { routineJobKey, routineWakeupJob } from "@argo/adapter-kit";
+import type { RoutineWatch } from "@argo/contracts";
+import { RoutineWatchSchema, TimeZoneSchema } from "@argo/contracts";
 import {
   cronFromPreset,
   formatCron,
@@ -13,8 +13,8 @@ import {
   unevenInterval,
   wallClock,
   zonedDateTime,
-} from "@rakazo/core";
-import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
+} from "@argo/core";
+import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
 
 import { localDateTime } from "./current-time.js";
 import { validateRoutineWatch } from "./routine-watch.js";

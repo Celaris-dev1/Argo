@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { MAX_MODEL_CONNECTION_LABEL } from "@rakazo/contracts";
+import { MAX_MODEL_CONNECTION_LABEL } from "@argo/contracts";
 import {
   Button,
   Command,
@@ -12,7 +12,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@rakazo/ui-web";
+} from "@argo/ui-web";
 import { ChevronRight, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useId, useRef, useState } from "react";

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Rakazo ultra-lean installer for a 1 vCPU / 2 GB / 6 GB box (IPv6-only is fine).
+# Argo ultra-lean installer for a 1 vCPU / 2 GB / 6 GB box (IPv6-only is fine).
 # Nothing is built here. Build and pack the images on a bigger box with build-ultra-images.sh.
 #
-#   sudo bash install-ultra.sh rakazo-ultra-images.tar.gz [egress.conf]
+#   sudo bash install-ultra.sh argo-ultra-images.tar.gz [egress.conf]
 #
 # egress.conf is the WireGuard client file from `ultra-egress.sh add-peer` on an IPv4 box.
 # Give it when this box has no IPv4.
@@ -62,9 +62,9 @@ if [ ! -f "$ENV_FILE" ]; then
     printf 'SANDBOX_SUPERVISOR_TOKEN=%s\n' "$(openssl rand -hex 32)"
     printf 'SANDBOX_PROVIDER=docker\n'
     printf 'POSTGRES_IMAGE=postgres:16\n'
-    printf 'RAKAZO_COMPUTER_IMAGE_TAG=headless\n'
-    printf 'RAKAZO_COMPUTER_HEADLESS=1\n'
-    [ -f "$COMPOSE_DIR/.env.lite.example" ] && grep -v '^RAKAZO_COMPUTER_IMAGE_TAG=' "$COMPOSE_DIR/.env.lite.example"
+    printf 'ARGO_COMPUTER_IMAGE_TAG=headless\n'
+    printf 'ARGO_COMPUTER_HEADLESS=1\n'
+    [ -f "$COMPOSE_DIR/.env.lite.example" ] && grep -v '^ARGO_COMPUTER_IMAGE_TAG=' "$COMPOSE_DIR/.env.lite.example"
   } > "$ENV_FILE"
   chmod 600 "$ENV_FILE"
 fi
@@ -81,5 +81,5 @@ cd "$COMPOSE_DIR"
 docker compose --env-file .env -f docker-compose.images.yml -f docker-compose.lite.yml \
   -f docker-compose.ultra.yml up -d --pull never
 echo
-echo "Rakazo ultra is starting at http://127.0.0.1:5173 (headless computer, API models)."
+echo "Argo ultra is starting at http://127.0.0.1:5173 (headless computer, API models)."
 echo "Put Cloudflare (proxied) or Caddy in front so IPv4 users can reach this IPv6 box."

@@ -1,6 +1,6 @@
-import type { Actor, MessageBlock } from "@rakazo/contracts";
-import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
-import { appendEventInTransaction, IsolationError } from "@rakazo/db";
+import type { Actor, MessageBlock } from "@argo/contracts";
+import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
+import { appendEventInTransaction, IsolationError } from "@argo/db";
 
 export type BotThreadDeps = {
   prisma: PrismaClient;

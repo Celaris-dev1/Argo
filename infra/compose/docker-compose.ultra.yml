@@ -40,18 +40,18 @@ services:
       - jit=off
 
   computer:
-    image: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-headless}
+    image: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-headless}
     pull_policy: never
 
   supervisor:
     mem_limit: 128m
     environment:
       NODE_OPTIONS: --max-old-space-size=96
-      RAKAZO_COMPUTER_IMAGE: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-headless}
-      RAKAZO_COMPUTER_MEMORY: ${RAKAZO_COMPUTER_MEMORY:-512m}
-      RAKAZO_COMPUTER_CPUS: ${RAKAZO_COMPUTER_CPUS:-0.8}
-      RAKAZO_COMPUTER_PIDS_LIMIT: ${RAKAZO_COMPUTER_PIDS_LIMIT:-256}
-      RAKAZO_MIN_FREE_MEMORY_MB: ${RAKAZO_MIN_FREE_MEMORY_MB:-300}
+      ARGO_COMPUTER_IMAGE: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-headless}
+      ARGO_COMPUTER_MEMORY: ${ARGO_COMPUTER_MEMORY:-512m}
+      ARGO_COMPUTER_CPUS: ${ARGO_COMPUTER_CPUS:-0.8}
+      ARGO_COMPUTER_PIDS_LIMIT: ${ARGO_COMPUTER_PIDS_LIMIT:-256}
+      ARGO_MIN_FREE_MEMORY_MB: ${ARGO_MIN_FREE_MEMORY_MB:-300}
 
   migrate:
     mem_limit: 512m
@@ -63,7 +63,7 @@ services:
     environment:
       NODE_OPTIONS: --max-old-space-size=288
       UV_THREADPOOL_SIZE: "1"
-      RAKAZO_COMPUTER_HEADLESS: "1"
+      ARGO_COMPUTER_HEADLESS: "1"
 
   worker:
     mem_limit: 448m
@@ -71,9 +71,9 @@ services:
       NODE_OPTIONS: --max-old-space-size=336
       UV_THREADPOOL_SIZE: "1"
       GRAPHILE_WORKER_CONCURRENCY: ${GRAPHILE_WORKER_CONCURRENCY:-1}
-      RAKAZO_COMPUTER_HEADLESS: "1"
+      ARGO_COMPUTER_HEADLESS: "1"
       # One extra model call per long run; leave on unless tokens are tight.
-      RAKAZO_SKILL_LEARNING: ${RAKAZO_SKILL_LEARNING:-on}
+      ARGO_SKILL_LEARNING: ${ARGO_SKILL_LEARNING:-on}
 
   web:
     mem_limit: 160m

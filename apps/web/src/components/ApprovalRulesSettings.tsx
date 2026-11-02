@@ -4,10 +4,10 @@ import type {
   ActionAutoReviewSettings,
   ApprovalMode,
   SettingsScope,
-} from "@rakazo/contracts";
-import { humanizeToolName } from "@rakazo/core";
-import { writeSaved } from "@rakazo/core/query";
-import { Button, ToggleGroup, ToggleGroupItem } from "@rakazo/ui-web";
+} from "@argo/contracts";
+import { humanizeToolName } from "@argo/core";
+import { writeSaved } from "@argo/core/query";
+import { Button, ToggleGroup, ToggleGroupItem } from "@argo/ui-web";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSpaceQueries } from "../lib/query";

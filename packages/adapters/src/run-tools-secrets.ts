@@ -1,8 +1,8 @@
-import { runContinueJob } from "@rakazo/adapter-kit";
-import { BotSecretName, botSecretSubmissionSchema } from "@rakazo/contracts";
-import { createStreamingRedactor, displayName } from "@rakazo/core";
-import { runLoginKind, runSecretKind } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+import { runContinueJob } from "@argo/adapter-kit";
+import { BotSecretName, botSecretSubmissionSchema } from "@argo/contracts";
+import { createStreamingRedactor, displayName } from "@argo/core";
+import { runLoginKind, runSecretKind } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import {
   completeExternalEffect,
   replaceCompletedExternalEffectResult,

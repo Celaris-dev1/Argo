@@ -61,7 +61,7 @@ describe("settings sheet", () => {
 
 describe("settings links", () => {
   it.each([true, false])("opens the share target for cold/warm arrivals (%s)", (initial) => {
-    expect(redirectSystemPath({ path: "rakazo://expo-sharing", initial })).toBe("/share");
+    expect(redirectSystemPath({ path: "argo://expo-sharing", initial })).toBe("/share");
   });
   it("knows every public page in the settings group", () => {
     const pages = readdirSync(resolve(mobileRoot, "app/(settings)"))
@@ -72,41 +72,41 @@ describe("settings links", () => {
   });
 
   it("reads the page from any link form", () => {
-    expect(isSettingsLink("rakazo:///models")).toBe(true);
+    expect(isSettingsLink("argo:///models")).toBe(true);
     // Picker sessions only exist after an in-sheet push, never from a link.
-    expect(isSettingsLink("rakazo:///model-picker")).toBe(false);
-    expect(isSettingsLink("rakazo:///model-connection")).toBe(false);
-    expect(isSettingsLink("rakazo://voice")).toBe(true);
-    expect(isSettingsLink("rakazo:///account?focus=usage")).toBe(true);
-    expect(isSettingsLink("rakazo://integrations/")).toBe(true);
+    expect(isSettingsLink("argo:///model-picker")).toBe(false);
+    expect(isSettingsLink("argo:///model-connection")).toBe(false);
+    expect(isSettingsLink("argo://voice")).toBe(true);
+    expect(isSettingsLink("argo:///account?focus=usage")).toBe(true);
+    expect(isSettingsLink("argo://integrations/")).toBe(true);
     expect(isSettingsLink("/change-password")).toBe(true);
-    expect(isSettingsLink("rakazo:///thread?botId=bot-1")).toBe(false);
-    expect(isSettingsLink("rakazo://group-thread?groupId=group-1")).toBe(false);
+    expect(isSettingsLink("argo:///thread?botId=bot-1")).toBe(false);
+    expect(isSettingsLink("argo://group-thread?groupId=group-1")).toBe(false);
     expect(isSettingsLink("/new")).toBe(false);
     expect(isSettingsLink("/artifacts")).toBe(false);
-    expect(isSettingsLink("rakazo:///artifacts")).toBe(false);
-    expect(isSettingsLink("rakazo://")).toBe(false);
-    expect(isSettingsLink("rakazo:///accounts")).toBe(false);
+    expect(isSettingsLink("argo:///artifacts")).toBe(false);
+    expect(isSettingsLink("argo://")).toBe(false);
+    expect(isSettingsLink("argo:///accounts")).toBe(false);
   });
 
   it("closes the sheet before a link to another screen, and keeps settings links in it", () => {
     const close = vi.fn();
     const unregister = registerSettingsSheet(close);
 
-    expect(redirectSystemPath({ path: "rakazo:///voice", initial: false })).toBe("rakazo:///voice");
-    expect(redirectSystemPath({ path: "rakazo:///account?focus=usage", initial: false })).toBe(
-      "rakazo:///account?focus=usage",
+    expect(redirectSystemPath({ path: "argo:///voice", initial: false })).toBe("argo:///voice");
+    expect(redirectSystemPath({ path: "argo:///account?focus=usage", initial: false })).toBe(
+      "argo:///account?focus=usage",
     );
     expect(close).not.toHaveBeenCalled();
 
-    expect(redirectSystemPath({ path: "rakazo:///thread?botId=bot-1", initial: false })).toBe(
-      "rakazo:///thread?botId=bot-1",
+    expect(redirectSystemPath({ path: "argo:///thread?botId=bot-1", initial: false })).toBe(
+      "argo:///thread?botId=bot-1",
     );
     expect(close).toHaveBeenCalledTimes(1);
-    expect(redirectSystemPath({ path: "rakazo://expo-sharing", initial: true })).toBe("/share");
+    expect(redirectSystemPath({ path: "argo://expo-sharing", initial: true })).toBe("/share");
     expect(close).toHaveBeenCalledTimes(2);
-    expect(redirectSystemPath({ path: "rakazo:///artifacts", initial: false })).toBe(
-      "rakazo:///artifacts",
+    expect(redirectSystemPath({ path: "argo:///artifacts", initial: false })).toBe(
+      "argo:///artifacts",
     );
     expect(close).toHaveBeenCalledTimes(3);
     unregister();

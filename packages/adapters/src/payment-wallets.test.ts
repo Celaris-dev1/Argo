@@ -3,9 +3,9 @@ import type {
   PaymentWalletCredential,
   PaymentWalletProvider,
   SecretStore,
-} from "@rakazo/adapter-kit";
-import { PaymentWalletDisconnected } from "@rakazo/adapter-kit";
-import type { PaymentWallet, PrismaClient } from "@rakazo/db";
+} from "@argo/adapter-kit";
+import { PaymentWalletDisconnected } from "@argo/adapter-kit";
+import type { PaymentWallet, PrismaClient } from "@argo/db";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaymentWalletDeps } from "./payment-wallets.js";
 import {
@@ -201,7 +201,7 @@ describe("payment wallet connection", () => {
       expiresAt: new Date(NOW.getTime() + 15 * 60_000).toISOString(),
     });
     expect(env.provider?.beginConnect).toHaveBeenCalledWith(
-      { clientName: "Rakazo" },
+      { clientName: "Argo" },
       expect.objectContaining({ userId: actor.userId }),
     );
     const [row] = env.rows;

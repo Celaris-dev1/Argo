@@ -3,9 +3,9 @@ import {
   isOllamaCloudBaseUrl,
   OLLAMA_CLOUD_BASE_URL,
   OPENAI_COMPATIBLE_PROVIDER_ID,
-} from "@rakazo/contracts";
-import { popularModelProvidersFirst } from "@rakazo/core";
-import { fetchFresh } from "@rakazo/core/query";
+} from "@argo/contracts";
+import { popularModelProvidersFirst } from "@argo/core";
+import { fetchFresh } from "@argo/core/query";
 import { isCancelledError, useQuery } from "@tanstack/react-query";
 import type { Href } from "expo-router";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";

@@ -1,5 +1,5 @@
-import type { ComputerMode } from "@rakazo/contracts";
-import { BOT_COMPUTER_MODES } from "@rakazo/contracts";
+import type { ComputerMode } from "@argo/contracts";
+import { BOT_COMPUTER_MODES } from "@argo/contracts";
 import { Text, View } from "react-native";
 import { useI18n } from "../lib/i18n";
 import { native, useMobileTokens } from "../lib/native";

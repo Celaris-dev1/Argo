@@ -1,4 +1,4 @@
-import { credentialIssue, MAX_PASSWORD_LENGTH, PASSWORD_RULES } from "@rakazo/core";
+import { credentialIssue, MAX_PASSWORD_LENGTH, PASSWORD_RULES } from "@argo/core";
 import { Redirect, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -248,9 +248,9 @@ export default function SignIn() {
                 {resetSent || codeStep
                   ? t("Check your email")
                   : mode === "in"
-                    ? t("Sign in to Rakazo")
+                    ? t("Sign in to Argo")
                     : mode === "up"
-                      ? t("Sign up for Rakazo")
+                      ? t("Sign up for Argo")
                       : t("Reset your password")}
               </Text>
               {resetSent ? (

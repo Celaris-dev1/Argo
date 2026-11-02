@@ -1,5 +1,5 @@
-import type { AdapterContext, JobPublisher } from "@rakazo/adapter-kit";
-import type { Actor, Group, MessageBlock } from "@rakazo/contracts";
+import type { AdapterContext, JobPublisher } from "@argo/adapter-kit";
+import type { Actor, Group, MessageBlock } from "@argo/contracts";
 import {
   BOT_INSTRUCTIONS_MAX_LENGTH,
   BotSectionName,
@@ -13,14 +13,14 @@ import {
   ThinkingLevelSchema,
   TimeZoneSchema,
   UpdateGroupInput,
-} from "@rakazo/contracts";
+} from "@argo/contracts";
 import {
   CARD_TITLE_ESCAPED_CHARACTERS,
   ONCE_ROUTINE_CRON,
   redactSecrets,
   toolRequiresExplicitApproval,
-} from "@rakazo/core";
-import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
+} from "@argo/core";
+import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
 import {
   commitBotUpdate,
   createGroupRepos,
@@ -28,8 +28,8 @@ import {
   InstructionConflictError,
   IsolationError,
   SpaceDeletionInProgressError,
-} from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/db";
+import { getLogger } from "@argo/logging";
 import type { FleetCardSummary } from "./approval-ask.js";
 import { approvalDetailLength, MAX_APPROVAL_SUMMARY_LENGTH } from "./approval-ask.js";
 import { attachedImageArtifactIds, resolveUpdateBotAvatar } from "./bot-avatar.js";

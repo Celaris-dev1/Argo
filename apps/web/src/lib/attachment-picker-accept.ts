@@ -1,4 +1,4 @@
-import { ATTACHMENT_ALLOWED_MIME_TYPES } from "@rakazo/contracts";
+import { ATTACHMENT_ALLOWED_MIME_TYPES } from "@argo/contracts";
 
 /**
  * Android's document picker can filter out CSV files when the accept attribute

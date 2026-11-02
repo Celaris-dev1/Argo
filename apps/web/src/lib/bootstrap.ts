@@ -1,6 +1,6 @@
-import type { AppBootstrap } from "@rakazo/contracts";
-import { ATTACHMENT_MAX_BYTES, attachmentMaxBytes } from "@rakazo/contracts";
-import { displayIdentityResult } from "@rakazo/core";
+import type { AppBootstrap } from "@argo/contracts";
+import { ATTACHMENT_MAX_BYTES, attachmentMaxBytes } from "@argo/contracts";
+import { displayIdentityResult } from "@argo/core";
 import { initialBootstrapTarget } from "./bootstrap-target";
 import { identityLabels } from "./identity-display";
 import { markOnce } from "./performance";
@@ -32,7 +32,7 @@ let primedBootstrap: {
 
 const initialTarget = initialBootstrapTarget(
   window.location.pathname,
-  Boolean(window.rakazoDesktop),
+  Boolean(window.argoDesktop),
 );
 if (initialTarget) {
   const { botId } = initialTarget;

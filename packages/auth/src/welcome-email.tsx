@@ -1,16 +1,16 @@
 /** @jsxRuntime automatic */
-import type { TransactionalEmail } from "@rakazo/adapter-kit";
-import { ANDROID_APK_URL, IOS_APP_STORE_URL } from "@rakazo/contracts";
-import { displayName } from "@rakazo/core";
+import type { TransactionalEmail } from "@argo/adapter-kit";
+import { ANDROID_APK_URL, IOS_APP_STORE_URL } from "@argo/contracts";
+import { displayName } from "@argo/core";
 import { Link, Text } from "react-email";
 import { linkStyle, message } from "./email.js";
 
 const APPS = [
   ["iPhone", IOS_APP_STORE_URL],
   ["Android", ANDROID_APK_URL],
-  ["Mac", "https://rakazo.com/api/download?platform=mac"],
-  ["Windows", "https://rakazo.com/api/download?platform=windows"],
-  ["Linux", "https://rakazo.com/api/download?platform=linux"],
+  ["Mac", "https://argo.example/api/download?platform=mac"],
+  ["Windows", "https://argo.example/api/download?platform=windows"],
+  ["Linux", "https://argo.example/api/download?platform=linux"],
 ] as const;
 
 export function welcomeEmail(
@@ -19,12 +19,12 @@ export function welcomeEmail(
 ): Promise<TransactionalEmail> {
   return message(
     user.email,
-    "Welcome to Rakazo",
+    "Welcome to Argo",
     <>
       <Text>Hi {displayName(user.name, "there")},</Text>
-      <Text>Thanks for signing up for Rakazo.</Text>
+      <Text>Thanks for signing up for Argo.</Text>
       <Text>
-        Rakazo also has apps for{" "}
+        Argo also has apps for{" "}
         {APPS.map(([name, href], index) => (
           <span key={name}>
             {index === APPS.length - 1 ? "and " : ""}
@@ -43,7 +43,7 @@ export function welcomeEmail(
         .
       </Text>
       <Text>
-        Rakazo is open source. If you like it,{" "}
+        Argo is open source. If you like it,{" "}
         <Link href="https://github.com/elie222/rakazo" style={linkStyle}>
           a star on GitHub
         </Link>{" "}
@@ -55,7 +55,7 @@ export function welcomeEmail(
           href="https://github.com/elie222/rakazo/blob/main/docs/self-host.md"
           style={linkStyle}
         >
-          Self-host Rakazo
+          Self-host Argo
         </Link>
         .
       </Text>

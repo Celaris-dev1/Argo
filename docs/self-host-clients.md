@@ -28,15 +28,15 @@ error that names `EXPO_ACCESS_TOKEN`; the token itself is never logged.
 ## Client updates
 
 Every web build is named by the UTC time it was built (`YYYYMMDDHHMMSS`). The web app sends its
-build on each `/rpc` request in `x-rakazo-client-build` (`web/20261022093015`; the mobile app sends
+build on each `/rpc` request in `x-argo-client-build` (`web/20261022093015`; the mobile app sends
 `mobile/` and the time its JavaScript bundle was built), and the API answers with the web build in
-its own image in `x-rakazo-build`. An open tab that sees a newer build reloads at a safe moment:
+its own image in `x-argo-build`. An open tab that sees a newer build reloads at a safe moment:
 while hidden, on its next navigation, or after a few idle minutes with nothing typed.
 
-To retire old clients immediately, set `RAKAZO_MIN_CLIENT_BUILD` on the API, for example
+To retire old clients immediately, set `ARGO_MIN_CLIENT_BUILD` on the API, for example
 `web=20261022093015` or `web=20261022093015,mobile=20261001000000`, and restart it. Older clients
 get HTTP 426 `CLIENT_UPDATE_REQUIRED`: the web app reloads, and the mobile app offers its update.
-Read the current build from the `x-rakazo-build` header of any `/rpc` response. Requests that name
+Read the current build from the `x-argo-build` header of any `/rpc` response. Requests that name
 no build, such as webhooks and API tools, are never refused. A malformed value stops the API from
 starting rather than being ignored.
 
@@ -44,8 +44,8 @@ starting rather than being ignored.
 
 The web server sends a strict Content-Security-Policy: scripts and connections are limited to the
 app's own origin. When a CDN in front of the app injects a script, such as an analytics beacon, the
-browser blocks it until you add its origins. `RAKAZO_CSP_SCRIPT_SRC` extends `script-src` and
-`RAKAZO_CSP_CONNECT_SRC` extends `connect-src`. Each takes space-separated `https://` origins, with
+browser blocks it until you add its origins. `ARGO_CSP_SCRIPT_SRC` extends `script-src` and
+`ARGO_CSP_CONNECT_SRC` extends `connect-src`. Each takes space-separated `https://` origins, with
 an optional port and leading `*.` wildcard (`https://*.example.com`). Keywords such as
 `'unsafe-inline'`, bare schemes, `*`, `http://` origins and paths are rejected, and the web server
 refuses to start until the value is fixed. Restart the web service after changing either one.
@@ -53,8 +53,8 @@ refuses to start until the value is fixed. Restart the web service after changin
 For example, Cloudflare Web Analytics loads its script from one host and reports to another:
 
 ```bash
-RAKAZO_CSP_SCRIPT_SRC=https://static.cloudflareinsights.com
-RAKAZO_CSP_CONNECT_SRC=https://cloudflareinsights.com
+ARGO_CSP_SCRIPT_SRC=https://static.cloudflareinsights.com
+ARGO_CSP_CONNECT_SRC=https://cloudflareinsights.com
 ```
 
 Add only origins you trust: a script these settings allow runs with the signed-in user's access.
@@ -65,11 +65,11 @@ for it to find the origins to add.
 
 ## Menu links
 
-`RAKAZO_NAV_LINKS` adds items to the account menu that open a page from the same domain inside the
-web app, such as an internal tool your reverse proxy serves next to Rakazo. Set it on the API:
+`ARGO_NAV_LINKS` adds items to the account menu that open a page from the same domain inside the
+web app, such as an internal tool your reverse proxy serves next to Argo. Set it on the API:
 
 ```bash
-RAKAZO_NAV_LINKS='[{"id":"clients","label":"Clients","path":"/ext/clients/"}]'
+ARGO_NAV_LINKS='[{"id":"clients","label":"Clients","path":"/ext/clients/"}]'
 ```
 
 Each `id` is lowercase letters, digits and dashes, and becomes `/app/x/<id>`. `path` must start with a
@@ -77,8 +77,8 @@ single `/` and must not be under `/app`, `/api`, `/rpc`, `/novnc` or `/health`. 
 catch-all in your proxy, for example `handle /ext/* { reverse_proxy office:8080 }` in
 `Caddyfile.prod`. A malformed value stops the API from starting.
 
-Pages open sandboxed with an opaque origin, so they cannot read Rakazo's pages or act with the
+Pages open sandboxed with an opaque origin, so they cannot read Argo's pages or act with the
 signed-in user's session; that also blocks their own cookies and storage. Add `"trusted": true` to a
 link only for a service you control: a trusted page runs with the signed-in user's access, like a
-script allowed by `RAKAZO_CSP_SCRIPT_SRC`. The page must allow framing by the app
+script allowed by `ARGO_CSP_SCRIPT_SRC`. The page must allow framing by the app
 (`frame-ancestors 'self'`). Links appear in the web app only; the desktop and mobile apps hide them.

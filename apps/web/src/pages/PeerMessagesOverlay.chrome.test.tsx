@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import type { RakazoDesktop } from "@rakazo/contracts";
+import type { ArgoDesktop } from "@argo/contracts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { act } from "react";
@@ -34,7 +34,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   host.remove();
-  delete window.rakazoDesktop;
+  delete window.argoDesktop;
   vi.unstubAllGlobals();
 });
 
@@ -60,7 +60,7 @@ async function render() {
 }
 
 it("clears the macOS window controls in the desktop app", async () => {
-  window.rakazoDesktop = { platform: "darwin" } as RakazoDesktop;
+  window.argoDesktop = { platform: "darwin" } as ArgoDesktop;
   const view = await render();
   const header = view.firstElementChild!;
   expect(header.classList).toContain("app-drag");

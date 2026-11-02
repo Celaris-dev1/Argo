@@ -1,0 +1,9 @@
+# Optional drop-in: /etc/systemd/system/argo-backup.service.d/alerts.conf
+[Unit]
+OnFailure=argo-backup-alert.service
+
+[Service]
+ExecStartPost=-/usr/local/sbin/argo-host-alert backup-failure ""
+ReadWritePaths=/var/lib/argo/alerts
+StateDirectory=argo/alerts
+StateDirectoryMode=0700

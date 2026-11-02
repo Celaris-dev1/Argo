@@ -1,4 +1,4 @@
-import type { ComputerRef } from "@rakazo/adapter-kit";
+import type { ComputerRef } from "@argo/adapter-kit";
 
 /**
  * A run's computer, started the first time a tool needs it.

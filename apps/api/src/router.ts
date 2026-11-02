@@ -8,7 +8,7 @@ import type {
   SandboxProvider,
   SecretStore,
   TransactionalEmailProvider,
-} from "@rakazo/adapter-kit";
+} from "@argo/adapter-kit";
 import type {
   CloudAgentConnection,
   CodexLiveCatalog,
@@ -28,10 +28,10 @@ import type {
   RemoteConnectorDependencies,
   TicketChangeNotifier,
   verifyModelServesAgents,
-} from "@rakazo/adapters";
-import type { Auth } from "@rakazo/auth";
-import type { NavLink } from "@rakazo/contracts";
-import type { BoardEvents, PrismaClient, ThreadEvents } from "@rakazo/db";
+} from "@argo/adapters";
+import type { Auth } from "@argo/auth";
+import type { NavLink } from "@argo/contracts";
+import type { BoardEvents, PrismaClient, ThreadEvents } from "@argo/db";
 import type { BillingService } from "./billing.js";
 import { accountRoutes } from "./routes/account.js";
 import { availabilityRoutes } from "./routes/availability.js";

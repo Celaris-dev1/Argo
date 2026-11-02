@@ -6,14 +6,14 @@ import type {
   ProductEvent,
   RoutineHistory,
   ThreadSnapshot,
-} from "@rakazo/contracts";
+} from "@argo/contracts";
 import {
   anySignal,
   createRefreshCoalescer,
   isRunTerminalEvent,
   runThreadSubscription,
-} from "@rakazo/core";
-import { fetchFresh } from "@rakazo/core/query";
+} from "@argo/core";
+import { fetchFresh } from "@argo/core/query";
 import type { RefObject } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {

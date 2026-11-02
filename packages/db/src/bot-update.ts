@@ -1,5 +1,5 @@
-import { displayName } from "@rakazo/core";
-import { getLogger } from "@rakazo/logging";
+import { displayName } from "@argo/core";
+import { getLogger } from "@argo/logging";
 import { writeBotInstructions } from "./bot-instructions.js";
 import type { Prisma, PrismaClient } from "./client.js";
 import { appendEventInTransaction } from "./events.js";

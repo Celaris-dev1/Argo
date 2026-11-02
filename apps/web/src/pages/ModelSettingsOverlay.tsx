@@ -1,12 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { SettingsScope } from "@rakazo/contracts";
+import type { SettingsScope } from "@argo/contracts";
 import {
   compatibleConnectionName,
   connectionDisplayName,
   OPENAI_COMPATIBLE_PRESETS,
   OPENAI_COMPATIBLE_PROVIDER_ID,
   savedCompatibleEndpointMatches,
-} from "@rakazo/contracts";
+} from "@argo/contracts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +24,7 @@ import {
   DialogTitle,
   ModelThinkingOptions,
   Spinner,
-} from "@rakazo/ui-web";
+} from "@argo/ui-web";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ModelCredential } from "../lib/model-auth";

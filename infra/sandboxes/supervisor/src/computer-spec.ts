@@ -5,23 +5,23 @@ import {
   COMPUTER_CACHE_ENV,
   MAX_DESKTOP_DISPLAY,
   screenPorts,
-} from "@rakazo/core/node/desktop-runtime";
-import { loadRootEnv } from "@rakazo/core/node/load-root-env";
+} from "@argo/core/node/desktop-runtime";
+import { loadRootEnv } from "@argo/core/node/load-root-env";
 import type Docker from "dockerode";
 
 loadRootEnv();
 
 /**
- * The computer image. RAKAZO_COMPUTER_IMAGE_TAG is appended the way Compose does, so a
+ * The computer image. ARGO_COMPUTER_IMAGE_TAG is appended the way Compose does, so a
  * supervisor started outside Compose pulls the same published tag instead of an untagged
  * (`:latest`) name. An image that already carries a tag or digest is used as is.
  */
 export function resolveComputerImage(
-  image = process.env.RAKAZO_COMPUTER_IMAGE,
-  tag = process.env.RAKAZO_COMPUTER_IMAGE_TAG,
+  image = process.env.ARGO_COMPUTER_IMAGE,
+  tag = process.env.ARGO_COMPUTER_IMAGE_TAG,
 ): string {
   const name = image?.trim();
-  if (!name) return "rakazo/computer:local";
+  if (!name) return "argo/computer:local";
   const wantedTag = tag?.trim();
   const lastSegment = name.slice(name.lastIndexOf("/") + 1);
   if (!wantedTag || name.includes("@") || lastSegment.includes(":")) return name;
@@ -37,11 +37,11 @@ export const COMPUTER_IMAGE_CONTEXT_FILES = [
   "user-env.sh",
   "control.py",
   "xcapture.c",
-  "rakazo-browser",
-  "rakazo-lightpanda",
-  "rakazo-focus-or-launch",
-  "rakazo-page-browser",
-  "rakazo-browser.desktop",
+  "argo-browser",
+  "argo-lightpanda",
+  "argo-focus-or-launch",
+  "argo-page-browser",
+  "argo-browser.desktop",
   "browser-policy.json",
   "embed.html",
   "clipboard-bridge.js",
@@ -49,14 +49,14 @@ export const COMPUTER_IMAGE_CONTEXT_FILES = [
   "fluxbox.init",
   "fluxbox.apps",
   "fluxbox.menu",
-  "rakazo-local-bin.sh",
+  "argo-local-bin.sh",
 ] as const;
 
 /**
  * Docker's rule for a name that carries its registry: the first path component has a "." or
  * ":", is "localhost", or has an uppercase letter. The supervisor pulls only such names, never an
  * unqualified one that Docker would look up on Docker Hub, where anyone could register
- * rakazo/computer.
+ * argo/computer.
  */
 export function isRegistryQualifiedImage(image: string): boolean {
   const slash = image.indexOf("/");
@@ -171,16 +171,16 @@ function envOrDefault(name: string, fallback: string): string {
 
 export function computerResourceLimits() {
   const memoryBytes = parseMemoryBytes(
-    "RAKAZO_COMPUTER_MEMORY",
-    envOrDefault("RAKAZO_COMPUTER_MEMORY", DEFAULT_COMPUTER_MEMORY),
+    "ARGO_COMPUTER_MEMORY",
+    envOrDefault("ARGO_COMPUTER_MEMORY", DEFAULT_COMPUTER_MEMORY),
   );
   const nanoCpus = parseNanoCpus(
-    "RAKAZO_COMPUTER_CPUS",
-    envOrDefault("RAKAZO_COMPUTER_CPUS", DEFAULT_COMPUTER_CPUS),
+    "ARGO_COMPUTER_CPUS",
+    envOrDefault("ARGO_COMPUTER_CPUS", DEFAULT_COMPUTER_CPUS),
   );
   const pidsLimit = parsePidsLimit(
-    "RAKAZO_COMPUTER_PIDS_LIMIT",
-    envOrDefault("RAKAZO_COMPUTER_PIDS_LIMIT", DEFAULT_COMPUTER_PIDS_LIMIT),
+    "ARGO_COMPUTER_PIDS_LIMIT",
+    envOrDefault("ARGO_COMPUTER_PIDS_LIMIT", DEFAULT_COMPUTER_PIDS_LIMIT),
   );
   return {
     // Memory and MemorySwap are set together: leaving MemorySwap unset lets the
@@ -204,7 +204,7 @@ export function resolveScreenNetworkMode(value: string | undefined): ScreenNetwo
  * endpoints. `restricted` keeps public internet egress but lets the operator drop
  * everything else with one host-side iptables rule set — the supervisor gives each
  * computer network a deterministic bridge interface name so the rules match by
- * interface (`-i rakazo-c+`) instead of ephemeral subnets. Enforcement lives on the
+ * interface (`-i argo-c+`) instead of ephemeral subnets. Enforcement lives on the
  * Docker host (infra/compose/restrict-computer-egress.sh) and is verified before
  * computers start (egress-probe.ts). The Compose stacks default to `auto`: restricted
  * when that check passes, open otherwise, so a stack installed before the rules
@@ -316,7 +316,7 @@ export function assertComputerMountSources(
  * Host directories mounted into every computer in every Space, from SANDBOX_COMPUTER_MOUNTS:
  * comma-separated `source:target[:option...]` entries with options ro (default), rw and rslave.
  * Both paths are absolute without `..`. A target sits below /mnt, /media or /srv: inside
- * /home/rakazo Docker would create the mount point root-owned in the bot's home, which then
+ * /home/argo Docker would create the mount point root-owned in the bot's home, which then
  * fails the home ownership check, and system directories are not the operator's to replace.
  */
 export function resolveComputerMounts(
@@ -374,7 +374,7 @@ function computerMountSettings(mount: ComputerMount): Docker.MountSettings {
  * as its own VM path when the container also mounts a volume, as every Compose computer's home
  * does, so the inspected Source cannot be compared with the setting.
  */
-const MOUNT_SOURCES_LABEL = "rakazo.mountSources";
+const MOUNT_SOURCES_LABEL = "argo.mountSources";
 
 function mountSourcesLabel(mounts: ComputerMount[]) {
   return JSON.stringify(Object.fromEntries(mounts.map((mount) => [mount.target, mount.source])));
@@ -398,7 +398,7 @@ export function computerMountsMatch(
   desired: ComputerMount[],
 ) {
   const binds = (info.HostConfig.Mounts ?? []).filter(
-    (mount) => mount.Type === "bind" && mount.Target !== "/home/rakazo",
+    (mount) => mount.Type === "bind" && mount.Target !== "/home/argo",
   );
   const sources = labeledMountSources(info.Config.Labels);
   return (
@@ -417,12 +417,12 @@ export function computerMountsMatch(
 
 /**
  * Host bridge interface name for a computer network. Linux caps interface names
- * at 15 bytes (IFNAMSIZ), so "rakazo-c" gets a 7-hex-char suffix derived from the
+ * at 15 bytes (IFNAMSIZ), so "argo-c" gets a 7-hex-char suffix derived from the
  * same digest as the network name — deterministic across recreate, unique per bot.
  */
 export function computerBridgeNameFor(botId: string) {
   const hash = createHash("sha256").update(botId).digest("hex").slice(0, 7);
-  return `rakazo-c${hash}`;
+  return `argo-c${hash}`;
 }
 
 /**
@@ -449,7 +449,7 @@ export function computerNetworkCreateOptions(
     Name: computerNetworkNameFor(botId),
     Driver: "bridge",
     CheckDuplicate: true,
-    Labels: { "rakazo.computerOwner": owner, "rakazo.botId": botId },
+    Labels: { "argo.exampleputerOwner": owner, "argo.botId": botId },
     ...(egress === "restricted"
       ? { Options: { "com.docker.network.bridge.name": computerBridgeNameFor(botId) } }
       : {}),
@@ -532,7 +532,7 @@ export function homeVolumeMatches(
   return (
     mounts?.some(
       (mount) =>
-        mount.Target === "/home/rakazo" &&
+        mount.Target === "/home/argo" &&
         mount.Type === "volume" &&
         mount.Source === volume.name &&
         mount.VolumeOptions?.Subpath === volume.subpath &&
@@ -580,16 +580,16 @@ export function containerCreateOptions(input: ComputerCreateInput) {
     Env: [
       ...Object.entries(COMPUTER_CACHE_ENV).map(([key, value]) => `${key}=${value}`),
       "DISPLAY=:1",
-      "HOME=/home/rakazo",
-      "PATH=/home/rakazo/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-      "NPM_CONFIG_PREFIX=/home/rakazo/.local",
+      "HOME=/home/argo",
+      "PATH=/home/argo/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "NPM_CONFIG_PREFIX=/home/argo/.local",
       "PIP_USER=1",
-      ...(input.controlToken ? [`RAKAZO_COMPUTER_CONTROL_TOKEN=${input.controlToken}`] : []),
+      ...(input.controlToken ? [`ARGO_COMPUTER_CONTROL_TOKEN=${input.controlToken}`] : []),
     ],
     Labels: {
-      "rakazo.managed": "true",
-      "rakazo.botId": input.botId,
-      "rakazo.spaceId": input.spaceId,
+      "argo.managed": "true",
+      "argo.botId": input.botId,
+      "argo.spaceId": input.spaceId,
       ...(input.mounts?.length ? { [MOUNT_SOURCES_LABEL]: mountSourcesLabel(input.mounts) } : {}),
     },
     ExposedPorts: ports.ExposedPorts,
@@ -601,7 +601,7 @@ export function containerCreateOptions(input: ComputerCreateInput) {
               {
                 Type: "volume" as const,
                 Source: input.homeVolume.name,
-                Target: "/home/rakazo",
+                Target: "/home/argo",
                 // Docker makes Labels and DriverConfig optional; dockerode's types do not.
                 VolumeOptions: {
                   NoCopy: true,
@@ -612,7 +612,7 @@ export function containerCreateOptions(input: ComputerCreateInput) {
             ],
           }
         : {
-            Binds: [`${input.homePath}:/home/rakazo`],
+            Binds: [`${input.homePath}:/home/argo`],
             Mounts: extraMounts.length ? extraMounts : undefined,
           }),
       PortBindings: ports.PortBindings,
@@ -625,7 +625,7 @@ export function containerCreateOptions(input: ComputerCreateInput) {
       NetworkMode: input.networkMode ?? "bridge",
       ...(input.dns ? { Dns: input.dns } : {}),
     },
-    WorkingDir: "/home/rakazo",
+    WorkingDir: "/home/argo",
   };
 }
 
@@ -635,7 +635,7 @@ export function sanitizeIdentifier(botId: string) {
 }
 
 export function containerNameFor(botId: string) {
-  return `rakazo-bot-${sanitizeIdentifier(botId)}`;
+  return `argo-bot-${sanitizeIdentifier(botId)}`;
 }
 
 export function computerNetworkNameFor(botId: string) {
@@ -643,7 +643,7 @@ export function computerNetworkNameFor(botId: string) {
   // characters (e.g. "a/b" and "ab"). Do not change containerNameFor — that
   // name must stay stable so an existing computer can resume.
   const hash = createHash("sha256").update(botId).digest("hex").slice(0, 32);
-  return `rakazo-computer-${sanitizeIdentifier(botId).slice(0, 32)}-${hash}`;
+  return `argo-computer-${sanitizeIdentifier(botId).slice(0, 32)}-${hash}`;
 }
 
 /** Current and prior network names, for delete cleanup. */
@@ -652,8 +652,8 @@ export function computerNetworkNamesForCleanup(botId: string) {
   const digest = createHash("sha256").update(botId).digest("hex");
   return [
     computerNetworkNameFor(botId),
-    `rakazo-computer-${safe}`,
-    `rakazo-computer-${safe.slice(0, 32)}-${digest.slice(0, 8)}`,
+    `argo-computer-${safe}`,
+    `argo-computer-${safe.slice(0, 32)}-${digest.slice(0, 8)}`,
   ];
 }
 

@@ -1,12 +1,12 @@
 import type { Socket } from "node:net";
-import { loadRootEnv } from "@rakazo/core/node/load-root-env";
-import { stopOnShutdownSignals } from "@rakazo/core/node/shutdown-signals";
+import { loadRootEnv } from "@argo/core/node/load-root-env";
+import { stopOnShutdownSignals } from "@argo/core/node/shutdown-signals";
 
 loadRootEnv();
 
 import { serve } from "@hono/node-server";
-import { SERVICE_NAMES } from "@rakazo/logging";
-import { createRootLogger } from "@rakazo/logging/axiom";
+import { SERVICE_NAMES } from "@argo/logging";
+import { createRootLogger } from "@argo/logging/axiom";
 import { createApp } from "./app.js";
 import { loadEnv } from "./env.js";
 

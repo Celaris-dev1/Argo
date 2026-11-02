@@ -1,12 +1,12 @@
-import type { ModelCallObserver } from "@rakazo/adapter-kit";
-import { HOSTED_MODEL_CREDITS_REQUIRED_ERROR } from "@rakazo/core";
-import type { PrismaClient } from "@rakazo/db";
+import type { ModelCallObserver } from "@argo/adapter-kit";
+import { HOSTED_MODEL_CREDITS_REQUIRED_ERROR } from "@argo/core";
+import type { PrismaClient } from "@argo/db";
 import {
   creditAccount,
   organizationForMember,
   recordModelCreditReceipt,
   reserveModelCredits,
-} from "@rakazo/db";
+} from "@argo/db";
 
 export class HostedModelCreditsRequiredError extends Error {}
 

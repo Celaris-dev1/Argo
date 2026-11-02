@@ -4,11 +4,11 @@ import { mkdir, rm } from "node:fs/promises";
 import { hostname } from "node:os";
 import path from "node:path";
 import type {
-  RakazoDesktopDevice,
+  ArgoDesktopDevice,
   UserDevicePairRequest,
   UserDevicePairResponse,
-} from "@rakazo/contracts";
-import { USER_DEVICE_PAIR_PATH, USER_DEVICE_PATH } from "@rakazo/contracts";
+} from "@argo/contracts";
+import { USER_DEVICE_PAIR_PATH, USER_DEVICE_PATH } from "@argo/contracts";
 import { readPrivateFile, writePrivateFile } from "./setup-store.js";
 
 export interface DeviceTokenCipher {
@@ -293,7 +293,7 @@ export function createUserDeviceAccess(deps: {
     },
     /** Pairs the current server when it is not paired yet, e.g. once the person signs in. */
     pair,
-    state(origin: string): Omit<RakazoDesktopDevice, "name"> | null {
+    state(origin: string): Omit<ArgoDesktopDevice, "name"> | null {
       if (origin !== current) return null;
       return {
         deviceId: paired.get(origin) ?? null,

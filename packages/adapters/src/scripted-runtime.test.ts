@@ -1,5 +1,5 @@
-import type { AgentRuntimeEvent } from "@rakazo/adapter-kit";
-import { buildBotMessageWakePrompt, STEERING_CONTINUATION_PROMPT } from "@rakazo/core";
+import type { AgentRuntimeEvent } from "@argo/adapter-kit";
+import { buildBotMessageWakePrompt, STEERING_CONTINUATION_PROMPT } from "@argo/core";
 import { describe, expect, it, vi } from "vitest";
 import { inferScript, ScriptedAgentRuntime } from "./scripted-runtime.js";
 

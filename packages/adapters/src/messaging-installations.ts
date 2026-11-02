@@ -5,11 +5,11 @@ import type {
   MessagingInstallationStore,
   MessagingInstallProvider,
   SecretStore,
-} from "@rakazo/adapter-kit";
-import type { Actor, MessagingInstallationSummary } from "@rakazo/contracts";
-import type { PrismaClient } from "@rakazo/db";
-import { IsolationError, requireMembership, runAsSystem } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/adapter-kit";
+import type { Actor, MessagingInstallationSummary } from "@argo/contracts";
+import type { PrismaClient } from "@argo/db";
+import { IsolationError, requireMembership, runAsSystem } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import { credentialDigest } from "./credential-digest.js";
 
 /** OAuth state is short-lived, single-use and tied to a user, space and bot. */

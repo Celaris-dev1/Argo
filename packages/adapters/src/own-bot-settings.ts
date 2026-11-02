@@ -1,5 +1,5 @@
-import type { Actor } from "@rakazo/contracts";
-import { ThinkingLevelSchema } from "@rakazo/contracts";
+import type { Actor } from "@argo/contracts";
+import { ThinkingLevelSchema } from "@argo/contracts";
 import type { FleetPrepareDeps } from "./fleet-tools.js";
 import { modelLabel } from "./fleet-tools.js";
 import { connectedModelChoices, resolveModelChoice } from "./model-choice.js";

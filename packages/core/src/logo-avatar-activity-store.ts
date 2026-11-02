@@ -1,4 +1,4 @@
-import type { Run } from "@rakazo/contracts";
+import type { Run } from "@argo/contracts";
 import type {
   LogoAvatarActivity,
   LogoAvatarEvent,

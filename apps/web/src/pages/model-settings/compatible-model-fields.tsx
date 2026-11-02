@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { ThinkingLevel } from "@rakazo/contracts";
-import { compatiblePresetNeedsKey } from "@rakazo/contracts";
-import { toggleEnabledModelId } from "@rakazo/core";
+import type { ThinkingLevel } from "@argo/contracts";
+import { compatiblePresetNeedsKey } from "@argo/contracts";
+import { toggleEnabledModelId } from "@argo/core";
 import {
   Button,
   Checkbox,
@@ -11,7 +11,7 @@ import {
   ModelThinkingOptions,
   NativeSelect,
   NativeSelectOption,
-} from "@rakazo/ui-web";
+} from "@argo/ui-web";
 import { ModelPreflightFeedback } from "../../components/ModelConnectionPreflightNotice";
 import { ModelHeadersEditor } from "../../components/ModelHeadersEditor";
 
@@ -127,7 +127,7 @@ export function CompatibleModelFields({
           summary={<Trans>Setup help</Trans>}
         >
           <p className="mt-1">
-            {t`Paste the OpenAI-compatible address from your server. Rakazo adds /v1 if needed.`}
+            {t`Paste the OpenAI-compatible address from your server. Argo adds /v1 if needed.`}
           </p>
         </Disclosure>
       ) : null}

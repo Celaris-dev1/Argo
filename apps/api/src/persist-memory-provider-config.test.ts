@@ -1,5 +1,5 @@
-import { MemoryProviderPrivateEndpointRequiredError } from "@rakazo/adapters";
-import type { PrismaClient } from "@rakazo/db";
+import { MemoryProviderPrivateEndpointRequiredError } from "@argo/adapters";
+import type { PrismaClient } from "@argo/db";
 import { describe, expect, it, vi } from "vitest";
 import {
   disconnectMemoryProvider,

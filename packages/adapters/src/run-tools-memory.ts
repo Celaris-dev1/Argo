@@ -1,6 +1,6 @@
-import { MEMORY_REVISION_CONFLICT_ERROR } from "@rakazo/adapter-kit";
-import { HistoryReadInputSchema, HistorySearchInputSchema } from "@rakazo/contracts";
-import { readHistory, searchHistory } from "@rakazo/db";
+import { MEMORY_REVISION_CONFLICT_ERROR } from "@argo/adapter-kit";
+import { HistoryReadInputSchema, HistorySearchInputSchema } from "@argo/contracts";
+import { readHistory, searchHistory } from "@argo/db";
 import { sharedMemorySaveError } from "./builtin-tools.js";
 import { redactConnectorPayload } from "./connector-safety.js";
 import { MAX_RECALLED_MEMORIES } from "./history-compaction.js";

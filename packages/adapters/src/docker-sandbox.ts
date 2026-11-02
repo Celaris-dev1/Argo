@@ -16,14 +16,14 @@ import type {
   ScreenRequest,
   ScreenSession,
   TerminalRequest,
-} from "@rakazo/adapter-kit";
+} from "@argo/adapter-kit";
 import {
   boundedSandboxCommandTimeoutMs,
   cancelResponseBody,
   requestDeadline,
   resolveSupervisorToken,
-} from "@rakazo/core";
-import { outgoingCorrelationHeaders } from "@rakazo/logging";
+} from "@argo/core";
+import { outgoingCorrelationHeaders } from "@argo/logging";
 import {
   boundedComputerActions,
   clampRounded,
@@ -100,7 +100,7 @@ function sandboxGoneError(computer: ComputerRef): Error {
 
 export class DockerSandboxProvider implements SandboxProvider {
   private readonly supervisorToken: string;
-  private readonly headless = /^(1|true|yes|on)$/i.test(process.env.RAKAZO_COMPUTER_HEADLESS ?? "");
+  private readonly headless = /^(1|true|yes|on)$/i.test(process.env.ARGO_COMPUTER_HEADLESS ?? "");
 
   constructor(
     private readonly supervisorUrl: string,
@@ -134,12 +134,12 @@ export class DockerSandboxProvider implements SandboxProvider {
   private headers(context: AdapterContext, botId?: string) {
     return {
       authorization: `Bearer ${this.supervisorToken}`,
-      "x-rakazo-space-id": context.spaceId,
+      "x-argo-space-id": context.spaceId,
       ...outgoingCorrelationHeaders(),
-      ...(botId ? { "x-rakazo-bot-id": botId } : {}),
-      ...(context.botId ? { "x-rakazo-screen-id": context.botId } : {}),
-      ...(context.screenLeaseId ? { "x-rakazo-screen-lease-id": context.screenLeaseId } : {}),
-      ...(context.cancelRunWork ? { "x-rakazo-cancel-run-work": "1" } : {}),
+      ...(botId ? { "x-argo-bot-id": botId } : {}),
+      ...(context.botId ? { "x-argo-screen-id": context.botId } : {}),
+      ...(context.screenLeaseId ? { "x-argo-screen-lease-id": context.screenLeaseId } : {}),
+      ...(context.cancelRunWork ? { "x-argo-cancel-run-work": "1" } : {}),
     };
   }
 
@@ -543,7 +543,7 @@ export class DockerSandboxProvider implements SandboxProvider {
           headers: {
             ...this.headers(context, computer.botId),
             ...(context.keepScreenWarm && !context.cancelRunWork && !context.signal.aborted
-              ? { "x-rakazo-preserve-screen": "1" }
+              ? { "x-argo-preserve-screen": "1" }
               : {}),
           },
           signal: deadline.signal,
@@ -703,9 +703,9 @@ function parseProcessLine(line: string): ProcessEvent | undefined {
 }
 
 function dockerCwd(cwd: string | undefined) {
-  if (!cwd || cwd === "." || cwd === "/" || cwd === "/home/rakazo") return "/home/rakazo";
-  const relative = cwd.startsWith("/home/rakazo/")
-    ? cwd.slice("/home/rakazo/".length)
+  if (!cwd || cwd === "." || cwd === "/" || cwd === "/home/argo") return "/home/argo";
+  const relative = cwd.startsWith("/home/argo/")
+    ? cwd.slice("/home/argo/".length)
     : normalizeWorkspacePath(cwd);
-  return path.posix.join("/home/rakazo", relative);
+  return path.posix.join("/home/argo", relative);
 }

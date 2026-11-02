@@ -1,6 +1,6 @@
 import type { MenuAction } from "@expo/ui/community/menu";
 import { MenuView } from "@expo/ui/community/menu";
-import type { AgentSkillCatalogEntry } from "@rakazo/contracts";
+import type { AgentSkillCatalogEntry } from "@argo/contracts";
 import type {
   buildComposerMentionOptions,
   ComposerMention,
@@ -8,7 +8,7 @@ import type {
   ComposerMentionQuery,
   ComposerMentionRange,
   SlashActionId,
-} from "@rakazo/core";
+} from "@argo/core";
 import {
   bindComposerMention,
   composerMentionQuery,
@@ -21,8 +21,8 @@ import {
   SLASH_ACTIONS,
   serializeComposerPrompt,
   truncateSlashDescription,
-} from "@rakazo/core";
-import { MAX_FONT_SCALE } from "@rakazo/ui-tokens";
+} from "@argo/core";
+import { MAX_FONT_SCALE } from "@argo/ui-tokens";
 import type { Ref } from "react";
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import type { ViewStyle } from "react-native";

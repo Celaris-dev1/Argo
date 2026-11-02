@@ -1,4 +1,4 @@
-import type { MessageBlock } from "@rakazo/contracts";
+import type { MessageBlock } from "@argo/contracts";
 
 /**
  * Reasoning distills and many uncensored/local fine-tunes (DeepSeek-R1 distills, QwQ, some

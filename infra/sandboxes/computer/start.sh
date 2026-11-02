@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -uo pipefail
-source /usr/local/lib/rakazo-user-env.sh
+source /usr/local/lib/argo-user-env.sh
 export DISPLAY="${DISPLAY:-:1}"
-export HOME="${HOME:-/home/rakazo}"
+export HOME="${HOME:-/home/argo}"
 AGENT_HOME="$HOME"
-mkdir -p "$AGENT_HOME" "$AGENT_HOME/.local/bin" "$AGENT_HOME/.config" /tmp/rakazo /tmp/.X11-unix /tmp/fluxbox-home
-# Login shells re-apply ~/.local/bin from /etc/profile.d/rakazo-local-bin.sh.
+mkdir -p "$AGENT_HOME" "$AGENT_HOME/.local/bin" "$AGENT_HOME/.config" /tmp/argo /tmp/.X11-unix /tmp/fluxbox-home
+# Login shells re-apply ~/.local/bin from /etc/profile.d/argo-local-bin.sh.
 export PATH="$AGENT_HOME/.local/bin:/usr/local/bin:$PATH"
 export NPM_CONFIG_PREFIX="$AGENT_HOME/.local"
 export PIP_USER=1
@@ -30,12 +30,12 @@ trap shutdown TERM INT
 
 # Headless image (ultra-lean profile): no X server, VNC or window manager. Keep Lightpanda
 # listening on the page-browser CDP port and stay up as PID 1 until stopped.
-if [[ "${RAKAZO_COMPUTER_HEADLESS:-}" =~ ^(1|true|yes|on)$ ]] || ! command -v Xvfb >/dev/null 2>&1; then
+if [[ "${ARGO_COMPUTER_HEADLESS:-}" =~ ^(1|true|yes|on)$ ]] || ! command -v Xvfb >/dev/null 2>&1; then
   if command -v lightpanda >/dev/null 2>&1; then
     while true; do
-      /usr/local/bin/rakazo-lightpanda >/dev/null 2>&1 || true
+      /usr/local/bin/argo-lightpanda >/dev/null 2>&1 || true
       sleep 15
-    done >/tmp/rakazo/lightpanda-keeper.log 2>&1 &
+    done >/tmp/argo/lightpanda-keeper.log 2>&1 &
   fi
   sleep infinity &
   XVFB_PID=$!
@@ -43,16 +43,16 @@ if [[ "${RAKAZO_COMPUTER_HEADLESS:-}" =~ ^(1|true|yes|on)$ ]] || ! command -v Xv
   exit 0
 fi
 
-if [[ -n "${RAKAZO_COMPUTER_CONTROL_TOKEN:-}" ]]; then
+if [[ -n "${ARGO_COMPUTER_CONTROL_TOKEN:-}" ]]; then
   while true; do
-    /usr/local/bin/rakazo-computer-control
+    /usr/local/bin/argo-computer-control
     sleep 1
-  done >/tmp/rakazo/control.log 2>&1 &
+  done >/tmp/argo/control.log 2>&1 &
 fi
 
 rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
 
-Xvfb :1 -screen 0 1280x800x24 -ac +extension RANDR +render -noreset >/tmp/rakazo/xvfb.log 2>&1 &
+Xvfb :1 -screen 0 1280x800x24 -ac +extension RANDR +render -noreset >/tmp/argo/xvfb.log 2>&1 &
 XVFB_PID=$!
 
 ready=0
@@ -65,16 +65,16 @@ for _ in $(seq 1 100); do
 done
 if [[ "$ready" -ne 1 ]]; then
   echo "Xvfb failed to start" >&2
-  cat /tmp/rakazo/xvfb.log >&2 || true
+  cat /tmp/argo/xvfb.log >&2 || true
   exit 1
 fi
 
 if command -v dbus-launch >/dev/null 2>&1; then
   eval "$(dbus-launch --sh-syntax)"
-  # rakazo-browser is launched later without this session's environment; the
+  # argo-browser is launched later without this session's environment; the
   # file-chooser portals only work if the browser finds the same bus.
   printf 'export DBUS_SESSION_BUS_ADDRESS=%s\n' "$DBUS_SESSION_BUS_ADDRESS" \
-    > /tmp/rakazo/dbus-session
+    > /tmp/argo/dbus-session
 fi
 
 # Chromium's file chooser talks to xdg-desktop-portal over the session bus.
@@ -82,41 +82,41 @@ fi
 # chosen file never reaches the page — uploads silently do nothing. The
 # daemons install as flat files in /usr/libexec on Debian bookworm.
 if [ -x /usr/libexec/xdg-desktop-portal ] && [ -x /usr/libexec/xdg-desktop-portal-gtk ]; then
-  /usr/libexec/xdg-desktop-portal >/tmp/rakazo/portal.log 2>&1 &
-  /usr/libexec/xdg-desktop-portal-gtk >/tmp/rakazo/portal-gtk.log 2>&1 &
+  /usr/libexec/xdg-desktop-portal >/tmp/argo/portal.log 2>&1 &
+  /usr/libexec/xdg-desktop-portal-gtk >/tmp/argo/portal-gtk.log 2>&1 &
 fi
 
 xsetroot -solid "#111113" >/dev/null 2>&1 || true
 mkdir -p /tmp/fluxbox-home/.fluxbox
-cp /etc/rakazo/fluxbox/init /tmp/fluxbox-home/.fluxbox/init
-cp /etc/rakazo/fluxbox/apps /tmp/fluxbox-home/.fluxbox/apps 2>/dev/null || true
-cp /etc/rakazo/fluxbox/menu /tmp/fluxbox-home/.fluxbox/menu 2>/dev/null || true
+cp /etc/argo/fluxbox/init /tmp/fluxbox-home/.fluxbox/init
+cp /etc/argo/fluxbox/apps /tmp/fluxbox-home/.fluxbox/apps 2>/dev/null || true
+cp /etc/argo/fluxbox/menu /tmp/fluxbox-home/.fluxbox/menu 2>/dev/null || true
 cat > /tmp/fluxbox-home/.fluxbox/startup <<'EOF'
 #!/bin/sh
 xsetroot -solid "#111113"
 exec fluxbox -rc /tmp/fluxbox-home/.fluxbox/init
 EOF
 chmod +x /tmp/fluxbox-home/.fluxbox/startup
-HOME=/tmp/fluxbox-home /tmp/fluxbox-home/.fluxbox/startup >/tmp/rakazo/fluxbox.log 2>&1 &
+HOME=/tmp/fluxbox-home /tmp/fluxbox-home/.fluxbox/startup >/tmp/argo/fluxbox.log 2>&1 &
 
 register_browser_handler() {
   local mime="$1"
-  if ! xdg-mime default rakazo-browser.desktop "$mime" >/dev/null 2>&1 \
-    || [[ "$(xdg-mime query default "$mime" 2>/dev/null || true)" != "rakazo-browser.desktop" ]]; then
-    echo "failed to register rakazo-browser for $mime" >&2
+  if ! xdg-mime default argo-browser.desktop "$mime" >/dev/null 2>&1 \
+    || [[ "$(xdg-mime query default "$mime" 2>/dev/null || true)" != "argo-browser.desktop" ]]; then
+    echo "failed to register argo-browser for $mime" >&2
     exit 1
   fi
 }
 register_browser_handler x-scheme-handler/http
 register_browser_handler x-scheme-handler/https
 register_browser_handler text/html
-if ! xdg-settings set default-web-browser rakazo-browser.desktop >/dev/null 2>&1 \
-  || [[ "$(xdg-settings get default-web-browser 2>/dev/null || true)" != "rakazo-browser.desktop" ]]; then
-  echo "failed to set default web browser to rakazo-browser" >&2
+if ! xdg-settings set default-web-browser argo-browser.desktop >/dev/null 2>&1 \
+  || [[ "$(xdg-settings get default-web-browser 2>/dev/null || true)" != "argo-browser.desktop" ]]; then
+  echo "failed to set default web browser to argo-browser" >&2
   exit 1
 fi
 
-x11vnc -display :1 -forever -shared -viewonly -nopw -listen 127.0.0.1 -rfbport 5900 -xkb -ncache 0 >/tmp/rakazo/x11vnc.log 2>&1 &
+x11vnc -display :1 -forever -shared -viewonly -nopw -listen 127.0.0.1 -rfbport 5900 -xkb -ncache 0 >/tmp/argo/x11vnc.log 2>&1 &
 
 NOVNC_ROOT=/usr/share/novnc
 if [[ ! -d "$NOVNC_ROOT" ]]; then
@@ -136,7 +136,7 @@ if [[ ! -f "$NOVNC_ROOT/mobile-keyboard.js" ]]; then
   exit 1
 fi
 # The screen proxy reaches this isolated container through its bridge interface.
-websockify --heartbeat=30 --web="$NOVNC_ROOT" --token-plugin=TokenFile --token-source=/tmp/rakazo/view-target-1 0.0.0.0:6080 >/tmp/rakazo/novnc.log 2>&1 &
+websockify --heartbeat=30 --web="$NOVNC_ROOT" --token-plugin=TokenFile --token-source=/tmp/argo/view-target-1 0.0.0.0:6080 >/tmp/argo/novnc.log 2>&1 &
 
 wait "$XVFB_PID"
 echo "Xvfb exited" >&2

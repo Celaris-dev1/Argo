@@ -33,7 +33,7 @@ vi.mock("./side-insets", () => ({ useSideInsets: () => ({}) }));
 vi.mock("./api", () => ({
   currentApiBase: () => "https://app.example.test",
   captureApiRequestContext: async (spaceId = "space-fixture") => ({
-    headers: { "x-rakazo-space-id": spaceId },
+    headers: { "x-argo-space-id": spaceId },
   }),
   selectedSpaceId: () => "space-fixture",
   rpc: async (
@@ -330,7 +330,7 @@ it("hands a connected model back to the slot that asked for it", async () => {
 });
 
 describe("a Space's model override", () => {
-  const otherSpace = { headers: { "x-rakazo-space-id": "space-other" } };
+  const otherSpace = { headers: { "x-argo-space-id": "space-other" } };
 
   it("edits that Space's lists in that Space and leaves connections to the account", async () => {
     params.spaceId = "space-other";
@@ -376,11 +376,11 @@ it("keeps setup help and API key collapsible for generic compatible servers", as
   const row = (name: string) =>
     [...container.querySelectorAll("button")].find((button) => button.textContent === name)!;
   expect(field("API key")).toBeNull();
-  expect(container.textContent).not.toContain("Rakazo adds /v1");
+  expect(container.textContent).not.toContain("Argo adds /v1");
   await act(async () => row("Setup help").click());
-  expect(container.textContent).toContain("Rakazo adds /v1");
+  expect(container.textContent).toContain("Argo adds /v1");
   await act(async () => row("Setup help").click());
-  expect(container.textContent).not.toContain("Rakazo adds /v1");
+  expect(container.textContent).not.toContain("Argo adds /v1");
   await act(async () => row("API key").click());
   expect(field("API key")).not.toBeNull();
   await act(async () => row("API key").click());

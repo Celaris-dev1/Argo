@@ -1,6 +1,6 @@
-import type { ToolBatch } from "@rakazo/adapter-kit";
-import type { MessageBlock } from "@rakazo/contracts";
-import { BOT_INSTRUCTIONS_MAX_LENGTH } from "@rakazo/contracts";
+import type { ToolBatch } from "@argo/adapter-kit";
+import type { MessageBlock } from "@argo/contracts";
+import { BOT_INSTRUCTIONS_MAX_LENGTH } from "@argo/contracts";
 import {
   batchActions,
   CARD_TITLE_ESCAPED_CHARACTERS,
@@ -9,8 +9,8 @@ import {
   redactSecrets,
   sanitizeMessagingLabel,
   toolRequiresExplicitApproval,
-} from "@rakazo/core";
-import { urlSite } from "@rakazo/core/egress";
+} from "@argo/core";
+import { urlSite } from "@argo/core/egress";
 import { USER_COMPUTER_SCREEN_TOOLS, userComputerAppName } from "./run-tools-user-computer.js";
 
 export const MAX_APPROVAL_SUMMARY_LENGTH = 500;

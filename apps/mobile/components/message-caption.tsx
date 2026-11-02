@@ -1,5 +1,5 @@
-import { ChatMarkdown, LinkifiedText } from "@rakazo/chat-ui/native";
-import type { ColorTokens, ResolvedAppearance } from "@rakazo/ui-tokens";
+import { ChatMarkdown, LinkifiedText } from "@argo/chat-ui/native";
+import type { ColorTokens, ResolvedAppearance } from "@argo/ui-tokens";
 import { useContext } from "react";
 import type { MobileMessage } from "../lib/api";
 import { MessageMentionsContext } from "../lib/message-mentions";

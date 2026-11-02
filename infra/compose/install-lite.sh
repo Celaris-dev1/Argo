@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rakazo lite installer for an 8 GB Linux machine.
+# Argo lite installer for an 8 GB Linux machine.
 # Builds the app and computer images from this checkout, writes .env with fresh secrets,
 # and starts the stack with docker-compose.lite.yml.
 #
@@ -57,13 +57,13 @@ if ! grep -q '^SANDBOX_COMPUTER_EGRESS=' "$ENV_FILE"; then
   fi
 fi
 if [ -n "$LOCAL_AI" ]; then
-  sed -i "s|^RAKAZO_LOCAL_MODELS=.*|RAKAZO_LOCAL_MODELS=$LOCAL_MODEL|" "$ENV_FILE"
+  sed -i "s|^ARGO_LOCAL_MODELS=.*|ARGO_LOCAL_MODELS=$LOCAL_MODEL|" "$ENV_FILE"
 fi
 
 echo "Building the computer image (bot desktop, browser, OpenCode)…"
-docker build -t rakazo/computer:local "$ROOT/infra/sandboxes/computer"
+docker build -t argo/computer:local "$ROOT/infra/sandboxes/computer"
 echo "Building the app image (this is the slow, memory-hungry step)…"
-DOCKER_BUILDKIT=1 docker build -t rakazo/app:local -f "$COMPOSE_DIR/Dockerfile" "$ROOT"
+DOCKER_BUILDKIT=1 docker build -t argo/app:local -f "$COMPOSE_DIR/Dockerfile" "$ROOT"
 
 cd "$COMPOSE_DIR"
 profile=()
@@ -77,5 +77,5 @@ if [ -n "$LOCAL_AI" ]; then
 fi
 
 echo
-echo "Rakazo lite is starting at http://127.0.0.1:5173"
+echo "Argo lite is starting at http://127.0.0.1:5173"
 echo "Add models in Settings > Models: pick a preset or paste any OpenAI-compatible URL."

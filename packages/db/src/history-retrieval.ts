@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
-import type { HistoryReadInput, HistorySearchInput } from "@rakazo/contracts";
-import { HistoryQueriesSchema } from "@rakazo/contracts";
-import { shortenedTextLength, textBoundary } from "@rakazo/core";
+import type { HistoryReadInput, HistorySearchInput } from "@argo/contracts";
+import { HistoryQueriesSchema } from "@argo/contracts";
+import { shortenedTextLength, textBoundary } from "@argo/core";
 import type { PrismaClient } from "./client.js";
 import { Prisma } from "./client.js";
 import { searchTerms } from "./content-crypto.js";

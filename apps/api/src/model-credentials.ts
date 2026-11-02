@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import type { CodexLiveCatalog } from "@rakazo/adapters";
+import type { CodexLiveCatalog } from "@argo/adapters";
 import {
   buildModelConnectPlaintext,
   codexLiveListsModel,
@@ -12,15 +12,15 @@ import {
   validateModelAuthAvailability,
   verifyCatalogProviderApiKey,
   verifyOpenAiCompatibleApiKey,
-} from "@rakazo/adapters";
-import type { Actor, ModelConnectInput, SettingsScope, ThinkingLevel } from "@rakazo/contracts";
+} from "@argo/adapters";
+import type { Actor, ModelConnectInput, SettingsScope, ThinkingLevel } from "@argo/contracts";
 import {
   canonicalPiProviderId,
   OPENAI_COMPATIBLE_PROVIDER_ID,
   storedPiProviderIds,
   usableModelId,
-} from "@rakazo/contracts";
-import { clampCatalogThinkingLevel } from "@rakazo/core";
+} from "@argo/contracts";
+import { clampCatalogThinkingLevel } from "@argo/core";
 import {
   deleteUnreferencedCredentialSecret,
   findNewestUserModelCredential,
@@ -30,7 +30,7 @@ import {
   Prisma,
   saveModelPreference,
   writeModelRole,
-} from "@rakazo/db";
+} from "@argo/db";
 import { mayUsePrivateEndpoint } from "./mcp-servers.js";
 import { assertNoDanglingModelPins } from "./model-pins.js";
 import type { RouterDeps } from "./router.js";

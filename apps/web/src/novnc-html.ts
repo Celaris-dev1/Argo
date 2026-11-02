@@ -65,7 +65,7 @@ export function rewrittenNovncHeaders(headers: IncomingHttpHeaders): IncomingHtt
  * screen's state to the app. Extension content scripts run inside the sandboxed document too;
  * one reading storage throws a SecurityError that noVNC's global error handler would otherwise
  * show in place of the screen. The app cannot see into the frame, so the page posts "loading" as
- * soon as it runs and then follows noVNC's connection classes (which Rakazo's own embed page
+ * soon as it runs and then follows noVNC's connection classes (which Argo's own embed page
  * sets as well) and its status bar.
  */
 export function injectNovncStorageShim(html: string, { viewOnly = false } = {}) {
@@ -95,13 +95,13 @@ export function injectNovncStorageShim(html: string, { viewOnly = false } = {}) 
   // VideoDecoder.flush() never returns, so the page never starts. Screens never use H.264.
   try { delete window.VideoDecoder; } catch {}
   // The app cannot look into this sandboxed frame, so tell it how the screen is doing.
-  const report = (rakazoScreen, detail) => {
+  const report = (argoScreen, detail) => {
     try {
-      window.parent.postMessage(detail ? { rakazoScreen, detail } : { rakazoScreen }, "*");
+      window.parent.postMessage(detail ? { argoScreen, detail } : { argoScreen }, "*");
     } catch {}
     // The mobile app's WebView hears only the state word: no URL and none of the page's text.
     try {
-      window.ReactNativeWebView?.postMessage(JSON.stringify({ rakazoScreen }));
+      window.ReactNativeWebView?.postMessage(JSON.stringify({ argoScreen }));
     } catch {}
   };
   // A reconnected screen takes the keyboard back when the app asks; nothing else is accepted.
@@ -112,7 +112,7 @@ export function injectNovncStorageShim(html: string, { viewOnly = false } = {}) 
       !data ||
       typeof data !== "object" ||
       Object.keys(data).length !== 1 ||
-      data.rakazoScreenFocus !== true
+      data.argoScreenFocus !== true
     )
       return;
     const canvas = document.querySelector("#screen canvas, #noVNC_container canvas, canvas");
@@ -121,13 +121,13 @@ export function injectNovncStorageShim(html: string, { viewOnly = false } = {}) 
     } catch {}
   });
   let last = "";
-  // Pages that never set noVNC's classes (older Rakazo embed images) still build their viewer
+  // Pages that never set noVNC's classes (older Argo embed images) still build their viewer
   // canvas, which is as far as they can be followed.
   let classed = false;
   const sync = () => {
     const root = document.documentElement;
     const status = document.getElementById("noVNC_status");
-    const failure = root.getAttribute("data-rakazo-screen-error");
+    const failure = root.getAttribute("data-argo-screen-error");
     const statusError =
       status && status.classList.contains("noVNC_open") && status.classList.contains("noVNC_status_error");
     const connecting =
@@ -155,7 +155,7 @@ export function injectNovncStorageShim(html: string, { viewOnly = false } = {}) 
     sync();
     new MutationObserver(sync).observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "data-rakazo-screen-error"],
+      attributeFilter: ["class", "data-argo-screen-error"],
       childList: true,
       subtree: true,
     });

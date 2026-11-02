@@ -2,20 +2,20 @@
 
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
-import { Button } from "@rakazo/ui-web/components/ui/button";
-import { Input } from "@rakazo/ui-web/components/ui/input";
-import { Separator } from "@rakazo/ui-web/components/ui/separator";
+import { Button } from "@argo/ui-web/components/ui/button";
+import { Input } from "@argo/ui-web/components/ui/input";
+import { Separator } from "@argo/ui-web/components/ui/separator";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@rakazo/ui-web/components/ui/sheet";
-import { Skeleton } from "@rakazo/ui-web/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@rakazo/ui-web/components/ui/tooltip";
-import { useIsMobile } from "@rakazo/ui-web/hooks/use-mobile";
-import { cn } from "@rakazo/ui-web/lib/utils";
+} from "@argo/ui-web/components/ui/sheet";
+import { Skeleton } from "@argo/ui-web/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@argo/ui-web/components/ui/tooltip";
+import { useIsMobile } from "@argo/ui-web/hooks/use-mobile";
+import { cn } from "@argo/ui-web/lib/utils";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";

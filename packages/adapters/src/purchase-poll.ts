@@ -1,11 +1,11 @@
-import type { AdapterContext, PurchaseSnapshot, PurchaseStatus } from "@rakazo/adapter-kit";
+import type { AdapterContext, PurchaseSnapshot, PurchaseStatus } from "@argo/adapter-kit";
 import {
   PaymentWalletDisconnected,
   PaymentWalletRequestRejected,
   runContinueJob,
-} from "@rakazo/adapter-kit";
-import type { Purchase } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/adapter-kit";
+import type { Purchase } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import type { PurchaseDeps } from "./purchase-service.js";
 import {
   enqueuePurchasePoll,

@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { NavLink } from "@rakazo/contracts";
-import { ANDROID_APK_URL, IOS_APP_STORE_URL } from "@rakazo/contracts";
+import type { NavLink } from "@argo/contracts";
+import { ANDROID_APK_URL, IOS_APP_STORE_URL } from "@argo/contracts";
 import {
   AppMarkStack,
   Button,
@@ -8,7 +8,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@rakazo/ui-web";
+} from "@argo/ui-web";
 import {
   BookOpen,
   Download,

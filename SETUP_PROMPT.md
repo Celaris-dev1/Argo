@@ -1,4 +1,4 @@
-# Set up Rakazo with a coding agent
+# Set up Argo with a coding agent
 
 Copy one of the prompts below into a coding agent.
 
@@ -7,7 +7,7 @@ Copy one of the prompts below into a coding agent.
 Prefer this when the user wants a running web UI with Docker only (no Node/pnpm clone).
 
 ```text
-Set up Rakazo from published GHCR images and leave the web UI running.
+Set up Argo from published GHCR images and leave the web UI running.
 
 Work like a careful onboarding engineer: perform the setup yourself, explain only decisions or blockers, and verify the product through the UI.
 
@@ -20,10 +20,10 @@ Safety rules:
 
 Before making changes, ask me these concise questions:
 
-1. Which directory should contain the Rakazo folder (or use the current directory)?
+1. Which directory should contain the Argo folder (or use the current directory)?
 2. How should models be connected?
    - Add a deployment-wide `OPENROUTER_API_KEY` to `.env`.
-   - Connect during Rakazo onboarding with a provider API key or with ChatGPT Plus/Pro, GitHub Copilot, or SuperGrok / X Premium.
+   - Connect during Argo onboarding with a provider API key or with ChatGPT Plus/Pro, GitHub Copilot, or SuperGrok / X Premium.
    - Defer model setup and verify infrastructure only. Make clear that bots cannot answer until a model is connected.
 3. Do I want remote computers instead of local Docker? If yes, choose E2B (`E2B_API_KEY`), Daytona (`DAYTONA_API_KEY`), or Boat (`BOAT_API_KEY`) and set `SANDBOX_PROVIDER` accordingly. If no, keep the default `SANDBOX_PROVIDER=docker` (local computers via the in-stack supervisor).
 
@@ -41,12 +41,12 @@ Setup:
 1. Create the directory if needed and enter it.
 2. Download and inspect this installer (do not clone the repository):
    https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/install-images.sh
-   If that host is unreachable, use a mirror URL (e.g. set `RAKAZO_INSTALLER_URL` to
-   `https://example.com/mirror/rakazo/infra/compose/install-images.sh` and curl that instead).
+   If that host is unreachable, use a mirror URL (e.g. set `ARGO_INSTALLER_URL` to
+   `https://example.com/mirror/argo/infra/compose/install-images.sh` and curl that instead).
 3. Run `bash install-images.sh --prepare-only`. It downloads the Compose and environment example
    files, then creates `.env` with all required random secrets when one does not already exist.
-   Optional: set `RAKAZO_DOWNLOAD_BASE` to a generic mirror of `infra/compose`, and/or use
-   `--local` / `RAKAZO_DOWNLOAD_SKIP_EXISTING=1` when Compose files are already present locally.
+   Optional: set `ARGO_DOWNLOAD_BASE` to a generic mirror of `infra/compose`, and/or use
+   `--local` / `ARGO_DOWNLOAD_SKIP_EXISTING=1` when Compose files are already present locally.
    See docs/self-host.md (Restricted networks / mirror downloads).
 4. Preserve existing values. Keep `SANDBOX_PROVIDER=docker` unless I chose a remote computer
    provider, and add only the provider or model keys I selected.
@@ -70,7 +70,7 @@ When finished, report the directory path, effective Docker/Compose versions, con
 Use this for development, Docker sandboxes on the host, or Electron.
 
 ```text
-Set up Rakazo locally and leave it running in a usable state.
+Set up Argo locally and leave it running in a usable state.
 
 Repository: https://github.com/elie222/rakazo.git
 
@@ -86,10 +86,10 @@ Safety rules:
 
 Before making changes, ask me these concise questions:
 
-1. Should you clone into the current directory, or what parent directory should contain `rakazo`? If you are already inside a Rakazo checkout, offer to use it without recloning.
+1. Should you clone into the current directory, or what parent directory should contain `argo`? If you are already inside a Argo checkout, offer to use it without recloning.
 2. How should models be connected?
    - Add a deployment-wide `OPENROUTER_API_KEY` to `.env`.
-   - Connect during Rakazo onboarding with a provider API key or with ChatGPT Plus/Pro, GitHub Copilot, or SuperGrok / X Premium.
+   - Connect during Argo onboarding with a provider API key or with ChatGPT Plus/Pro, GitHub Copilot, or SuperGrok / X Premium.
    - Defer model setup and verify infrastructure only. Make clear that bots cannot answer until a model is connected.
 3. Do I want a managed app catalog? If yes, choose Composio (`COMPOSIO_API_KEY`) or Pipedream Connect (`PIPEDREAM_CLIENT_ID`, `PIPEDREAM_CLIENT_SECRET`, and `PIPEDREAM_PROJECT_ID`); otherwise leave them empty. Explain that this is optional and that users can still add Treg, HTTPS MCP, or OpenAPI sources in the app.
 4. Set up the web app only (recommended), or also launch the Electron desktop shell after the web stack works?
@@ -103,13 +103,13 @@ Preflight:
 - Use a Node.js version supported by `engines.node` and the pnpm version declared in `packageManager` in the root `package.json`. Prefer Corepack; if unavailable, use `npx --yes pnpm@<declared-version>` instead of globally installing a different version. Use that same executable for every later `pnpm` command, including verification and restart commands. Show the effective versions.
 - Verify the Docker daemon is running.
 - Check whether `127.0.0.1` ports 5433 (only if using the optional postgres-host overlay), 3100, 5173, and 7091 are available. Resolve conflicts without touching unrelated workloads.
-- Ensure `.env` sets non-empty `POSTGRES_PASSWORD` (owner, migrations) and `POSTGRES_APP_PASSWORD` (the app's `rakazo_app` login). When using the optional postgres-host overlay (or any host-side database URL), `DATABASE_MIGRATION_URL` must use `POSTGRES_PASSWORD` and `DATABASE_URL` must use `rakazo_app` with `POSTGRES_APP_PASSWORD`.
+- Ensure `.env` sets non-empty `POSTGRES_PASSWORD` (owner, migrations) and `POSTGRES_APP_PASSWORD` (the app's `argo_app` login). When using the optional postgres-host overlay (or any host-side database URL), `DATABASE_MIGRATION_URL` must use `POSTGRES_PASSWORD` and `DATABASE_URL` must use `argo_app` with `POSTGRES_APP_PASSWORD`.
 
 Setup:
 
 1. Clone the repository if needed and enter its root.
 2. Read `AGENTS.md`, `README.md`, `.env.example`, and the root `package.json` before acting. Follow repository instructions if they have changed since this prompt was written.
-3. If `.env` does not exist, copy `.env.example` to `.env`. In a new file, generate `POSTGRES_PASSWORD` and `POSTGRES_APP_PASSWORD` independently with `openssl rand -hex 16`, and put them into host-side `DATABASE_MIGRATION_URL` and `DATABASE_URL` respectively (replace the placeholder passwords). For an existing file without `POSTGRES_APP_PASSWORD`, generate it and point host-side `DATABASE_URL` at `rakazo_app` with it, and `DATABASE_MIGRATION_URL` at the owner; `pnpm db:migrate` creates that login. Also generate `BETTER_AUTH_SECRET`, `ENCRYPTION_KEY`, `SCREEN_PROXY_SECRET`, and `SANDBOX_SUPERVISOR_TOKEN` independently with `openssl rand -hex 32` (64 hex characters each). For an existing file, check those keys without printing values and generate only absent non-Postgres secrets. For `POSTGRES_PASSWORD` and host-side `DATABASE_MIGRATION_URL` (when present / when the postgres-host overlay will be used), compare the password parts without printing them and require one confirmed shared password written to both settings. First check whether the Compose `pgdata` volume already exists (for example `docker volume ls` for the project postgres volume). If `pgdata` is absent, generate one URI-safe password with `openssl rand -hex 16` and write it to both `POSTGRES_PASSWORD` and host-side `DATABASE_MIGRATION_URL`. If `pgdata` exists and either credential is missing or they disagree, ask which password that volume already uses and set both to that first-init value. Do not generate a new `POSTGRES_PASSWORD` when `pgdata` already exists unless I explicitly confirm in-place `ALTER ROLE` or a disposable `pgdata` recreate (backup first; `docker compose down -v` deletes all Postgres state); otherwise preserve the working credentials so `pnpm db:migrate` keeps authenticating. Preserve other existing values; if a required non-Postgres value is empty, ask before replacing it. Keep local defaults for Postgres user/db, origins, Pi, Docker, and Graphile unless the preflight found a conflict. Add only the model and managed-connector credentials I selected. Leave optional credentials blank.
+3. If `.env` does not exist, copy `.env.example` to `.env`. In a new file, generate `POSTGRES_PASSWORD` and `POSTGRES_APP_PASSWORD` independently with `openssl rand -hex 16`, and put them into host-side `DATABASE_MIGRATION_URL` and `DATABASE_URL` respectively (replace the placeholder passwords). For an existing file without `POSTGRES_APP_PASSWORD`, generate it and point host-side `DATABASE_URL` at `argo_app` with it, and `DATABASE_MIGRATION_URL` at the owner; `pnpm db:migrate` creates that login. Also generate `BETTER_AUTH_SECRET`, `ENCRYPTION_KEY`, `SCREEN_PROXY_SECRET`, and `SANDBOX_SUPERVISOR_TOKEN` independently with `openssl rand -hex 32` (64 hex characters each). For an existing file, check those keys without printing values and generate only absent non-Postgres secrets. For `POSTGRES_PASSWORD` and host-side `DATABASE_MIGRATION_URL` (when present / when the postgres-host overlay will be used), compare the password parts without printing them and require one confirmed shared password written to both settings. First check whether the Compose `pgdata` volume already exists (for example `docker volume ls` for the project postgres volume). If `pgdata` is absent, generate one URI-safe password with `openssl rand -hex 16` and write it to both `POSTGRES_PASSWORD` and host-side `DATABASE_MIGRATION_URL`. If `pgdata` exists and either credential is missing or they disagree, ask which password that volume already uses and set both to that first-init value. Do not generate a new `POSTGRES_PASSWORD` when `pgdata` already exists unless I explicitly confirm in-place `ALTER ROLE` or a disposable `pgdata` recreate (backup first; `docker compose down -v` deletes all Postgres state); otherwise preserve the working credentials so `pnpm db:migrate` keeps authenticating. Preserve other existing values; if a required non-Postgres value is empty, ask before replacing it. Keep local defaults for Postgres user/db, origins, Pi, Docker, and Graphile unless the preflight found a conflict. Add only the model and managed-connector credentials I selected. Leave optional credentials blank.
 4. Confirm `.env` is ignored and that no secret-bearing file is staged.
 5. Start only local Postgres with the base Compose file (Postgres stays network-internal; no host publish):
 
@@ -140,7 +140,7 @@ Verification:
 - Open the Agent computer pane and confirm the Docker computer reaches `running` and renders its desktop.
 - Open Integrations. If neither managed catalog was configured, confirm the view still offers Treg, HTTPS MCP, and OpenAPI sources. If one was configured, verify its app catalog loads without exposing any key or client secret.
 - Run `pnpm test` and `pnpm check`. Report failures with the relevant output; do not claim success if either fails.
-- If I requested Electron, leave the web stack running and then launch `pnpm --filter @rakazo/desktop dev`. Verify the shell loads the same app. Let me make the Docker-versus-This-Mac choice because This Mac grants bots access under my OS account.
+- If I requested Electron, leave the web stack running and then launch `pnpm --filter @argo/desktop dev`. Verify the shell loads the same app. Let me make the Docker-versus-This-Mac choice because This Mac grants bots access under my OS account.
 
 When finished, report:
 

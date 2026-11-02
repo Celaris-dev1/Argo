@@ -1,4 +1,4 @@
-import { isBackgroundRunTrigger, redactSecrets } from "@rakazo/core";
+import { isBackgroundRunTrigger, redactSecrets } from "@argo/core";
 import type { RunContext } from "./run-context.js";
 import { publishMessage } from "./run-messages.js";
 import { clampUserProgressMessage } from "./user-progress.js";

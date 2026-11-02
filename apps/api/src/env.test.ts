@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadEnv } from "./env.js";
 
 const base = {
-  DATABASE_URL: "postgres://rakazo:rakazo@127.0.0.1:5433/rakazo",
+  DATABASE_URL: "postgres://argo:argo@127.0.0.1:5433/argo",
   NODE_ENV: "test",
 };
 
@@ -65,12 +65,12 @@ describe("loadEnv", () => {
     expect(
       loadEnv({
         ...base,
-        RAKAZO_NAV_LINKS: '[{"id":"clients","label":"Clients","path":"/ext/clients/"}]',
+        ARGO_NAV_LINKS: '[{"id":"clients","label":"Clients","path":"/ext/clients/"}]',
       }).navLinks,
     ).toEqual([{ id: "clients", label: "Clients", path: "/ext/clients/", trusted: false }]);
     expect(() =>
-      loadEnv({ ...base, RAKAZO_NAV_LINKS: '[{"id":"x","label":"X","path":"/api/me"}]' }),
-    ).toThrow("RAKAZO_NAV_LINKS");
+      loadEnv({ ...base, ARGO_NAV_LINKS: '[{"id":"x","label":"X","path":"/api/me"}]' }),
+    ).toThrow("ARGO_NAV_LINKS");
   });
   it("keeps Crisp chat off unless a valid website ID is set", () => {
     expect(loadEnv(base).crispWebsiteId).toBeNull();
@@ -278,16 +278,16 @@ describe("loadEnv", () => {
   it("exposes a deployed git revision when GIT_SHA is set", () => {
     expect(loadEnv(base).gitSha).toBeUndefined();
     expect(loadEnv({ ...base, GIT_SHA: "  3c6e209  " }).gitSha).toBe("3c6e209");
-    expect(loadEnv({ ...base, RAKAZO_GIT_SHA: "abc1234" }).gitSha).toBe("abc1234");
+    expect(loadEnv({ ...base, ARGO_GIT_SHA: "abc1234" }).gitSha).toBe("abc1234");
   });
 
   it("loads per-client minimum builds and refuses a malformed one", () => {
     expect(loadEnv(base).minimumClientBuilds).toEqual({});
     expect(
-      loadEnv({ ...base, RAKAZO_MIN_CLIENT_BUILD: "web=20261022093015" }).minimumClientBuilds,
+      loadEnv({ ...base, ARGO_MIN_CLIENT_BUILD: "web=20261022093015" }).minimumClientBuilds,
     ).toEqual({ web: "20261022093015" });
-    expect(() => loadEnv({ ...base, RAKAZO_MIN_CLIENT_BUILD: "latest" })).toThrow(
-      /RAKAZO_MIN_CLIENT_BUILD/,
+    expect(() => loadEnv({ ...base, ARGO_MIN_CLIENT_BUILD: "latest" })).toThrow(
+      /ARGO_MIN_CLIENT_BUILD/,
     );
   });
 
@@ -303,12 +303,12 @@ describe("loadEnv", () => {
       loadEnv({
         ...base,
         SMTP_URL: " smtps://user:secret@smtp.example.test:465 ",
-        EMAIL_FROM: " Rakazo <no-reply@example.test> ",
+        EMAIL_FROM: " Argo <no-reply@example.test> ",
         EMAIL_EMULATOR: "true",
       }),
     ).toMatchObject({
       smtpUrl: "smtps://user:secret@smtp.example.test:465",
-      emailFrom: "Rakazo <no-reply@example.test>",
+      emailFrom: "Argo <no-reply@example.test>",
       emailEmulator: true,
     });
     expect(

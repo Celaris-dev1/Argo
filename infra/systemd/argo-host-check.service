@@ -1,0 +1,13 @@
+[Unit]
+Description=Check host storage, backup health and SSH access rules
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/argo/backup.env
+ExecStart=/usr/local/sbin/argo-host-check
+StateDirectory=argo/alerts
+StateDirectoryMode=0700
+ProtectSystem=strict
+ReadWritePaths=/var/lib/argo/alerts
+ProtectHome=true
+PrivateTmp=true

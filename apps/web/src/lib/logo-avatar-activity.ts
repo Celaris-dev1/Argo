@@ -1,6 +1,6 @@
-import type { ProductEvent } from "@rakazo/contracts";
-import type { LogoAvatarActivitySnapshot } from "@rakazo/core";
-import { createLogoAvatarActivityStore } from "@rakazo/core";
+import type { ProductEvent } from "@argo/contracts";
+import type { LogoAvatarActivitySnapshot } from "@argo/core";
+import { createLogoAvatarActivityStore } from "@argo/core";
 
 /** Client-owned projection; clear when the authenticated identity changes. */
 const projection = createLogoAvatarActivityStore();

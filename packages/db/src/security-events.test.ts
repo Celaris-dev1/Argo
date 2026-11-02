@@ -1,5 +1,5 @@
-import { SECURITY_EVENT_TYPES } from "@rakazo/contracts";
-import { createLogger, createTestSink, installLogger, runWithLogContext } from "@rakazo/logging";
+import { SECURITY_EVENT_TYPES } from "@argo/contracts";
+import { createLogger, createTestSink, installLogger, runWithLogContext } from "@argo/logging";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createSecurityEventPruner,
@@ -56,7 +56,7 @@ let store: ReturnType<typeof fakeStore>;
 
 beforeEach(() => {
   sink = createTestSink();
-  installLogger(createLogger({ service: "rakazo-api", sinks: [sink], level: "debug" }));
+  installLogger(createLogger({ service: "argo-api", sinks: [sink], level: "debug" }));
   store = fakeStore();
   installSecurityEventStore(store as never);
 });

@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("rakazoDesktop", {
+contextBridge.exposeInMainWorld("argoDesktop", {
   platform: process.platform,
   nativeWindowFrame: process.platform === "win32",
   badge: {

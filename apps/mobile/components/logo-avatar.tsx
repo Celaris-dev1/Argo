@@ -1,4 +1,4 @@
-import type { AvatarMotionMode, AvatarPoke, LogoAvatarActivity } from "@rakazo/core";
+import type { AvatarMotionMode, AvatarPoke, LogoAvatarActivity } from "@argo/core";
 import {
   avatarPokeFrame,
   contrastRatio,
@@ -9,8 +9,8 @@ import {
   logoAvatarFrame,
   logoAvatarPaint,
   logoAvatarTraits,
-} from "@rakazo/core";
-import { botEyeColor } from "@rakazo/ui-tokens";
+} from "@argo/core";
+import { botEyeColor } from "@argo/ui-tokens";
 import type { ReactNode } from "react";
 import { useEffect, useId, useMemo } from "react";
 import { Pressable } from "react-native";

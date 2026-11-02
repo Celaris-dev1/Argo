@@ -1,9 +1,9 @@
 # Headless bot computer for the ultra-lean profile (1 vCPU / 2 GB boxes).
 # Shell, files, git, gh, uv, OpenCode (Coding mode) and Lightpanda as the page browser.
 # No X server, VNC, window manager or Chromium: screen tools and takeover are off
-# (set RAKAZO_COMPUTER_HEADLESS=1 on api and worker so bots are not offered them).
+# (set ARGO_COMPUTER_HEADLESS=1 on api and worker so bots are not offered them).
 #
-#   docker build -f infra/sandboxes/computer/Dockerfile.headless -t rakazo/computer:headless infra/sandboxes/computer
+#   docker build -f infra/sandboxes/computer/Dockerfile.headless -t argo/computer:headless infra/sandboxes/computer
 FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
 ARG WITH_PANDOC=0
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils \
     $([ "$WITH_PANDOC" = 1 ] && echo pandoc) \
   && rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* \
-  && groupadd --gid 1000 rakazo \
-  && useradd --uid 1000 --gid rakazo --create-home --shell /bin/bash rakazo
+  && groupadd --gid 1000 argo \
+  && useradd --uid 1000 --gid argo --create-home --shell /bin/bash argo
 RUN ln -s "$(dpkg -L libnss-wrapper | grep '/libnss_wrapper.so$')" /usr/local/lib/libnss_wrapper.so
 ARG TARGETARCH
 ARG UV_VERSION=0.12.19
@@ -83,25 +83,25 @@ RUN set -eux; \
   chmod 755 /usr/local/bin/lightpanda
 # DISPLAY only picks the CDP port (9221 + display), there is no X server.
 ENV DISPLAY=:1
-ENV HOME=/home/rakazo
+ENV HOME=/home/argo
 ENV LANG=C.UTF-8
-ENV RAKAZO_COMPUTER_HEADLESS=1
-ENV UV_TOOL_DIR=/home/rakazo/.local/share/uv/tools \
-    UV_TOOL_BIN_DIR=/home/rakazo/.local/bin \
-    UV_PYTHON_INSTALL_DIR=/home/rakazo/.local/share/uv/python
-WORKDIR /home/rakazo
-COPY --chmod=755 start.sh /usr/local/bin/rakazo-computer
-COPY --chmod=644 user-env.sh /usr/local/lib/rakazo-user-env.sh
-COPY --chmod=755 rakazo-lightpanda /usr/local/bin/rakazo-lightpanda
-COPY --chmod=755 rakazo-page-browser /usr/local/bin/rakazo-page-browser
-COPY --chmod=644 rakazo-local-bin.sh /etc/profile.d/rakazo-local-bin.sh
+ENV ARGO_COMPUTER_HEADLESS=1
+ENV UV_TOOL_DIR=/home/argo/.local/share/uv/tools \
+    UV_TOOL_BIN_DIR=/home/argo/.local/bin \
+    UV_PYTHON_INSTALL_DIR=/home/argo/.local/share/uv/python
+WORKDIR /home/argo
+COPY --chmod=755 start.sh /usr/local/bin/argo-computer
+COPY --chmod=644 user-env.sh /usr/local/lib/argo-user-env.sh
+COPY --chmod=755 argo-lightpanda /usr/local/bin/argo-lightpanda
+COPY --chmod=755 argo-page-browser /usr/local/bin/argo-page-browser
+COPY --chmod=644 argo-local-bin.sh /etc/profile.d/argo-local-bin.sh
 # Anything that asks for "the browser" gets Lightpanda.
-RUN ln -s /usr/local/bin/rakazo-lightpanda /usr/local/bin/rakazo-browser \
-  && sed -i 's/\r$//' /usr/local/bin/rakazo-computer /usr/local/lib/rakazo-user-env.sh /usr/local/bin/rakazo-lightpanda /usr/local/bin/rakazo-page-browser /etc/profile.d/rakazo-local-bin.sh \
+RUN ln -s /usr/local/bin/argo-lightpanda /usr/local/bin/argo-browser \
+  && sed -i 's/\r$//' /usr/local/bin/argo-computer /usr/local/lib/argo-user-env.sh /usr/local/bin/argo-lightpanda /usr/local/bin/argo-page-browser /etc/profile.d/argo-local-bin.sh \
   && ln -s /usr/bin/python3 /usr/local/bin/python
-LABEL rakazo.computer.headless="1"
+LABEL argo.exampleputer.headless="1"
 ENV LD_PRELOAD=/usr/local/lib/libnss_wrapper.so \
-    NSS_WRAPPER_PASSWD=/tmp/rakazo-nss/passwd \
-    NSS_WRAPPER_GROUP=/tmp/rakazo-nss/group
+    NSS_WRAPPER_PASSWD=/tmp/argo-nss/passwd \
+    NSS_WRAPPER_GROUP=/tmp/argo-nss/group
 USER 1000:1000
-CMD ["/usr/bin/env", "-u", "LD_PRELOAD", "/usr/local/bin/rakazo-computer"]
+CMD ["/usr/bin/env", "-u", "LD_PRELOAD", "/usr/local/bin/argo-computer"]

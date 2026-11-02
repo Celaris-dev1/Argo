@@ -1,4 +1,4 @@
-# Lite profile: the full Rakazo stack (bots, Team/Private computers, browser, terminal, coding
+# Lite profile: the full Argo stack (bots, Team/Private computers, browser, terminal, coding
 # mode, integrations) tuned to fit an 8 GB Linux machine. Layer it on the published-images file:
 #
 #   docker compose --env-file .env -f docker-compose.images.yml -f docker-compose.lite.yml up -d
@@ -8,7 +8,7 @@
 #
 # Memory ceilings (approx.):  postgres 384m · supervisor 192m · api 640m · worker 768m · web 256m
 # + one bot computer 1.5g  ≈ 3.7 GB, leaving room for the OS and an optional 1–2B local model.
-# Each extra live computer costs RAKAZO_COMPUTER_MEMORY more.
+# Each extra live computer costs ARGO_COMPUTER_MEMORY more.
 
 services:
   postgres:
@@ -42,56 +42,56 @@ services:
 
   computer:
     # Built locally by install-lite.sh so your Dockerfile changes (OpenCode, Lightpanda,
-    # rakazo-captcha) are actually in the image.
-    image: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-local}
+    # argo-captcha) are actually in the image.
+    image: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-local}
     pull_policy: never
 
   supervisor:
-    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    image: ${ARGO_IMAGE:-argo/app}:${ARGO_IMAGE_TAG:-local}
     pull_policy: never
     mem_limit: 192m
     environment:
       NODE_OPTIONS: --max-old-space-size=128
-      RAKAZO_COMPUTER_IMAGE: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-local}
-      RAKAZO_COMPUTER_MEMORY: ${RAKAZO_COMPUTER_MEMORY:-1536m}
-      RAKAZO_COMPUTER_CPUS: ${RAKAZO_COMPUTER_CPUS:-1.5}
-      RAKAZO_COMPUTER_PIDS_LIMIT: ${RAKAZO_COMPUTER_PIDS_LIMIT:-1024}
+      ARGO_COMPUTER_IMAGE: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-local}
+      ARGO_COMPUTER_MEMORY: ${ARGO_COMPUTER_MEMORY:-1536m}
+      ARGO_COMPUTER_CPUS: ${ARGO_COMPUTER_CPUS:-1.5}
+      ARGO_COMPUTER_PIDS_LIMIT: ${ARGO_COMPUTER_PIDS_LIMIT:-1024}
       # Refuse to start or wake a computer when the host has less free memory than this.
-      RAKAZO_MIN_FREE_MEMORY_MB: ${RAKAZO_MIN_FREE_MEMORY_MB:-900}
+      ARGO_MIN_FREE_MEMORY_MB: ${ARGO_MIN_FREE_MEMORY_MB:-900}
 
   migrate:
-    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    image: ${ARGO_IMAGE:-argo/app}:${ARGO_IMAGE_TAG:-local}
     pull_policy: never
     mem_limit: 768m
     environment:
       NODE_OPTIONS: --max-old-space-size=512
 
   api:
-    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    image: ${ARGO_IMAGE:-argo/app}:${ARGO_IMAGE_TAG:-local}
     pull_policy: never
     mem_limit: 640m
     environment:
       NODE_OPTIONS: --max-old-space-size=448
       UV_THREADPOOL_SIZE: "2"
-      RAKAZO_SMALL_MODELS: ${RAKAZO_SMALL_MODELS:-}
-      RAKAZO_SMALL_MODEL_TOOLS: ${RAKAZO_SMALL_MODEL_TOOLS:-}
+      ARGO_SMALL_MODELS: ${ARGO_SMALL_MODELS:-}
+      ARGO_SMALL_MODEL_TOOLS: ${ARGO_SMALL_MODEL_TOOLS:-}
 
   worker:
-    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    image: ${ARGO_IMAGE:-argo/app}:${ARGO_IMAGE_TAG:-local}
     pull_policy: never
     mem_limit: 768m
     environment:
       NODE_OPTIONS: --max-old-space-size=576
       UV_THREADPOOL_SIZE: "2"
       GRAPHILE_WORKER_CONCURRENCY: ${GRAPHILE_WORKER_CONCURRENCY:-3}
-      RAKAZO_SMALL_MODELS: ${RAKAZO_SMALL_MODELS:-}
-      RAKAZO_SMALL_MODEL_TOOLS: ${RAKAZO_SMALL_MODEL_TOOLS:-}
-      RAKAZO_SKILL_LEARNING: ${RAKAZO_SKILL_LEARNING:-on}
-      RAKAZO_SKILL_LEARNING_MIN_TOOLS: ${RAKAZO_SKILL_LEARNING_MIN_TOOLS:-3}
-      RAKAZO_CODING_STALL_MINUTES: ${RAKAZO_CODING_STALL_MINUTES:-10,20,40}
+      ARGO_SMALL_MODELS: ${ARGO_SMALL_MODELS:-}
+      ARGO_SMALL_MODEL_TOOLS: ${ARGO_SMALL_MODEL_TOOLS:-}
+      ARGO_SKILL_LEARNING: ${ARGO_SKILL_LEARNING:-on}
+      ARGO_SKILL_LEARNING_MIN_TOOLS: ${ARGO_SKILL_LEARNING_MIN_TOOLS:-3}
+      ARGO_CODING_STALL_MINUTES: ${ARGO_CODING_STALL_MINUTES:-10,20,40}
 
   web:
-    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    image: ${ARGO_IMAGE:-argo/app}:${ARGO_IMAGE_TAG:-local}
     pull_policy: never
     mem_limit: 256m
     environment:
@@ -113,7 +113,7 @@ services:
       OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-10m}
       OLLAMA_FLASH_ATTENTION: "1"
       OLLAMA_KV_CACHE_TYPE: q8_0
-      OLLAMA_CONTEXT_LENGTH: ${RAKAZO_LOCAL_CONTEXT_WINDOW:-16384}
+      OLLAMA_CONTEXT_LENGTH: ${ARGO_LOCAL_CONTEXT_WINDOW:-16384}
     volumes:
       - ollama:/root/.ollama
     networks:

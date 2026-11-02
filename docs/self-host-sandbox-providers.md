@@ -29,18 +29,18 @@ Native file reads and workspace exports are limited to 8 MiB per file. A larger 
 - **Docker** is the quick-start default for published images and for a source checkout / full local
   Compose stack. Workspace bots share a persistent Team Computer by default; Private computers are
   optional. Keep the supervisor private, as the included Compose files do.
-- **E2B** runs bot computers away from the Rakazo host and is a good choice for public or multi-user
-  production deployments. Rakazo checkpoints the portable workspace and browser-profile directory to
+- **E2B** runs bot computers away from the Argo host and is a good choice for public or multi-user
+  production deployments. Argo checkpoints the portable workspace and browser-profile directory to
   `DATA_DIR`; the E2B disk is a runtime cache, not the durable source of truth.
 - **Daytona** provides the same remote-computer contract through Daytona sandboxes. Configure
   `DAYTONA_API_KEY` and optionally `DAYTONA_API_URL` / `DAYTONA_TARGET` / `DAYTONA_SNAPSHOT`.
 - **CreateOS** provides the same remote-computer contract through CreateOS desktop sandboxes.
   Configure `CREATEOS_SANDBOX_API_KEY` and optionally `CREATEOS_SANDBOX_BASE_URL`,
-  `CREATEOS_SANDBOX_SHAPE`, or `CREATEOS_SANDBOX_ROOTFS`. Rakazo defaults to
+  `CREATEOS_SANDBOX_SHAPE`, or `CREATEOS_SANDBOX_ROOTFS`. Argo defaults to
   `https://api.sb.createos.sh`, `s-2vcpu-2gb`, and `desktop:1`.
 - **Boat** provides a managed Linux desktop through `BOAT_API_KEY` and optionally
-  `BOAT_API_URL`. Rakazo always creates or resumes sandboxes with `noEnv: true`, keeps the portable
-  workspace under `/home/user/rakazo-home`, and refreshes a two-hour TTL. Boat uses the shared Linux
+  `BOAT_API_URL`. Argo always creates or resumes sandboxes with `noEnv: true`, keeps the portable
+  workspace under `/home/user/argo-home`, and refreshes a two-hour TTL. Boat uses the shared Linux
   desktop runtime and protected port routes for concurrent bot desktops. Each bot has its own
   persistent Chrome profile; logins are not shared between bots.
 - **Local computer access** in the app-managed Electron instance runs commands on Windows, macOS,
@@ -64,7 +64,7 @@ Native file reads and workspace exports are limited to 8 MiB per file. A larger 
 
 Compose starts a **sandbox supervisor** (from the app image) on the internal
 network (port `7091` in published-images). It creates sibling **computer**
-containers from `RAKAZO_COMPUTER_IMAGE` + `RAKAZO_COMPUTER_IMAGE_TAG`.
+containers from `ARGO_COMPUTER_IMAGE` + `ARGO_COMPUTER_IMAGE_TAG`.
 
 Requirements:
 
@@ -92,15 +92,15 @@ The published computer image uses Chromium. To use Brave instead, build the imag
 `BROWSER=brave` and point Compose at it:
 
 ```bash
-docker build --build-arg BROWSER=brave -t rakazo-computer-brave infra/sandboxes/computer
+docker build --build-arg BROWSER=brave -t argo-computer-brave infra/sandboxes/computer
 ```
 
 ```env
-RAKAZO_COMPUTER_IMAGE=rakazo-computer-brave
-RAKAZO_COMPUTER_IMAGE_TAG=latest
+ARGO_COMPUTER_IMAGE=argo-computer-brave
+ARGO_COMPUTER_IMAGE_TAG=latest
 ```
 
-The image holds one browser, and `rakazo-browser` launches whichever is installed. A locally built
+The image holds one browser, and `argo-browser` launches whichever is installed. A locally built
 image is not on a registry, so start the stack with `bash install-images.sh --pull-never` after
 pulling the other images once. Brave's Rewards, Wallet, Leo, VPN and News are disabled by managed
 policy. Browser identity is only one input to bot-check challenges; the host's IP reputation usually
@@ -114,7 +114,7 @@ The API and worker talk to the Kubernetes API with their own service account (or
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `KUBERNETES_SANDBOX_NAMESPACE` | `rakazo-sandboxes` | Namespace for computer pods; it must exist |
+| `KUBERNETES_SANDBOX_NAMESPACE` | `argo-sandboxes` | Namespace for computer pods; it must exist |
 | `KUBERNETES_SANDBOX_COMPUTER_IMAGE` | `ghcr.io/elie222/rakazo/computer:edge` | Pin a digest in production |
 | `KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME` | unset | For example `kata` or `gvisor` for a VM or user-space kernel boundary |
 | `KUBERNETES_SANDBOX_CPU_LIMIT` / `_MEMORY_LIMIT` | unset | Container limits, such as `2` and `4Gi` |
@@ -122,7 +122,7 @@ The API and worker talk to the Kubernetes API with their own service account (or
 | `KUBERNETES_SANDBOX_READY_TIMEOUT_MS` | `120000` | How long a new pod has to become ready |
 
 Each pod runs the image's own user (uid 1000) with no service account token and no service links,
-and is labelled `app.kubernetes.io/name=rakazo-computer` and `rakazo-bot-id=<bot id>`. Commands,
+and is labelled `app.kubernetes.io/name=argo-computer` and `argo-bot-id=<bot id>`. Commands,
 file transfers and workspace save and restore go through `pods/exec`; save and restore stream the
 home as one tar archive. Screens use the image's desktop gateway on the pod IP, so the API, the
 worker and the web screen proxy must be able to reach pods in that namespace on port `6080` and the
@@ -139,7 +139,7 @@ local Docker computer. The claim must be in the computer namespace, so in practi
 run in the API's namespace. Because a ReadWriteOnce volume is attached to one node,
 `KUBERNETES_SANDBOX_HOME_COLOCATE_NAMESPACE` and `KUBERNETES_SANDBOX_HOME_COLOCATE_LABELS` (a JSON
 object) are required with it and become a required pod affinity to the pods that hold the volume,
-for example `{"app":"rakazo-api"}`. The pod gets `fsGroup: 1000`. An existing pod without the home
+for example `{"app":"argo-api"}`. The pod gets `fsGroup: 1000`. An existing pod without the home
 volume keeps copying its files until it is stopped; its next fresh pod mounts the saved home. This applies only to the local home store; with
 `OBJECT_STORAGE_BUCKET` set, the home claim is ignored and homes are copied as usual.
 
@@ -149,8 +149,8 @@ The API and worker service account needs this in the computer namespace:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: rakazo-computers
-  namespace: rakazo-sandboxes
+  name: argo-computers
+  namespace: argo-sandboxes
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -167,7 +167,7 @@ private ranges, is recommended.
 ## `wuying`
 
 Bot computers run on one existing Wuying (无影) cloud computer. Each computer's home is a folder
-under the desktop user's profile (`%USERPROFILE%\rakazo\<home>`), and the desktop's own disk
+under the desktop user's profile (`%USERPROFILE%\argo\<home>`), and the desktop's own disk
 keeps it between stops, so nothing is copied in or out. Commands run in PowerShell; files,
 screenshots and input go through the desktop's MCP gateway. Stopping the computer powers the
 desktop off; deleting it removes only its home folder, never the desktop.
@@ -198,7 +198,7 @@ the same Windows desktop and account permissions, including files outside their 
 folders. Use it only in a trusted deployment.
 The gateway bounds each call to one minute, 16 KiB of command output and 1,000 folder entries.
 A command allowed longer than a minute runs detached with its output in files under
-`%USERPROFILE%\rakazo\.runs`, read back every second and removed when it ends or is cancelled.
+`%USERPROFILE%\argo\.runs`, read back every second and removed when it ends or is cancelled.
 
 ## `none`
 
@@ -216,7 +216,7 @@ Set `SANDBOX_PROVIDER` to exactly one of:
 | `boat` | `BOAT_API_KEY` | Optional `BOAT_API_URL` (see `.env.example`) |
 | `boxd` | `BOXD_API_KEY` | Optional `BOXD_ORG` to create computers in a boxd organization |
 | `createos` | `CREATEOS_SANDBOX_API_KEY` | Optional `CREATEOS_SANDBOX_BASE_URL`, `CREATEOS_SANDBOX_SHAPE`, `CREATEOS_SANDBOX_ROOTFS` |
-| `railway` | `RAILWAY_API_TOKEN` and `RAILWAY_ENVIRONMENT_ID` | Optional `RAILWAY_SANDBOX_REGION`; `RAILWAY_MAX_WORKSPACE_FILE_BYTES` (default 64 MiB) caps each workspace file Rakazo reads or saves. Railway supplies the environment ID when Rakazo runs there; see the [Railway template](../infra/railway/README.md) |
+| `railway` | `RAILWAY_API_TOKEN` and `RAILWAY_ENVIRONMENT_ID` | Optional `RAILWAY_SANDBOX_REGION`; `RAILWAY_MAX_WORKSPACE_FILE_BYTES` (default 64 MiB) caps each workspace file Argo reads or saves. Railway supplies the environment ID when Argo runs there; see the [Railway template](../infra/railway/README.md) |
 | `wuying` | `WUYING_*` (below) | One existing Wuying cloud computer (Windows) |
 
 Remote paths still need a working API/worker; they do not replace Postgres or
@@ -244,7 +244,7 @@ computer's owner and space. A run starts when the computer becomes ready (boot t
 counted) and ends when it stops. `endReason` says how: `stopped`, `idle`, `active_limit`,
 `replaced` (update, recovery, or reset), `gone` (the provider had already stopped or lost
 the sandbox), `deleted`, or `reconciled` (the end was never seen; the worker found the
-computer no longer running). For `gone` and `reconciled`, `endedAt` is when Rakazo
+computer no longer running). For `gone` and `reconciled`, `endedAt` is when Argo
 noticed, so the true end may be earlier. The worker also opens the run of a running
 computer whose start was not recorded. An open run whose computer still reads as running
 is a computer that may be left on. Deleting a user or space keeps their runs with
@@ -296,7 +296,7 @@ rechecks each selected PID's marker descriptors before signaling it.
 
 ### E2B computer template
 
-E2B computers start from the `rakazo-computer` template: E2B's stock desktop at
+E2B computers start from the `argo-computer` template: E2B's stock desktop at
 2 vCPU and 4 GB instead of its 8 vCPU and 8 GB. Build it once in the E2B team that
 owns `E2B_API_KEY`, and again whenever its definition in
 `packages/adapters/src/e2b-template.ts` changes:
@@ -317,7 +317,7 @@ Build the desktop template once in the account that owns that key:
 NOVITA_API_KEY=<deployment-key> pnpm sandbox:novita-template
 ```
 
-The `rakazo-computer` template uses Novita's desktop image at 2 vCPU and 4 GB.
+The `argo-computer` template uses Novita's desktop image at 2 vCPU and 4 GB.
 The provider requires this template and does not fall back to the larger stock desktop.
 To use another desktop template, set `SANDBOX_TEMPLATE` to the same name when building
 and on both services. Rebuild when the template definition changes; existing computers
@@ -344,7 +344,7 @@ or network error does not authorize replacing an existing computer.
 
 ### Boat computer snapshot
 
-Boat computers start from a named snapshot, `rakazo-computer-<hash>`, that already has the
+Boat computers start from a named snapshot, `argo-computer-<hash>`, that already has the
 desktop tools installed. The hash follows the setup in `packages/adapters/src/boat-sandbox.ts`,
 so changing it produces a new name and existing computers keep the one they started from.
 
@@ -361,7 +361,7 @@ BOAT_API_KEY=<deployment key> pnpm sandbox:boat-snapshot
 ### boxd computers
 
 boxd computers are isolated microVMs: no boxd credentials inside, and no route to the
-account's other machines. They start from a snapshot, `rakazo-computer-<hash>`, with the
+account's other machines. They start from a snapshot, `argo-computer-<hash>`, with the
 desktop tools and Chrome installed, built the same way as Boat's: once in the background
 when missing, from a fresh machine that is deleted afterwards. To build it ahead of the
 first computer:

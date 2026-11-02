@@ -1,6 +1,6 @@
-import type { Actor, Group, GroupMember, SpaceGroup } from "@rakazo/contracts";
-import { GROUP_MEMBER_MAX, GROUP_MEMBER_MIN, resolveBotAvatarSet } from "@rakazo/contracts";
-import { displayName } from "@rakazo/core";
+import type { Actor, Group, GroupMember, SpaceGroup } from "@argo/contracts";
+import { GROUP_MEMBER_MAX, GROUP_MEMBER_MIN, resolveBotAvatarSet } from "@argo/contracts";
+import { displayName } from "@argo/core";
 import { cancelRunsInTransaction } from "./cancel-runs.js";
 import type { Prisma, PrismaClient } from "./client.js";
 import { expireComputerExecutionLeases, restoreBotUnderComputerQuota } from "./computers.js";

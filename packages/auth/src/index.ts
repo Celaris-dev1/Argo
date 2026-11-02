@@ -1,6 +1,6 @@
 import { expo } from "@better-auth/expo";
 import { passkey } from "@better-auth/passkey";
-import type { ProductAnalytics, TransactionalEmailProvider } from "@rakazo/adapter-kit";
+import type { ProductAnalytics, TransactionalEmailProvider } from "@argo/adapter-kit";
 import {
   displayName,
   emailAllowed,
@@ -8,9 +8,9 @@ import {
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
   signupPolicyFromEnv,
-} from "@rakazo/core";
-import type { PrismaClient, SecurityEventType } from "@rakazo/db";
-import { bootstrapUserSpace, personalOrganizationIds, recordSecurityEvent } from "@rakazo/db";
+} from "@argo/core";
+import type { PrismaClient, SecurityEventType } from "@argo/db";
+import { bootstrapUserSpace, personalOrganizationIds, recordSecurityEvent } from "@argo/db";
 import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -96,7 +96,7 @@ export const SIGN_IN_CODE_EXPIRES_IN_SECONDS = 10 * 60;
 
 /**
  * The email OTP plugin also exposes OTP email verification, password reset and
- * email change. Rakazo uses links for those, so only sign-in codes stay open.
+ * email change. Argo uses links for those, so only sign-in codes stay open.
  */
 function isUnusedEmailCodePath(path: string, body: { type?: unknown } | undefined): boolean {
   if (path === SEND_SIGN_IN_CODE_PATH) return body?.type !== "sign-in";
@@ -107,7 +107,7 @@ function isUnusedEmailCodePath(path: string, body: { type?: unknown } | undefine
  * The only header Better Auth reads a client IP from. The API sets it from the socket peer and its
  * trusted proxies and drops any client-supplied copy, so a caller cannot choose its own address.
  */
-export const CLIENT_IP_HEADER = "x-rakazo-client-ip";
+export const CLIENT_IP_HEADER = "x-argo-client-ip";
 
 /** Routes that end sessions other than the caller's own sign-out. Recorded per deleted session. */
 const REVOCATION_PATHS = new Set(["/revoke-session", "/revoke-sessions", "/revoke-other-sessions"]);
@@ -155,11 +155,11 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
   let authContext: Promise<{ secretConfig: TokenKey }> | undefined;
   const tokenKey = async () => (await authContext!).secretConfig;
   const auth = betterAuth({
-    appName: "Rakazo",
+    appName: "Argo",
     logger: env.logger,
     secret: env.secret,
     baseURL: env.baseURL,
-    trustedOrigins: [...buildTrustedOrigins(env), "rakazo://"],
+    trustedOrigins: [...buildTrustedOrigins(env), "argo://"],
     account: {
       accountLinking: { enabled: true, disableImplicitLinking: true, trustedProviders: [] },
       encryptOAuthTokens: true,
@@ -307,7 +307,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
         ? [
             passkey({
               rpID: relyingParty.rpID,
-              rpName: "Rakazo",
+              rpName: "Argo",
               origin: relyingParty.origins,
             }) as BetterAuthPlugin,
           ]
@@ -426,7 +426,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
               internalAdapter: {
                 ...ctx.context.internalAdapter,
                 // Better Auth drops an unverified account's logins and sessions when a
-                // code proves the mailbox; credentials Rakazo stores elsewhere go too.
+                // code proves the mailbox; credentials Argo stores elsewhere go too.
                 ...(ctx.path === CODE_SIGN_IN_PATH
                   ? {
                       updateUser: async (...args: Parameters<typeof updateUser>) => {

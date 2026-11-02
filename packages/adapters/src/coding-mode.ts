@@ -3,8 +3,8 @@ import type {
   ComputerRef,
   ProcessEvent,
   SandboxProvider,
-} from "@rakazo/adapter-kit";
-import { redactSecrets } from "@rakazo/core";
+} from "@argo/adapter-kit";
+import { redactSecrets } from "@argo/core";
 import { shellCommandEnvironment } from "./bot-secrets.js";
 import { resolveBotWorkspaceCwd } from "./computer-support.js";
 import { findConnectedModelCredential, runModelChoice } from "./model-selection.js";
@@ -21,11 +21,11 @@ const CODING_ALONE_MS = 6 * 60 * 60 * 1000;
 const CODING_POLL_MS = 4_000;
 
 const ALONE =
-  "Work alone until this is finished. Do not ask the user questions, do not wait for permission, and do not stop to confirm a choice. Decide and continue. If a command fails, fix it and keep going. Stop only when the task is done or you are blocked by something only the user can provide, such as a missing secret. The desktop browser is Chromium; leave its profile in place. If a page shows a CAPTCHA, run rakazo-captcha or click the challenge yourself and continue. Do not ask the user to solve one.";
+  "Work alone until this is finished. Do not ask the user questions, do not wait for permission, and do not stop to confirm a choice. Decide and continue. If a command fails, fix it and keep going. Stop only when the task is done or you are blocked by something only the user can provide, such as a missing secret. The desktop browser is Chromium; leave its profile in place. If a page shows a CAPTCHA, run argo-captcha or click the challenge yourself and continue. Do not ask the user to solve one.";
 
 /**
  * Finish protocol, after dori-superagent's lanes (https://github.com/sisyphuslabs/dori-superagent,
- * MIT): no "done" without proof. Rakazo checks for these lines when the session ends.
+ * MIT): no "done" without proof. Argo checks for these lines when the session ends.
  */
 const FINISH =
   "When you finish, end your last message with these lines:\nREADY: <one line saying what is now true>\nEVIDENCE: <proof, one per line: the test or build command you ran and its result, a commit SHA, a PR or deploy URL, or the files you changed>\nIf you cannot finish, end with BLOCKED: <the one thing only the user can provide> instead. Never write READY without evidence you produced in this session.";
@@ -61,7 +61,7 @@ export function parseCodingVerdict(summary: string): CodingVerdict {
 }
 
 /** Minutes of silence before a status note, a second note, and stopping the session. */
-export function codingStallMinutes(value = process.env.RAKAZO_CODING_STALL_MINUTES): number[] {
+export function codingStallMinutes(value = process.env.ARGO_CODING_STALL_MINUTES): number[] {
   const parsed = (value ?? "10,20,40")
     .split(",")
     .map((item) => Number(item.trim()))
@@ -90,9 +90,9 @@ elif command -v kilo >/dev/null 2>&1; then bin=kilo
 else echo "coding mode needs OpenCode or Kilo on this computer" >&2; exit 127
 fi
 if [ -x /usr/local/bin/lightpanda ]; then
-  port="\${RAKAZO_CDP_PORT:-9222}"
+  port="\${ARGO_CDP_PORT:-9222}"
   if ! curl -sf -o /dev/null --max-time 0.4 "http://127.0.0.1:$port/json/version"; then
-    nohup /usr/local/bin/lightpanda serve --host 127.0.0.1 --port "$port" >/tmp/rakazo-lightpanda.log 2>&1 &
+    nohup /usr/local/bin/lightpanda serve --host 127.0.0.1 --port "$port" >/tmp/argo-lightpanda.log 2>&1 &
   fi
 fi
 : > "$logfile"
@@ -130,7 +130,7 @@ if command -v xdotool >/dev/null 2>&1 && DISPLAY="\${DISPLAY:-:1}" xdotool searc
   exit 0
 fi
 if command -v opencode-desktop >/dev/null 2>&1; then
-  DISPLAY="\${DISPLAY:-:1}" nohup opencode-desktop >/tmp/rakazo-opencode-desktop.log 2>&1 &
+  DISPLAY="\${DISPLAY:-:1}" nohup opencode-desktop >/tmp/argo-opencode-desktop.log 2>&1 &
   echo desktop
   exit 0
 fi
@@ -138,7 +138,7 @@ if command -v opencode >/dev/null 2>&1; then bin=opencode
 elif command -v kilo >/dev/null 2>&1; then bin=kilo
 else echo "coding mode needs OpenCode or Kilo on this computer" >&2; exit 127
 fi
-DISPLAY="\${DISPLAY:-:1}" nohup xterm -T OpenCode -fa Monospace -fs 12 -e "$bin" >/tmp/rakazo-opencode-cli.log 2>&1 &
+DISPLAY="\${DISPLAY:-:1}" nohup xterm -T OpenCode -fa Monospace -fs 12 -e "$bin" >/tmp/argo-opencode-cli.log 2>&1 &
 echo cli`;
 
 export async function openCodingSurface(
@@ -305,8 +305,8 @@ export const codingTools: ToolHandlers = {
         surface === "desktop" ? "Coding — OpenCode desktop" : "Coding — OpenCode CLI",
       );
     }
-    const pidfile = `/tmp/rakazo-code-${bot.id}.pid`;
-    const logfile = `/tmp/rakazo-code-${bot.id}.log`;
+    const pidfile = `/tmp/argo-code-${bot.id}.pid`;
+    const logfile = `/tmp/argo-code-${bot.id}.log`;
     const task = `${ALONE}\n\n${FINISH}\n\n${prompt}`;
     let summary = "";
     let lastStatus = "";
@@ -364,7 +364,7 @@ export const codingTools: ToolHandlers = {
     }, WORK_STATUS_INTERVAL_MS);
     pulse.unref?.();
     const stop = () =>
-      runShort(["bash", "-c", STOP_SESSION, "rakazo-code-stop", pidfile], false).catch(
+      runShort(["bash", "-c", STOP_SESSION, "argo-code-stop", pidfile], false).catch(
         () => undefined,
       );
     const onAbort = () => {
@@ -383,7 +383,7 @@ export const codingTools: ToolHandlers = {
           "bash",
           "-c",
           START_SESSION,
-          "rakazo-code-start",
+          "argo-code-start",
           pidfile,
           logfile,
           ...(model ? ["--model", model] : []),
@@ -403,7 +403,7 @@ export const codingTools: ToolHandlers = {
       while (Date.now() < deadline) {
         if (context.signal.aborted) break;
         const polled = await runShort(
-          ["bash", "-c", POLL_SESSION, "rakazo-code-poll", pidfile, logfile],
+          ["bash", "-c", POLL_SESSION, "argo-code-poll", pidfile, logfile],
           false,
         );
         stderr = polled.stderr;

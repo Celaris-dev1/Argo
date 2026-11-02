@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { MessagingChannelMembership, MessagingInstallationsStatus } from "@rakazo/contracts";
-import { isRetryableError, messagingConnectOptions } from "@rakazo/core";
-import { fetchFresh, writeSaved } from "@rakazo/core/query";
+import type { MessagingChannelMembership, MessagingInstallationsStatus } from "@argo/contracts";
+import { isRetryableError, messagingConnectOptions } from "@argo/core";
+import { fetchFresh, writeSaved } from "@argo/core/query";
 import {
   Button,
   DropdownMenu,
@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   NativeSelect,
   NativeSelectOption,
-} from "@rakazo/ui-web";
+} from "@argo/ui-web";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDownIcon, PlusIcon } from "lucide-react";
 import type { ReactNode } from "react";
@@ -216,7 +216,7 @@ export function MessagingSettingsPanel() {
   }
 
   function installSlack() {
-    const popup = window.open("about:blank", "rakazo-slack-install");
+    const popup = window.open("about:blank", "argo-slack-install");
     if (popup) popup.opener = null;
     void act(async () => {
       try {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="argo_call_channel">Ongoing call</string>
+  <string name="argo_call_title">Argo call</string>
+  <string name="argo_call_text">Microphone is active</string>
+</resources>

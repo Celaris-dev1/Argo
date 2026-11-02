@@ -2,7 +2,7 @@
 
 import { i18n } from "@lingui/core";
 import { ORPCError } from "@orpc/client";
-import type { Bot, BotAvatarSet } from "@rakazo/contracts";
+import type { Bot, BotAvatarSet } from "@argo/contracts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps, ReactNode } from "react";
 import { act } from "react";
@@ -32,7 +32,7 @@ vi.mock("@lingui/react/macro", () => {
     parts.reduce((text, part, index) => `${text}${index > 0 ? values[index - 1] : ""}${part}`, "");
   return { useLingui: () => ({ t }), Trans: ({ children }: { children: ReactNode }) => children };
 });
-vi.mock("@rakazo/ui-web", () => ({
+vi.mock("@argo/ui-web", () => ({
   Button: ({
     variant: _variant,
     size: _size,
@@ -113,7 +113,7 @@ vi.mock("./avatar-studio-popover", () => ({
         aria-label="Avatar set"
         data-avatar-set={avatarSet}
         data-color={value}
-        onClick={() => onChange("#F97316", avatarSet === "rakazo" ? "organic" : "rakazo")}
+        onClick={() => onChange("#F97316", avatarSet === "argo" ? "organic" : "argo")}
       />
     </>
   ),
@@ -699,12 +699,12 @@ describe("BotSettings avatar set persistence", () => {
     await render("Billing", { color: "#10B981" });
     const control = () => container.querySelector<HTMLButtonElement>('[aria-label="Avatar set"]')!;
     await act(async () => control().click());
-    expect(onSave.mock.lastCall?.[0]).toMatchObject({ avatarSet: "rakazo", color: "#F97316" });
-    expect(control().getAttribute("data-avatar-set")).toBe("rakazo");
+    expect(onSave.mock.lastCall?.[0]).toMatchObject({ avatarSet: "argo", color: "#F97316" });
+    expect(control().getAttribute("data-avatar-set")).toBe("argo");
     await act(async () => root.unmount());
     root = createRoot(container);
-    await render("Billing", { color: "#F97316", avatarSet: "rakazo" });
-    expect(control().getAttribute("data-avatar-set")).toBe("rakazo");
+    await render("Billing", { color: "#F97316", avatarSet: "argo" });
+    expect(control().getAttribute("data-avatar-set")).toBe("argo");
   });
 
   it("restores the accepted colour and set when switching fails", async () => {
@@ -720,14 +720,14 @@ describe("BotSettings avatar set persistence", () => {
   });
 
   it("keeps a colour edit in its existing set", async () => {
-    await render("Billing", { avatarSet: "rakazo" });
+    await render("Billing", { avatarSet: "argo" });
     await act(async () =>
       container.querySelector<HTMLButtonElement>('[aria-label="Avatar color"]')!.click(),
     );
     expect(onSave.mock.lastCall?.[0]).not.toHaveProperty("avatarSet");
     expect(
       container.querySelector('[aria-label="Avatar set"]')?.getAttribute("data-avatar-set"),
-    ).toBe("rakazo");
+    ).toBe("argo");
   });
 });
 

@@ -1,5 +1,5 @@
 import { DecryptCommand, EncryptCommand, KMSClient } from "@aws-sdk/client-kms";
-import type { KeyProvider, KeyWrapContext, WrappedDataKey } from "@rakazo/adapter-kit";
+import type { KeyProvider, KeyWrapContext, WrappedDataKey } from "@argo/adapter-kit";
 
 export interface AwsKmsKeyProviderConfig {
   /** Key ARN, not an alias, which can be repointed without stored keys noticing. */
@@ -113,8 +113,8 @@ export class AwsKmsKeyProvider implements KeyProvider {
 
 function encryptionContext(context: KeyWrapContext): Record<string, string> {
   return {
-    "rakazo:purpose": "space-key/v1",
-    "rakazo:space": context.spaceId,
-    "rakazo:version": String(context.version),
+    "argo:purpose": "space-key/v1",
+    "argo:space": context.spaceId,
+    "argo:version": String(context.version),
   };
 }

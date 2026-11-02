@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="argo_call_channel">Текущий звонок</string>
+  <string name="argo_call_title">Звонок Argo</string>
+  <string name="argo_call_text">Микрофон активен</string>
+</resources>

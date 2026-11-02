@@ -1,15 +1,15 @@
 import { randomInt } from "node:crypto";
-import type { BillingProvider } from "@rakazo/adapter-kit";
-import type { BillingStatus } from "@rakazo/contracts";
-import { BYOK_MONTHLY_PRICE_CENTS } from "@rakazo/contracts";
-import type { PrismaClient } from "@rakazo/db";
+import type { BillingProvider } from "@argo/adapter-kit";
+import type { BillingStatus } from "@argo/contracts";
+import { BYOK_MONTHLY_PRICE_CENTS } from "@argo/contracts";
+import type { PrismaClient } from "@argo/db";
 import {
   billingAccountForOrganization,
   hasBillingAccess,
   Prisma,
   reconcileCreditPurchase,
-} from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/db";
+import { getLogger } from "@argo/logging";
 
 const CODE_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
 const CODE_LENGTH = 8;

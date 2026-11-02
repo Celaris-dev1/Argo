@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { ORGANIC_AVATAR_LOOKS } from "@rakazo/core";
+import { ORGANIC_AVATAR_LOOKS } from "@argo/core";
 import type { ReactNode } from "react";
 import { act } from "react";
 import type { Root } from "react-dom/client";
@@ -81,7 +81,7 @@ describe("CreateBotDialog", () => {
     await render(onCreate);
     expect(button("Original").getAttribute("aria-selected")).toBe("true");
     const family = Number(
-      document.querySelector(".rakazo-organic-avatar")?.getAttribute("data-shape-family"),
+      document.querySelector(".argo-organic-avatar")?.getAttribute("data-shape-family"),
     );
     await typeName("Scout");
     await click(button("Create"));
@@ -93,32 +93,32 @@ describe("CreateBotDialog", () => {
     expect(onCreate.mock.lastCall?.[0]).not.toHaveProperty("id");
   });
 
-  it("sends the Rakazo preview id without an organic family", async () => {
+  it("sends the Argo preview id without an organic family", async () => {
     const onCreate = vi.fn(async (_input: CreateBotDialogInput) => undefined);
     await render(onCreate);
-    await click(button("Rakazo"));
+    await click(button("Argo"));
     await typeName("Scout");
     await click(button("Create"));
     const input = onCreate.mock.lastCall![0];
-    const preview = document.querySelector(".rakazo-logo-avatar")!;
-    expect(input).toMatchObject({ name: "Scout", avatarSet: "rakazo" });
+    const preview = document.querySelector(".argo-logo-avatar")!;
+    expect(input).toMatchObject({ name: "Scout", avatarSet: "argo" });
     expect(input).not.toHaveProperty("avatarFamily");
     expect(input.id).toMatch(/^c[a-z0-9]{24}$/);
     expect(input.color?.toUpperCase()).toBe(preview.getAttribute("data-color")?.toUpperCase());
   });
 
-  it("preserves an explicitly chosen Rakazo colour through a failed create and retry", async () => {
+  it("preserves an explicitly chosen Argo colour through a failed create and retry", async () => {
     const onCreate = vi
       .fn(async (_input: CreateBotDialogInput) => undefined)
       .mockRejectedValueOnce(new Error("Try again"));
     await render(onCreate);
-    await click(button("Rakazo"));
+    await click(button("Argo"));
     await click(button("Color #10B981"));
     await typeName("Scout");
     await click(button("Create"));
-    expect(onCreate.mock.lastCall?.[0]).toMatchObject({ avatarSet: "rakazo", color: "#10B981" });
+    expect(onCreate.mock.lastCall?.[0]).toMatchObject({ avatarSet: "argo", color: "#10B981" });
     await click(button("Create"));
-    expect(onCreate.mock.lastCall?.[0]).toMatchObject({ avatarSet: "rakazo", color: "#10B981" });
+    expect(onCreate.mock.lastCall?.[0]).toMatchObject({ avatarSet: "argo", color: "#10B981" });
   });
 
   it("sends the organic family the preview draws", async () => {
@@ -126,7 +126,7 @@ describe("CreateBotDialog", () => {
     await render(onCreate);
     await click(button("Shape 2"));
     await click(button("Color #10B981"));
-    const preview = document.querySelector(".rakazo-organic-avatar");
+    const preview = document.querySelector(".argo-organic-avatar");
     const family = Number(preview?.getAttribute("data-shape-family"));
     await typeName("Scout");
     await click(button("Create"));
@@ -171,13 +171,13 @@ it("retains the preview identity and colour through rerenders, set toggles and a
     .fn(async (_input: CreateBotDialogInput) => undefined)
     .mockRejectedValueOnce(new Error("Try again"));
   await render(onCreate);
-  await click(button("Rakazo"));
-  const colour = document.querySelector(".rakazo-logo-avatar")!.getAttribute("data-color");
+  await click(button("Argo"));
+  const colour = document.querySelector(".argo-logo-avatar")!.getAttribute("data-color");
   await typeName("First name");
   await render(onCreate);
-  expect(document.querySelector(".rakazo-logo-avatar")!.getAttribute("data-color")).toBe(colour);
+  expect(document.querySelector(".argo-logo-avatar")!.getAttribute("data-color")).toBe(colour);
   await click(button("Original"));
-  await click(button("Rakazo"));
+  await click(button("Argo"));
   await click(button("Create"));
   const first = onCreate.mock.lastCall![0];
   await typeName("Retry name");

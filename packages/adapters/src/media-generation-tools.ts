@@ -3,11 +3,11 @@ import type {
   GeneratedMedia,
   MediaGenerationProvider,
   MediaVideoJob,
-} from "@rakazo/adapter-kit";
-import { MediaGenerationError } from "@rakazo/adapter-kit";
-import type { MessageBlock } from "@rakazo/contracts";
-import { messageBlockForArtifact } from "@rakazo/core";
-import type { ExternalEffect, PrismaClient } from "@rakazo/db";
+} from "@argo/adapter-kit";
+import { MediaGenerationError } from "@argo/adapter-kit";
+import type { MessageBlock } from "@argo/contracts";
+import { messageBlockForArtifact } from "@argo/core";
+import type { ExternalEffect, PrismaClient } from "@argo/db";
 import { z } from "zod";
 import { mediaPromptSchema, validateGeneratedMedia } from "./media-generation-provider.js";
 

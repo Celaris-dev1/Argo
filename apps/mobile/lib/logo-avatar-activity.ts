@@ -1,6 +1,6 @@
-import type { ThreadSnapshot } from "@rakazo/contracts";
-import type { LogoAvatarActivitySnapshot } from "@rakazo/core";
-import { createLogoAvatarActivityStore } from "@rakazo/core";
+import type { ThreadSnapshot } from "@argo/contracts";
+import type { LogoAvatarActivitySnapshot } from "@argo/core";
+import { createLogoAvatarActivityStore } from "@argo/core";
 
 const projection = createLogoAvatarActivityStore();
 const snapshots = new Map<string, { value: LogoAvatarActivitySnapshot; order: number }>();

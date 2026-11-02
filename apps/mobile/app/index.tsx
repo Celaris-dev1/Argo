@@ -1,5 +1,5 @@
-import type { RunActivityRow, SpaceBot, SpaceGroup } from "@rakazo/contracts";
-import { accountDisplay, isRetryableError } from "@rakazo/core";
+import type { RunActivityRow, SpaceBot, SpaceGroup } from "@argo/contracts";
+import { accountDisplay, isRetryableError } from "@argo/core";
 import type { Href } from "expo-router";
 import {
   Redirect,

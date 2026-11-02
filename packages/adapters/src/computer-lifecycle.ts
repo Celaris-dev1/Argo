@@ -5,30 +5,30 @@ import type {
   ComputerRef,
   JobPublisher,
   SandboxProvider,
-} from "@rakazo/adapter-kit";
+} from "@argo/adapter-kit";
 import {
   computerControlExpireJobKey,
   SandboxAllowanceUsedError,
   SandboxRateLimitError,
   SandboxUnavailableError,
   SandboxUnresponsiveError,
-} from "@rakazo/adapter-kit";
-import type { ComputerUpdate } from "@rakazo/contracts";
+} from "@argo/adapter-kit";
+import type { ComputerUpdate } from "@argo/contracts";
 import {
   ACTIVE_RUN_STATUSES,
   abortableDelay,
   isRetryableError,
   parseScreenLeaseId,
   screenLeaseId,
-} from "@rakazo/core";
-import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
+} from "@argo/core";
+import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
 import {
   expireComputerExecutionLeases,
   parseComputerMode,
   recordComputerRunEnd,
   recordComputerRunStart,
-} from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/db";
+import { getLogger } from "@argo/logging";
 import {
   clearInactiveUserComputerControl,
   expireComputerControl,

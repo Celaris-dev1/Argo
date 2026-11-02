@@ -5,8 +5,8 @@ import type {
   LoginFieldInput,
   MessageReaction,
   ThreadMessage,
-} from "@rakazo/contracts";
-import type { FoldedTranscript } from "@rakazo/core";
+} from "@argo/contracts";
+import type { FoldedTranscript } from "@argo/core";
 import {
   expandPeerReplies,
   groupVoiceChats,
@@ -19,9 +19,9 @@ import {
   timeSeparatorIds,
   unreadDividerMessageId,
   voiceChatHoldsMessage,
-} from "@rakazo/core";
-import type { GroupAvatarMember } from "@rakazo/ui-web";
-import { Button, cn, Spinner } from "@rakazo/ui-web";
+} from "@argo/core";
+import type { GroupAvatarMember } from "@argo/ui-web";
+import { Button, cn, Spinner } from "@argo/ui-web";
 import { ArrowDown } from "lucide-react";
 import type { CSSProperties, RefObject } from "react";
 import {

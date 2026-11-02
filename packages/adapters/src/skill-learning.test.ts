@@ -4,8 +4,8 @@ import { isLearnedSkill, learningSettings, parseLearningReply } from "./skill-le
 describe("skill learning", () => {
   it("is on by default and can be turned off", () => {
     expect(learningSettings({})).toEqual({ enabled: true, minTools: 3 });
-    expect(learningSettings({ RAKAZO_SKILL_LEARNING: "off" }).enabled).toBe(false);
-    expect(learningSettings({ RAKAZO_SKILL_LEARNING_MIN_TOOLS: "5" }).minTools).toBe(5);
+    expect(learningSettings({ ARGO_SKILL_LEARNING: "off" }).enabled).toBe(false);
+    expect(learningSettings({ ARGO_SKILL_LEARNING_MIN_TOOLS: "5" }).minTools).toBe(5);
   });
 
   it("parses operations and caps them at two", () => {

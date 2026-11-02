@@ -1,13 +1,13 @@
-Rakazo
-Copyright 2026 Rakazo contributors
+Argo
+Copyright 2026 Argo contributors
 
 This product is a modified version of an open-source project originally created by
 its upstream authors (GitHub: elie222) and distributed under the Apache License,
 Version 2.0. The original copyright and license notices are retained in LICENSE.
 
-Modifications by Rakazo contributors include, among others:
+Modifications by Argo contributors include, among others:
 - Coding mode (OpenCode / Kilo on the bot's computer)
-- Lightpanda page browser and the rakazo-captcha helper
+- Lightpanda page browser and the argo-captcha helper
 - Periodic work-status messages
 - Lite deployment profile for 8 GB machines (infra/compose/docker-compose.lite.yml)
 - OpenAI-compatible provider presets and small-model mode

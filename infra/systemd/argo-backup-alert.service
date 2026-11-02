@@ -1,0 +1,11 @@
+[Unit]
+Description=Notify operators when a production backup fails
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/argo-host-alert backup-failure "Nightly backup failed. Inspect argo-backup.service on the server."
+StateDirectory=argo/alerts
+StateDirectoryMode=0700
+ProtectSystem=strict
+ReadWritePaths=/var/lib/argo/alerts
+PrivateTmp=true

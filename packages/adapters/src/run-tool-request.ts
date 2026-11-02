@@ -1,6 +1,6 @@
-import type { ConnectorCall, ConnectorTool } from "@rakazo/adapter-kit";
-import { BOT_INSTRUCTIONS_MAX_LENGTH } from "@rakazo/contracts";
-import { redactSecrets } from "@rakazo/core";
+import type { ConnectorCall, ConnectorTool } from "@argo/adapter-kit";
+import { BOT_INSTRUCTIONS_MAX_LENGTH } from "@argo/contracts";
+import { redactSecrets } from "@argo/core";
 import { prepareAgentConnectionResponse } from "./agent-connections.js";
 import type { FleetCardSummary } from "./approval-ask.js";
 import {

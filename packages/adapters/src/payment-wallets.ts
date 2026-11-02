@@ -3,11 +3,11 @@ import type {
   PaymentWalletCredential,
   PaymentWalletProvider,
   SecretStore,
-} from "@rakazo/adapter-kit";
-import { PaymentWalletDisconnected, SecretStoreUnavailableError } from "@rakazo/adapter-kit";
-import type { PaymentWalletStatus } from "@rakazo/contracts";
-import type { PaymentWallet, Prisma, PrismaClient } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/adapter-kit";
+import { PaymentWalletDisconnected, SecretStoreUnavailableError } from "@argo/adapter-kit";
+import type { PaymentWalletStatus } from "@argo/contracts";
+import type { PaymentWallet, Prisma, PrismaClient } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import { deleteSecretBestEffort, holdSecretNotifications } from "./secret-store-factory.js";
 
 export interface PaymentWalletDeps {
@@ -272,7 +272,7 @@ export async function connectPaymentWallet(
   const provider = deps.paymentWallet;
   if (!provider) throw new Error("No payment wallet is configured");
   const start = await provider.beginConnect(
-    { clientName: "Rakazo" },
+    { clientName: "Argo" },
     providerContext(actor, "connect"),
   );
   const ciphertext = await storeMaterial(deps, actor, {

@@ -1,7 +1,7 @@
-import { BillingEmulator } from "@rakazo/adapters";
-import type { Actor } from "@rakazo/contracts";
-import type { PrismaClient } from "@rakazo/db";
-import { asSystem, billingAccountForOrganization, createDb, spaceHasModelAccess } from "@rakazo/db";
+import { BillingEmulator } from "@argo/adapters";
+import type { Actor } from "@argo/contracts";
+import type { PrismaClient } from "@argo/db";
+import { asSystem, billingAccountForOrganization, createDb, spaceHasModelAccess } from "@argo/db";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createBillingService } from "./billing.js";
 
@@ -15,7 +15,7 @@ dbTests("own-key plan", () => {
   const actor: Actor = {
     userId,
     spaceId,
-    email: `byok-${stamp}@rakazo.test`,
+    email: `byok-${stamp}@argo.test`,
     isDeploymentOwner: false,
   };
   const provider = new BillingEmulator({ modelCredits: true, namespace: `byok-${stamp}` });

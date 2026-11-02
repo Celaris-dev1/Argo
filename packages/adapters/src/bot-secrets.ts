@@ -1,11 +1,11 @@
 import { randomBytes } from "node:crypto";
-import type { SecretStore } from "@rakazo/adapter-kit";
+import type { SecretStore } from "@argo/adapter-kit";
 import type {
   BotSecretDestination,
   LoginField,
   LoginSecretValue,
   SettingsScope,
-} from "@rakazo/contracts";
+} from "@argo/contracts";
 import {
   BotSecretAuth,
   BotSecretName,
@@ -23,10 +23,10 @@ import {
   loginCommandName,
   SecretHttpRequest,
   sameLoginFieldLabel,
-} from "@rakazo/contracts";
-import type { Prisma, PrismaClient } from "@rakazo/db";
-import { lockSpaceSettings, runLoginKind, settingsTarget, withTransactionRetry } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/contracts";
+import type { Prisma, PrismaClient } from "@argo/db";
+import { lockSpaceSettings, runLoginKind, settingsTarget, withTransactionRetry } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import { z } from "zod";
 import { combineSignals, redactConnectorPayload } from "./connector-safety.js";
 import type { RemoteTransportDependencies } from "./remote-mcp.js";
@@ -118,7 +118,7 @@ function credentialHeader(destination: BotSecretDestination, plaintext: string) 
 
 /** Owner escape enabling plain-HTTP origins on private LAN hosts (see #907). */
 export function allowPrivateHttpSecretOrigins(): boolean {
-  return process.env.RAKAZO_SECRETS_ALLOW_PRIVATE_HTTP === "1";
+  return process.env.ARGO_SECRETS_ALLOW_PRIVATE_HTTP === "1";
 }
 
 export function normalizeSecretDestination(value: unknown): BotSecretDestination {

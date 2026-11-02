@@ -37,11 +37,11 @@ async function main() {
     : catalog;
 
   const udid = requiredEnv("SIM_UDID");
-  const apiUrl = requiredEnv("RAKAZO_API_URL").replace(/\/$/, "");
+  const apiUrl = requiredEnv("ARGO_API_URL").replace(/\/$/, "");
   const databaseUrl = requiredEnv("DATABASE_URL");
-  const email = requiredEnv("RAKAZO_SCREENSHOT_EMAIL");
-  const emptyEmail = requiredEnv("RAKAZO_SCREENSHOT_EMPTY_EMAIL");
-  const password = requiredEnv("RAKAZO_SCREENSHOT_PASSWORD");
+  const email = requiredEnv("ARGO_SCREENSHOT_EMAIL");
+  const emptyEmail = requiredEnv("ARGO_SCREENSHOT_EMPTY_EMAIL");
+  const password = requiredEnv("ARGO_SCREENSHOT_PASSWORD");
   const outDir = path.resolve(
     process.env.IOS_SCREENSHOT_OUT || path.join(ROOT, "test-report", "ios-screenshots"),
   );
@@ -79,17 +79,17 @@ async function main() {
             "--test-output-dir",
             path.join(work, "out"),
             "-e",
-            `RAKAZO_SCREENSHOT_EMAIL=${email}`,
+            `ARGO_SCREENSHOT_EMAIL=${email}`,
             "-e",
-            `RAKAZO_SCREENSHOT_EMPTY_EMAIL=${emptyEmail}`,
+            `ARGO_SCREENSHOT_EMPTY_EMAIL=${emptyEmail}`,
             "-e",
-            `RAKAZO_SCREENSHOT_PASSWORD=${password}`,
+            `ARGO_SCREENSHOT_PASSWORD=${password}`,
             "-e",
-            `RAKAZO_SCREENSHOT_BOT_ID=${fixture.botId}`,
+            `ARGO_SCREENSHOT_BOT_ID=${fixture.botId}`,
             "-e",
-            `RAKAZO_SCREENSHOT_GROUP_ID=${fixture.groupId}`,
+            `ARGO_SCREENSHOT_GROUP_ID=${fixture.groupId}`,
             "-e",
-            `RAKAZO_SCREENSHOT_ROUTINE_ID=${fixture.routineId}`,
+            `ARGO_SCREENSHOT_ROUTINE_ID=${fixture.routineId}`,
             path.join(CATALOG_DIR, section.flow),
           ],
           process.env,

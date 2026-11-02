@@ -1,17 +1,17 @@
-appId: com.rakazo.app
+appId: com.argo.app
 name: Compose
 ---
 - runFlow:
     file: ../subflows/sign-in.yaml
     env:
-      RAKAZO_ACTIVE_EMAIL: ${RAKAZO_SCREENSHOT_EMAIL}
-- openLink: "rakazo:///new-space"
+      ARGO_ACTIVE_EMAIL: ${ARGO_SCREENSHOT_EMAIL}
+- openLink: "argo:///new-space"
 - extendedWaitUntil:
     visible: "Customer support|Create space"
     timeout: 15000
 - takeScreenshot: 02-new-space
 - tapOn: "Cancel"
-- openLink: "rakazo:///new-group"
+- openLink: "argo:///new-group"
 - extendedWaitUntil:
     visible: "Search bots"
     timeout: 15000
@@ -21,4 +21,4 @@ name: Compose
 - tapOn: "Next"
 - assertVisible: "Skip"
 - takeScreenshot: 04-new-group-name
-- openLink: "rakazo:///"
+- openLink: "argo:///"

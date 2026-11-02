@@ -4,7 +4,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js";
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
-import type { ConnectorTool } from "@rakazo/adapter-kit";
+import type { ConnectorTool } from "@argo/adapter-kit";
 import {
   ipVersion,
   isCloudMetadataAddress,
@@ -15,7 +15,7 @@ import {
   isLoopbackAddress,
   isNonPublicAddress,
   normalizeHost,
-} from "@rakazo/contracts";
+} from "@argo/contracts";
 import { Agent } from "undici";
 import { composioToolBatch } from "./composio-batch.js";
 import { sensitiveQueryParameter } from "./connector-http.js";
@@ -139,7 +139,7 @@ async function withRemoteMcpClient<T>(
     },
     fetch: safeFetch,
   });
-  const client = new Client({ name: "rakazo", version: "0.1.0" }, { capabilities: {} });
+  const client = new Client({ name: "argo", version: "0.1.0" }, { capabilities: {} });
   try {
     await client.connect(transport, { signal, timeout: MCP_TIMEOUT_MS });
     return await run(client, signal);

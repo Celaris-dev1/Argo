@@ -1,10 +1,10 @@
-import type { AdapterContext } from "@rakazo/adapter-kit";
-import { computerControlExpireJobKey } from "@rakazo/adapter-kit";
-import type { ComputerUpdate } from "@rakazo/contracts";
-import { ComputerUpdateSchema } from "@rakazo/contracts";
-import { ACTIVE_RUN_STATUSES } from "@rakazo/core";
-import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+import type { AdapterContext } from "@argo/adapter-kit";
+import { computerControlExpireJobKey } from "@argo/adapter-kit";
+import type { ComputerUpdate } from "@argo/contracts";
+import { ComputerUpdateSchema } from "@argo/contracts";
+import { ACTIVE_RUN_STATUSES } from "@argo/core";
+import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import {
   enqueueTakeoverContinuation,
   isIdleOwnComputerTakeover,

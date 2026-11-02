@@ -4,7 +4,7 @@ import type {
   ModelApiProtocol,
   PurchaseCardField,
   SandboxKind,
-} from "@rakazo/contracts";
+} from "@argo/contracts";
 
 export interface AdapterContext {
   operationId: string;

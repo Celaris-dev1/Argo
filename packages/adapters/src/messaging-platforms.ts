@@ -11,8 +11,8 @@ import {
   WhatsAppApiError,
 } from "@chat-adapter/whatsapp";
 import type { HttpInstance } from "@larksuiteoapi/node-sdk";
-import type { MessagingInboundMessage, MessagingOutboundStatus } from "@rakazo/adapter-kit";
-import { getLogger } from "@rakazo/logging";
+import type { MessagingInboundMessage, MessagingOutboundStatus } from "@argo/adapter-kit";
+import { getLogger } from "@argo/logging";
 import type { Adapter } from "chat";
 import { ConsoleLogger, convertEmojiPlaceholders, markdownToPlainText } from "chat";
 import { createSendblueAdapter } from "chat-adapter-sendblue";
@@ -91,7 +91,7 @@ const TELEGRAM_NAMED_TOKEN = /^TELEGRAM_BOT_TOKEN_([A-Z0-9]+)$/;
 /**
  * Extra Telegram bots from TELEGRAM_BOT_TOKEN_<NAME> plus
  * TELEGRAM_WEBHOOK_SECRET_TOKEN_<NAME>. Each is its own Telegram bot (own
- * token, own getUpdates slot), so one person can link a different Rakazo bot
+ * token, own getUpdates slot), so one person can link a different Argo bot
  * — typically one per space — to each. <NAME> is letters and digits only and
  * becomes the provider id `telegram-<name>` (lowercased), which also names
  * its webhook route. A name with no secret is skipped, like the default bot.

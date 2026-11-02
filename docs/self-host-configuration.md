@@ -1,6 +1,6 @@
 # Configuration
 
-Rakazo reads its settings from environment variables, normally kept in the `.env` file next to
+Argo reads its settings from environment variables, normally kept in the `.env` file next to
 the Compose file.
 
 ## Where settings live
@@ -13,7 +13,7 @@ Do not commit `.env`. Never put `COMPOSIO_API_KEY`, OpenRouter keys, or provider
 
 ## Settings with names you choose
 
-The Compose files pass the API and worker only the settings each one reads, listed by name, rather than the whole `.env`. A setting whose name you choose, such as `TELEGRAM_BOT_TOKEN_<NAME>`, therefore needs its own line: add it under `api` and `worker` `environment` in an override file layered after the base file (and in `RAKAZO_COMPOSE_FILE` when the updater is enabled), with no value so Compose fills it from `.env`. `install-images.sh` names any `.env` setting that no container receives.
+The Compose files pass the API and worker only the settings each one reads, listed by name, rather than the whole `.env`. A setting whose name you choose, such as `TELEGRAM_BOT_TOKEN_<NAME>`, therefore needs its own line: add it under `api` and `worker` `environment` in an override file layered after the base file (and in `ARGO_COMPOSE_FILE` when the updater is enabled), with no value so Compose fills it from `.env`. `install-images.sh` names any `.env` setting that no container receives.
 
 ```yaml
 # docker-compose.override.yml
@@ -47,7 +47,7 @@ SANDBOX_IDLE_MS=600000    # pause or stop after 10 minutes idle; 0 disables idle
 COMPUTER_MAX_ACTIVE_MS=7200000 # uptime cap for providers that bill while running; minimum 60000; 0 disables
 SANDBOX_COMMAND_TIMEOUT_MS=300000 # stop a shell command after 5 minutes
 MAX_TOOL_CALLS_PER_TURN=  # optional Pi turn tool-call fuse; unset/0 = unlimited
-RAKAZO_MESSAGE_USER_MAX_CHARS=500 # message_user length cap; narration stays at 500
+ARGO_MESSAGE_USER_MAX_CHARS=500 # message_user length cap; narration stays at 500
 BOT_MESSAGE_MAX_HOPS=6    # bot-to-bot messages one chain may carry before the next is refused
 E2B_API_KEY=              # when SANDBOX_PROVIDER=e2b
 NOVITA_API_KEY=           # when SANDBOX_PROVIDER=novita; build its template first
@@ -69,25 +69,25 @@ retries let long turns survive brief provider failures.
 | `TICKET_BOARD_ENABLED` | `false` | Turns on the ticket board. Set it on the API and worker. |
 | `USER_DEVICES_ENABLED` | on | `false` stops signed-in desktop apps from letting bots run commands on the user's own computer. Set it on the API and worker. |
 | `PI_SESSION_RECORDING` | off | `true` records agent sessions as JSONL under `DATA_DIR/pi-sessions`. The files are not encrypted, so do not use it on a shared or multi-tenant install. |
-| `PRIVACY_POLICY_URL` | Rakazo's policy | The privacy policy linked from the AI data-sharing notice. Set it on the API. |
+| `PRIVACY_POLICY_URL` | Argo's policy | The privacy policy linked from the AI data-sharing notice. Set it on the API. |
 
 ## Database roles
 
-Rakazo uses two Postgres logins:
+Argo uses two Postgres logins:
 
 - The owner (`POSTGRES_USER`, or `DATABASE_MIGRATION_URL` outside Compose) runs migrations and
   owns the tables.
-- The app login (`rakazo_app` with `POSTGRES_APP_PASSWORD`, or `DATABASE_URL`) is not a
+- The app login (`argo_app` with `POSTGRES_APP_PASSWORD`, or `DATABASE_URL`) is not a
   superuser, cannot bypass row-level security, cannot create objects, and can only read and write
   the app tables.
 
-`pnpm db:migrate` (in containers, its prebuilt form `pnpm --filter @rakazo/api db:deploy`, which the
+`pnpm db:migrate` (in containers, its prebuilt form `pnpm --filter @argo/api db:deploy`, which the
 one-shot `migrate` container runs before the API starts) applies the migrations and the job queue
 schema as the owner. Only that container gets the owner login, so code running in the API or
 worker cannot find one that bypasses row-level security. It then creates the app login named in `DATABASE_URL`, or updates its
-password, and grants it the `rakazo_app` role. When migrations run as a role without
+password, and grants it the `argo_app` role. When migrations run as a role without
 `CREATEROLE`, as on some managed Postgres, create the login yourself and
-`GRANT rakazo_app TO <login>`.
+`GRANT argo_app TO <login>`.
 
 Messages, events, threads, memory, artifacts, secrets, model and voice credentials, skills, bots,
 runs, tasks, routines, connections, MCP servers and sign-ins, computers, boards and tickets,
@@ -126,7 +126,7 @@ those slots.
 
 Chat runs execute in the API container that receives the message, and routines and other
 background runs execute in the worker, so both hold live agent turns. In the production Compose
-file, `RAKAZO_API_MEMORY_LIMIT` and `RAKAZO_WORKER_MEMORY_LIMIT` cap them (Compose sizes such as
+file, `ARGO_API_MEMORY_LIMIT` and `ARGO_WORKER_MEMORY_LIMIT` cap them (Compose sizes such as
 `2g` or `3072m`, default `2g` each). Raise them on a larger host. Deploys briefly run the old and
 new container of each side by side, so leave room for both.
 
@@ -135,7 +135,7 @@ new container of each side by side, so leave room for both.
 The API listens on `API_HOST` (default `127.0.0.1`) and `API_PORT` (default `3100`). Keep loopback
 unless a container or a trusted reverse proxy must reach it; the Compose files set this for you.
 The published-images stack publishes the web app on `127.0.0.1:5173` and the API on
-`127.0.0.1:3100`; set `RAKAZO_WEB_PORT` or `RAKAZO_API_PORT` to use other host ports.
+`127.0.0.1:3100`; set `ARGO_WEB_PORT` or `ARGO_API_PORT` to use other host ports.
 
 ## Outbound proxy
 

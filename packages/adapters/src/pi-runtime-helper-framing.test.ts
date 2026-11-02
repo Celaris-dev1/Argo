@@ -1,4 +1,4 @@
-import { FLEET_TOOL_NAMES } from "@rakazo/contracts";
+import { FLEET_TOOL_NAMES } from "@argo/contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { builtinAgentTools } from "./builtin-tools.js";
 
@@ -105,12 +105,12 @@ describe("helpers know who they are talking to", () => {
   });
 
   it("tells the helper its task comes from the parent bot, not the user", () => {
-    expect(seen.helperSystemPrompt).toContain('You are a Rakazo subagent named "scout".');
+    expect(seen.helperSystemPrompt).toContain('You are a Argo subagent named "scout".');
     expect(seen.helperSystemPrompt).toContain(
       "Your task comes from the parent bot, not from the human user",
     );
     expect(seen.helperSystemPrompt).toContain(
-      "Messages marked as automated come from Rakazo, not from the user.",
+      "Messages marked as automated come from Argo, not from the user.",
     );
     expect(seen.helperPrompt).toBe(
       "Task from the parent bot (not from the user):\ncount the files",

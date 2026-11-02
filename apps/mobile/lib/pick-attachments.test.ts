@@ -1,6 +1,6 @@
-import { attachmentMaxBytes, attachmentMaxCount } from "@rakazo/contracts";
-import * as core from "@rakazo/core";
-import { inferAttachmentMimeType } from "@rakazo/core";
+import { attachmentMaxBytes, attachmentMaxCount } from "@argo/contracts";
+import * as core from "@argo/core";
+import { inferAttachmentMimeType } from "@argo/core";
 import { describe, expect, it, vi } from "vitest";
 import { filterPickedAttachments } from "./pick-attachments-filter.js";
 

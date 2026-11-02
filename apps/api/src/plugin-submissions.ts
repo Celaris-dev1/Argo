@@ -1,20 +1,20 @@
 import { ORPCError } from "@orpc/server";
-import type { TransactionalEmail } from "@rakazo/adapter-kit";
-import { parsePluginSource, previewPluginInstall } from "@rakazo/adapters";
+import type { TransactionalEmail } from "@argo/adapter-kit";
+import { parsePluginSource, previewPluginInstall } from "@argo/adapters";
 import {
   pluginSubmissionAdminEmail,
   pluginSubmissionReceivedEmail,
   pluginSubmissionReviewedEmail,
-} from "@rakazo/auth";
+} from "@argo/auth";
 import type {
   PluginMarketplaceEntry,
   PluginSubmission,
   PluginSubmissionReview,
   PluginSubmissionStatus,
-} from "@rakazo/contracts";
-import { PLUGIN_SUBMISSIONS_PATH, PluginSubmissionInputSchema } from "@rakazo/contracts";
-import { pluginCategory } from "@rakazo/core";
-import type { PluginSubmission as PluginSubmissionRow, PrismaClient } from "@rakazo/db";
+} from "@argo/contracts";
+import { PLUGIN_SUBMISSIONS_PATH, PluginSubmissionInputSchema } from "@argo/contracts";
+import { pluginCategory } from "@argo/core";
+import type { PluginSubmission as PluginSubmissionRow, PrismaClient } from "@argo/db";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { readBoundedBody } from "./http-body.js";
@@ -22,7 +22,7 @@ import { assertMcpRemoteEndpoint } from "./mcp-servers.js";
 import type { RouterDeps } from "./router.js";
 import { throttleKey, windowCounter } from "./window-counter.js";
 
-const PLUGIN_REGISTRY = "Rakazo";
+const PLUGIN_REGISTRY = "Argo";
 const MAX_BODY_BYTES = 32 * 1024;
 const HOUR_MS = 60 * 60_000;
 const SUBMISSIONS_PER_IP_PER_HOUR = 10;

@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { createRouterClient } from "@orpc/server";
-import type { Actor } from "@rakazo/contracts";
-import type { PrismaClient } from "@rakazo/db";
-import { allocateTicketNumber, createDb, ensureBoard, runAsSystem, runAsTenant } from "@rakazo/db";
+import type { Actor } from "@argo/contracts";
+import type { PrismaClient } from "@argo/db";
+import { allocateTicketNumber, createDb, ensureBoard, runAsSystem, runAsTenant } from "@argo/db";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { RouterDeps } from "./router.js";
 import { createRouter } from "./router.js";
@@ -37,7 +37,7 @@ describe.skipIf(!enabled).sequential("board prefix rename (PostgreSQL)", () => {
         data: {
           id: userId,
           name: "Board rename",
-          email: `${userId}@rakazo.test`,
+          email: `${userId}@argo.test`,
           emailVerified: false,
         },
       });
@@ -61,7 +61,7 @@ describe.skipIf(!enabled).sequential("board prefix rename (PostgreSQL)", () => {
       const board = await ensureBoard(prisma, spaceId);
       expect(board.nextNumber).toBe(1);
       boardId = board.id;
-      actor = { spaceId, userId, email: `${userId}@rakazo.test`, isDeploymentOwner: false };
+      actor = { spaceId, userId, email: `${userId}@argo.test`, isDeploymentOwner: false };
     }),
   );
 

@@ -5,16 +5,16 @@ import type {
   BillingProvider,
   BillingSubscriptionSnapshot,
   SandboxProvider,
-} from "@rakazo/adapter-kit";
+} from "@argo/adapter-kit";
 import {
   BillingCheckoutCompletedError,
   BillingCustomerNotFoundError,
   BillingNoMonthlyCreditsError,
-} from "@rakazo/adapter-kit";
-import { sandboxAllowance, sandboxHoursLeft } from "@rakazo/adapters";
-import type { Actor, BillingStatus } from "@rakazo/contracts";
-import { BYOK_MONTHLY_PRICE_CENTS } from "@rakazo/contracts";
-import type { BillingAccount, PrismaClient } from "@rakazo/db";
+} from "@argo/adapter-kit";
+import { sandboxAllowance, sandboxHoursLeft } from "@argo/adapters";
+import type { Actor, BillingStatus } from "@argo/contracts";
+import { BYOK_MONTHLY_PRICE_CENTS } from "@argo/contracts";
+import type { BillingAccount, PrismaClient } from "@argo/db";
 import {
   billingAccountForOrganization,
   byokFreeUntil,
@@ -33,8 +33,8 @@ import {
   releaseCheckoutLease,
   replaceBillingCustomer,
   syncBillingSnapshot,
-} from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/db";
+import { getLogger } from "@argo/logging";
 import { createReferrals } from "./referrals.js";
 
 export const TRIAL_DAYS = 7;

@@ -4,14 +4,14 @@ import {
   hasHostedModelCredits,
   isAutoReviewCheckerConfigured,
   PushSessionEndedError,
-} from "@rakazo/adapters";
-import type { ActionApprovalRule, Actor, Me, SettingsScope } from "@rakazo/contracts";
+} from "@argo/adapters";
+import type { ActionApprovalRule, Actor, Me, SettingsScope } from "@argo/contracts";
 import {
   approvalModeFromPreference,
   approvalPreferenceFromMode,
   previewActionApprovalRule,
-} from "@rakazo/core";
-import { urlSite } from "@rakazo/core/egress";
+} from "@argo/core";
+import { urlSite } from "@argo/core/egress";
 import {
   auditLogOrganization,
   findDefaultVoiceCredential,
@@ -29,7 +29,7 @@ import {
   saveAutoReviewPreference,
   selectVoicePreference,
   voicePreferenceTarget,
-} from "@rakazo/db";
+} from "@argo/db";
 import { aiConsentStatus, allowAiConsent } from "../ai-consent.js";
 import type { BillingService } from "../billing.js";
 import { firstModelConnectAnalytics } from "../model-connect-analytics.js";

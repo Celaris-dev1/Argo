@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@rakazo/db";
+import type { PrismaClient } from "@argo/db";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { FleetPrepareDeps } from "./fleet-tools.js";
 import type * as ModelSelection from "./model-selection.js";

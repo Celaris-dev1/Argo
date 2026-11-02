@@ -1,5 +1,5 @@
-import type { ComputerMode, ComputerReleaseReason } from "@rakazo/contracts";
-import type { ScreenPageState } from "@rakazo/core";
+import type { ComputerMode, ComputerReleaseReason } from "@argo/contracts";
+import type { ScreenPageState } from "@argo/core";
 import {
   createScreenReconnect,
   displayName,
@@ -7,7 +7,7 @@ import {
   SCREEN_RECONNECT_DELAY_MS,
   screenProbeUrl,
   waitForScreenPage,
-} from "@rakazo/core";
+} from "@argo/core";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import type { RefObject } from "react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";

@@ -3,11 +3,11 @@ import type {
   AdapterContext,
   HttpPaymentAuthorization,
   PaymentWalletProvider,
-} from "@rakazo/adapter-kit";
-import { PaidRequestInput } from "@rakazo/contracts";
-import { stableJsonValue } from "@rakazo/core/node/approval-effect-key";
-import type { Purchase } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+} from "@argo/adapter-kit";
+import { PaidRequestInput } from "@argo/contracts";
+import { stableJsonValue } from "@argo/core/node/approval-effect-key";
+import type { Purchase } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import { redactConnectorPayload } from "./connector-safety.js";
 import type { PurchaseDeps } from "./purchase-service.js";
 import {

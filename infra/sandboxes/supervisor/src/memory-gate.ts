@@ -3,13 +3,13 @@ import { readFile } from "node:fs/promises";
 /**
  * Host memory admission, after dori-superagent's loop gate: on a small host, starting one more
  * computer when memory is already short freezes everything, including the computers that run.
- * Off unless RAKAZO_MIN_FREE_MEMORY_MB is set.
+ * Off unless ARGO_MIN_FREE_MEMORY_MB is set.
  */
-export function resolveMinFreeMemoryMb(value = process.env.RAKAZO_MIN_FREE_MEMORY_MB): number {
+export function resolveMinFreeMemoryMb(value = process.env.ARGO_MIN_FREE_MEMORY_MB): number {
   if (value === undefined || value.trim() === "") return 0;
   const mb = Number(value);
   if (!Number.isSafeInteger(mb) || mb < 0) {
-    throw new Error("RAKAZO_MIN_FREE_MEMORY_MB must be a whole number of megabytes, or 0 for off");
+    throw new Error("ARGO_MIN_FREE_MEMORY_MB must be a whole number of megabytes, or 0 for off");
   }
   return mb;
 }

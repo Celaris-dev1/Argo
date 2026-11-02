@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { AccountSecurity } from "@rakazo/contracts";
-import { runWithIdentityConfirmation } from "@rakazo/contracts";
+import type { AccountSecurity } from "@argo/contracts";
+import { runWithIdentityConfirmation } from "@argo/contracts";
 import {
   Button,
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
   Input,
   Label,
-} from "@rakazo/ui-web";
+} from "@argo/ui-web";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   confirmIdentity,

@@ -94,10 +94,10 @@ describe("desktop session permissions", () => {
   });
 
   it.each([
-    "rakazo-model-oauth",
-    "rakazo-mcp-oauth",
-    "rakazo-app-connect",
-    "rakazo-plugin-connect",
+    "argo-model-oauth",
+    "argo-mcp-oauth",
+    "argo-app-connect",
+    "argo-plugin-connect",
   ])("allows %s navigation without granting permissions to its popup", (name) => {
     const policy = policyFixture();
     expect(shouldOpenInAppPopup(new URL(appUrl).origin, providerUrl, name)).toBe(true);

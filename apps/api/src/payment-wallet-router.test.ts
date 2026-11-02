@@ -1,8 +1,8 @@
 import { RPCHandler } from "@orpc/server/fetch";
-import type { PaymentWalletProvider } from "@rakazo/adapter-kit";
-import { createPaymentWalletProvider } from "@rakazo/adapters";
-import type { Actor } from "@rakazo/contracts";
-import type { PrismaClient } from "@rakazo/db";
+import type { PaymentWalletProvider } from "@argo/adapter-kit";
+import { createPaymentWalletProvider } from "@argo/adapters";
+import type { Actor } from "@argo/contracts";
+import type { PrismaClient } from "@argo/db";
 import { describe, expect, it, vi } from "vitest";
 import type { RouterDeps } from "./router.js";
 import { createRouter } from "./router.js";
@@ -15,7 +15,7 @@ type Row = Record<string, unknown>;
 const actor = {
   spaceId: "space-1",
   userId: "user-1",
-  email: "user@rakazo.test",
+  email: "user@argo.test",
   isDeploymentOwner: false,
 } satisfies Actor;
 
@@ -78,7 +78,7 @@ function walletDeps(paymentWallet: PaymentWalletProvider | null) {
       screenProxySecret: "fake-test-secret",
       sandboxProvider: "fake",
     },
-    dataDir: "/tmp/rakazo-router-test",
+    dataDir: "/tmp/argo-router-test",
   } as unknown as RouterDeps;
   const handler = new RPCHandler(createRouter(deps));
   async function call(path: "status" | "connect" | "disconnect") {

@@ -1,4 +1,4 @@
-import { BillingNoMonthlyCreditsError } from "@rakazo/adapter-kit";
+import { BillingNoMonthlyCreditsError } from "@argo/adapter-kit";
 import { describe, expect, it, vi } from "vitest";
 import { StripeBillingProvider } from "./stripe-billing.js";
 
@@ -46,7 +46,7 @@ describe("Stripe prepaid model credits", () => {
         .find((r) => r.path === "/v1/prices" && r.params.has("unit_amount"))
         ?.params.get("unit_amount"),
     ).toBe("1000");
-    expect(body.get("subscription_data[metadata][rakazo_credit_cents]")).toBe("1000");
+    expect(body.get("subscription_data[metadata][argo_credit_cents]")).toBe("1000");
     expect(body.has("subscription_data[trial_period_days]")).toBe(false);
   });
   it("creates top-ups as one-time payments without expiring other checkout sessions", async () => {
@@ -62,7 +62,7 @@ describe("Stripe prepaid model credits", () => {
     expect(requests[0]!.params.get("mode")).toBe("payment");
     expect(requests[0]!.params.get("allowed_payment_method_types[0]")).toBe("card");
     expect(requests[0]!.params.has("subscription_data[billing_mode][type]")).toBe(false);
-    expect(requests[0]!.params.get("payment_intent_data[metadata][rakazo_credit_cents]")).toBe(
+    expect(requests[0]!.params.get("payment_intent_data[metadata][argo_credit_cents]")).toBe(
       "2000",
     );
   });
@@ -133,7 +133,7 @@ describe("Stripe prepaid model credits", () => {
             currency: "usd",
             amount_total: 2000,
             payment_intent: "pi_1",
-            metadata: { rakazo_credit_cents: "2000" },
+            metadata: { argo_credit_cents: "2000" },
           },
           {
             id: "cs_unpaid",
@@ -142,7 +142,7 @@ describe("Stripe prepaid model credits", () => {
             currency: "usd",
             amount_total: 2000,
             payment_intent: "pi_2",
-            metadata: { rakazo_credit_cents: "2000" },
+            metadata: { argo_credit_cents: "2000" },
           },
         ],
         has_more: false,
@@ -159,7 +159,7 @@ describe("Stripe prepaid model credits", () => {
                 {
                   amount: 1000,
                   period: { end: 2_000_000_000 },
-                  metadata: { rakazo_credit_cents: "1000" },
+                  metadata: { argo_credit_cents: "1000" },
                   parent: {
                     type: "subscription_item_details",
                     subscription_item_details: { subscription: "sub_credit_fixture" },
@@ -203,7 +203,7 @@ describe("Stripe prepaid model credits", () => {
             currency: "usd",
             amount_total: 1000,
             payment_intent: null,
-            metadata: { rakazo_credit_cents: "1000" },
+            metadata: { argo_credit_cents: "1000" },
           },
         ],
         has_more: false,
@@ -220,7 +220,7 @@ describe("Stripe prepaid model credits", () => {
                 {
                   amount: 1000,
                   period: { end: 2_000_000_000 },
-                  metadata: { rakazo_credit_cents: "1000" },
+                  metadata: { argo_credit_cents: "1000" },
                   parent: {
                     type: "subscription_item_details",
                     subscription_item_details: { subscription: "sub_credit_fixture" },
@@ -246,7 +246,7 @@ describe("Stripe prepaid model credits", () => {
             parent: {
               subscription_details: {
                 subscription: "sub_credit_fixture",
-                metadata: { rakazo_credit_cents: "1000" },
+                metadata: { argo_credit_cents: "1000" },
               },
             },
           },
@@ -269,7 +269,7 @@ describe("Stripe prepaid model credits", () => {
           id: "sub_fixture",
           status: "active",
           created: 1,
-          metadata: { rakazo_credit_cents: String(amount) },
+          metadata: { argo_credit_cents: String(amount) },
           items: {
             data: [{ id: "si_fixture", price: { id: "price_old", product: "prod_archived" } }],
           },
@@ -286,9 +286,9 @@ describe("Stripe prepaid model credits", () => {
     expect(body.get("items[0][price]")).toBe("price_credits");
     expect(body.get("proration_behavior")).toBe("always_invoice");
     expect(body.get("payment_behavior")).toBe("error_if_incomplete");
-    expect(body.get("metadata[rakazo_credit_cents]")).toBe("2000");
+    expect(body.get("metadata[argo_credit_cents]")).toBe("2000");
     expect(requests.find((r) => r.params.has("product_data[name]"))?.params.get("lookup_key")).toBe(
-      "rakazo_monthly_credits_2000",
+      "argo_monthly_credits_2000",
     );
   });
   it("names a change to an ended monthly plan as having no plan to change", async () => {
@@ -361,7 +361,7 @@ describe("Stripe prepaid model credits", () => {
                 {
                   amount: 2000,
                   period: { end: 2_000_000_000 },
-                  metadata: { rakazo_credit_cents: "1000" },
+                  metadata: { argo_credit_cents: "1000" },
                   parent: {
                     type: "subscription_item_details",
                     subscription_item_details: { subscription: "sub_credit_fixture" },
@@ -372,7 +372,7 @@ describe("Stripe prepaid model credits", () => {
             parent: {
               subscription_details: {
                 subscription: "sub_credit_fixture",
-                metadata: { rakazo_credit_cents: "2000" },
+                metadata: { argo_credit_cents: "2000" },
               },
             },
           },
@@ -422,7 +422,7 @@ describe("Stripe prepaid model credits", () => {
               parent: {
                 subscription_details: {
                   subscription: "sub_credit",
-                  metadata: { rakazo_credit_cents: "1000" },
+                  metadata: { argo_credit_cents: "1000" },
                 },
               },
               lines: {

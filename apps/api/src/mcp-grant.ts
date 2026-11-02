@@ -1,5 +1,5 @@
-import type { Actor } from "@rakazo/contracts";
-import type { Prisma } from "@rakazo/db";
+import type { Actor } from "@argo/contracts";
+import type { Prisma } from "@argo/db";
 
 /** A connection the user just added belongs to every chat they already have. */
 export async function grantMcpServerToExistingBots(

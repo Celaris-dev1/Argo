@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
-import { compatiblePresetNeedsKey } from "@rakazo/contracts";
-import { Disclosure } from "@rakazo/ui-web";
+import { compatiblePresetNeedsKey } from "@argo/contracts";
+import { Disclosure } from "@argo/ui-web";
 import type { ReactNode } from "react";
 
 export function CompatibleKeyField({

@@ -5,14 +5,14 @@
  * The approach (one realization per skill, update instead of duplicating, retire what newer
  * evidence contradicts, never store secrets, most runs teach nothing) follows the learning
  * extension of Klex by stagewise (https://github.com/stagewise-io/klex, Apache-2.0). The code and
- * prompt here are Rakazo's own.
+ * prompt here are Argo's own.
  */
-import type { AgentRunRequest, AgentRuntime } from "@rakazo/adapter-kit";
-import type { MessageBlock } from "@rakazo/contracts";
-import { blocksToAgentHistoryText, escapePromptData, parseSkillMd } from "@rakazo/core";
-import type { PrismaClient } from "@rakazo/db";
-import { recordUsage } from "@rakazo/db";
-import { getLogger } from "@rakazo/logging";
+import type { AgentRunRequest, AgentRuntime } from "@argo/adapter-kit";
+import type { MessageBlock } from "@argo/contracts";
+import { blocksToAgentHistoryText, escapePromptData, parseSkillMd } from "@argo/core";
+import type { PrismaClient } from "@argo/db";
+import { recordUsage } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import {
   listAgentSkillRecords,
   skillCreateFromTool,
@@ -34,9 +34,9 @@ const FRESH_RUN_MS = 30 * 60_000;
 export type LearningSettings = { enabled: boolean; minTools: number };
 
 export function learningSettings(env: NodeJS.ProcessEnv = process.env): LearningSettings {
-  const flag = (env.RAKAZO_SKILL_LEARNING ?? "on").trim().toLowerCase();
+  const flag = (env.ARGO_SKILL_LEARNING ?? "on").trim().toLowerCase();
   const enabled = !["0", "off", "false", "no"].includes(flag);
-  const min = Number(env.RAKAZO_SKILL_LEARNING_MIN_TOOLS ?? "3");
+  const min = Number(env.ARGO_SKILL_LEARNING_MIN_TOOLS ?? "3");
   return { enabled, minTools: Number.isFinite(min) && min >= 0 ? Math.floor(min) : 3 };
 }
 

@@ -1,22 +1,22 @@
 import { createHash } from "node:crypto";
 import { ORPCError } from "@orpc/server";
-import type { SecretStore } from "@rakazo/adapter-kit";
-import type { PluginMcpServerEntry, PluginRepoFetcher } from "@rakazo/adapters";
+import type { SecretStore } from "@argo/adapter-kit";
+import type { PluginMcpServerEntry, PluginRepoFetcher } from "@argo/adapters";
 import {
   buildMcpCredentialBlob,
   persistPreparedSecret,
   pluginPreviewDto,
   previewPluginInstall,
-} from "@rakazo/adapters";
-import type { Actor, CapabilityInstall, PluginPart } from "@rakazo/contracts";
-import { installedPluginParts } from "@rakazo/core";
-import type { Prisma, PrismaClient } from "@rakazo/db";
+} from "@argo/adapters";
+import type { Actor, CapabilityInstall, PluginPart } from "@argo/contracts";
+import { installedPluginParts } from "@argo/core";
+import type { Prisma, PrismaClient } from "@argo/db";
 import {
   AVAILABILITY_SELECT,
   availableInSpace,
   runAsSystemInTransaction,
   spaceAvailability,
-} from "@rakazo/db";
+} from "@argo/db";
 import { assertNameFreeWhereAvailable, lockOwner } from "./availability.js";
 import { grantMcpServerToExistingBots } from "./mcp-grant.js";
 

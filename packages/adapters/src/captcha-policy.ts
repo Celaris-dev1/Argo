@@ -9,7 +9,7 @@ export function isCaptchaTakeover(reason: string): boolean {
 export const CAPTCHA_SOLVE_NOTE =
   "Takeover was not requested. This is a CAPTCHA, and it stays with you. Do not ask the user. " +
   "The desktop browser is Chromium and its profile, cookies, and history must be left in place. " +
-  "Run `rakazo-captcha` once. " +
+  "Run `argo-captcha` once. " +
   "`solved` means continue the task. `image-challenge` means look at the screenshot and click every tile that matches the words, then the Verify button, with computer_act. " +
   "`still-blocked` or `clicked-still-there` means click the checkbox yourself: it is the small box on the left of the widget. " +
   "Then snapshot again and continue.";

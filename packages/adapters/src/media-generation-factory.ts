@@ -1,4 +1,4 @@
-import type { MediaGenerationProvider } from "@rakazo/adapter-kit";
+import type { MediaGenerationProvider } from "@argo/adapter-kit";
 import {
   FakeMediaGenerationProvider,
   FalMediaGenerationProvider,

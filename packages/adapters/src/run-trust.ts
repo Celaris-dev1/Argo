@@ -1,8 +1,8 @@
-import type { MessageBlock } from "@rakazo/contracts";
-import type { ActionApprovalRule } from "@rakazo/core";
-import { connectorKindFromToolName, inboundRoutinePrompts, siteAlwaysAllowed } from "@rakazo/core";
-import { sitesInText, urlSite } from "@rakazo/core/egress";
-import { listApprovalRules, storedBatchActions } from "@rakazo/db";
+import type { MessageBlock } from "@argo/contracts";
+import type { ActionApprovalRule } from "@argo/core";
+import { connectorKindFromToolName, inboundRoutinePrompts, siteAlwaysAllowed } from "@argo/core";
+import { sitesInText, urlSite } from "@argo/core/egress";
+import { listApprovalRules, storedBatchActions } from "@argo/db";
 import { SITE_SENDING_TOOLS } from "./approval-ask.js";
 import { boundDirectApprovalDetails, catalogApprovalDetails } from "./approval-effect.js";
 import type { ExecutorDeps } from "./executor-deps.js";

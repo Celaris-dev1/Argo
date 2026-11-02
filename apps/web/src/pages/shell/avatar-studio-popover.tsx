@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import type { BotAvatarSet } from "@rakazo/contracts";
-import { resolveBotAvatarSet } from "@rakazo/contracts";
-import { SHIPPED_BOT_AVATAR_SHAPE_KEYS } from "@rakazo/core";
+import type { BotAvatarSet } from "@argo/contracts";
+import { resolveBotAvatarSet } from "@argo/contracts";
+import { SHIPPED_BOT_AVATAR_SHAPE_KEYS } from "@argo/core";
 import {
   BOT_AVATAR_COLORS,
   BotAvatar,
@@ -20,8 +20,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@rakazo/ui-web";
-import { Button } from "@rakazo/ui-web/components/ui/button";
+} from "@argo/ui-web";
+import { Button } from "@argo/ui-web/components/ui/button";
 import { Check, Pencil, Upload, X } from "lucide-react";
 import type { ClipboardEvent, DragEvent } from "react";
 import { useRef, useState } from "react";
@@ -66,8 +66,8 @@ export function BotLookPicker({
           <TabsTrigger value="organic" className="flex-1">
             <Trans>Original</Trans>
           </TabsTrigger>
-          <TabsTrigger value="rakazo" className="flex-1">
-            <Trans>Rakazo</Trans>
+          <TabsTrigger value="argo" className="flex-1">
+            <Trans>Argo</Trans>
           </TabsTrigger>
         </TabsList>
       </Tabs>
