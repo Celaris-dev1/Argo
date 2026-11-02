@@ -28,6 +28,21 @@ shutdown() {
 }
 trap shutdown TERM INT
 
+# Headless image (ultra-lean profile): no X server, VNC or window manager. Keep Lightpanda
+# listening on the page-browser CDP port and stay up as PID 1 until stopped.
+if [[ "${RAKAZO_COMPUTER_HEADLESS:-}" =~ ^(1|true|yes|on)$ ]] || ! command -v Xvfb >/dev/null 2>&1; then
+  if command -v lightpanda >/dev/null 2>&1; then
+    while true; do
+      /usr/local/bin/rakazo-lightpanda >/dev/null 2>&1 || true
+      sleep 15
+    done >/tmp/rakazo/lightpanda-keeper.log 2>&1 &
+  fi
+  sleep infinity &
+  XVFB_PID=$!
+  wait "$XVFB_PID"
+  exit 0
+fi
+
 if [[ -n "${RAKAZO_COMPUTER_CONTROL_TOKEN:-}" ]]; then
   while true; do
     /usr/local/bin/rakazo-computer-control

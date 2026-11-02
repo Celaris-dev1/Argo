@@ -58,3 +58,34 @@ lite env) lets you use servers on this machine or your LAN.
 - **Coding mode proof.** OpenCode is told to finish with `READY:` and `EVIDENCE:` lines, or `BLOCKED:`. The bot gets `verified: true` with the evidence, `blocked` with the missing item, or `verified: false` and an instruction to check the work itself. The branch, last commit and `git status` come back with every result.
 - **Stalls.** A session silent for 10 and 20 minutes posts a status note; at 40 minutes it is stopped so it does not hold the computer for the full six hours (`RAKAZO_CODING_STALL_MINUTES=10,20,40`).
 - **Memory gate.** With `RAKAZO_MIN_FREE_MEMORY_MB=900`, the supervisor refuses to start or wake a computer when the host has less free memory than that, and the bot reports why instead of the machine swapping to a halt. Set 0 to turn it off.
+
+## Ultra-lean: 1 vCPU / 2 GB / 6 GB boxes
+
+For one bot owner on a tiny VPS, using API models only. The bot computer is **headless**: shell,
+files, git, gh, uv, Coding mode (OpenCode) and Lightpanda as the page browser. There is no desktop,
+no takeover, no screen tools and no local model. Bots are told this (`RAKAZO_COMPUTER_HEADLESS=1`),
+so they are never offered `computer_observe` or `computer_act`.
+
+The small box never builds anything.
+
+1. On a bigger box (8 GB is fine), build and pack the images:
+   `bash infra/compose/build-ultra-images.sh` → `rakazo-ultra-images.tar.gz`
+2. If the small box is **IPv6-only**, give it IPv4 egress through a box that has IPv4:
+   - on the IPv4 box: `sudo bash infra/compose/ultra-egress.sh server` then
+     `sudo bash infra/compose/ultra-egress.sh add-peer ultra1` → `ultra1.conf`
+   - IPv4 goes through WireGuard; IPv6 stays native. Open UDP 51820 on the IPv4 box.
+3. Copy the tarball, `ultra1.conf` and the `infra/compose` folder to the small box, then:
+   `sudo bash install-ultra.sh rakazo-ultra-images.tar.gz ultra1.conf`
+
+The installer adds 2 GB swap (swappiness 10), sets up the tunnel, caps Docker logs, loads the
+images and starts the stack with `docker-compose.ultra.yml` layered on the lite file.
+
+Memory ceilings: postgres 192m · supervisor 128m · api 384m · worker 448m · web 160m · one headless
+computer 512m (about 1.8 GB). The memory gate refuses a new computer below 300 MB free.
+One computer at a time. Worker concurrency is 1.
+
+For users on IPv4 to reach an IPv6-only box, put it behind Cloudflare (proxied DNS record) or a
+reverse proxy on a dual-stack box.
+
+Caveats: Lightpanda supports a subset of what Chromium does over CDP, and some pages will not render
+or will not take clicks. Sites that need a real browser need the lite profile.

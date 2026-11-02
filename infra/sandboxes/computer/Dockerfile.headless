@@ -1,0 +1,107 @@
+# Headless bot computer for the ultra-lean profile (1 vCPU / 2 GB boxes).
+# Shell, files, git, gh, uv, OpenCode (Coding mode) and Lightpanda as the page browser.
+# No X server, VNC, window manager or Chromium: screen tools and takeover are off
+# (set RAKAZO_COMPUTER_HEADLESS=1 on api and worker so bots are not offered them).
+#
+#   docker build -f infra/sandboxes/computer/Dockerfile.headless -t rakazo/computer:headless infra/sandboxes/computer
+FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
+ARG WITH_PANDOC=0
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-openpyxl \
+    libnss-wrapper \
+    ca-certificates \
+    procps \
+    bash \
+    curl \
+    git \
+    jq \
+    openssh-client \
+    unzip \
+    poppler-utils \
+    $([ "$WITH_PANDOC" = 1 ] && echo pandoc) \
+  && rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* \
+  && groupadd --gid 1000 rakazo \
+  && useradd --uid 1000 --gid rakazo --create-home --shell /bin/bash rakazo
+RUN ln -s "$(dpkg -L libnss-wrapper | grep '/libnss_wrapper.so$')" /usr/local/lib/libnss_wrapper.so
+ARG TARGETARCH
+ARG UV_VERSION=0.12.19
+RUN set -eux; \
+  case "$TARGETARCH" in \
+    amd64) uv_arch=x86_64; uv_sha256=23bf5552d220e0842b65c862097b2ebaeba0064b74eda5e565e77fd25969d8c8 ;; \
+    arm64) uv_arch=aarch64; uv_sha256=0804e9b164c64b6914182d5920c08551958a095986f10a3731056df701126436 ;; \
+    *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
+  esac; \
+  archive="$(mktemp)"; \
+  curl -fsSL "https://releases.astral.sh/github/uv/releases/download/${UV_VERSION}/uv-${uv_arch}-unknown-linux-gnu.tar.gz" -o "$archive"; \
+  echo "$uv_sha256  $archive" | sha256sum -c -; \
+  tar -xzf "$archive" -C /usr/local/bin --strip-components=1 "uv-${uv_arch}-unknown-linux-gnu/uv" "uv-${uv_arch}-unknown-linux-gnu/uvx"; \
+  rm -f "$archive"; \
+  uv --version; \
+  uvx --version
+# Bookworm has no gh package; pin the upstream binary and verify sha256, same as uv.
+ARG GH_VERSION=2.100.0
+RUN set -eux; \
+  case "$TARGETARCH" in \
+    amd64) gh_arch=amd64; gh_sha256=e4d4bb4498e8d007abe545b6568926793ace1b6447da598294a610018cb164be ;; \
+    arm64) gh_arch=arm64; gh_sha256=ea4e7a581a32ccad6cc7923cb1576ac5859ba4b9a16ab22eb8f8a96e78e2e961 ;; \
+    *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
+  esac; \
+  archive="$(mktemp)"; \
+  curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${gh_arch}.tar.gz" -o "$archive"; \
+  echo "$gh_sha256  $archive" | sha256sum -c -; \
+  tar -xzf "$archive" -C /usr/local/bin --strip-components=2 "gh_${GH_VERSION}_linux_${gh_arch}/bin/gh"; \
+  rm -f "$archive"; \
+  gh --version
+# Coding mode. OpenCode (anomalyco/opencode) is the headless coding agent.
+# Pinned like gh: the sandbox user cannot install packages at runtime.
+ARG OPENCODE_VERSION=1.19.5
+RUN set -eux; \
+  case "$TARGETARCH" in \
+    amd64) oc_asset=opencode-linux-x64.tar.gz; oc_sha256=588310a336fa3b9df36b3f0225b26f679d453efaad0cf3d66c3651ef3ec1647a ;; \
+    arm64) oc_asset=opencode-linux-arm64.tar.gz; oc_sha256=fae5be262d693b7c5e562856cc473e59e741772936db0c0600ac0d5ed5bd088b ;; \
+    *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
+  esac; \
+  archive="$(mktemp)"; \
+  curl -fsSL "https://github.com/anomalyco/opencode/releases/download/v${OPENCODE_VERSION}/${oc_asset}" -o "$archive"; \
+  echo "$oc_sha256  $archive" | sha256sum -c -; \
+  tar -xzf "$archive" -C /usr/local/bin opencode; \
+  rm -f "$archive"; \
+  chmod 755 /usr/local/bin/opencode; \
+  test -x /usr/local/bin/opencode
+# Lightpanda is the page browser. Chromium stays on the image only as a fallback
+# for computers that do not have this binary.
+ARG LIGHTPANDA_VERSION=1.0.2
+RUN set -eux; \
+  case "$TARGETARCH" in \
+    amd64) lp_asset=lightpanda-x86_64-linux; lp_sha256=ae7d01d261efb9e480e18ce3424533332883863bcf70b12a4321b5733f37e19e ;; \
+    arm64) lp_asset=lightpanda-aarch64-linux; lp_sha256=ac546dfc43c533430da92b75ab36f2a29da7d6324d5d38baf606ef2e0d849345 ;; \
+    *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
+  esac; \
+  curl -fsSL "https://github.com/lightpanda-io/browser/releases/download/${LIGHTPANDA_VERSION}/${lp_asset}" -o /usr/local/bin/lightpanda; \
+  echo "$lp_sha256  /usr/local/bin/lightpanda" | sha256sum -c -; \
+  chmod 755 /usr/local/bin/lightpanda
+# DISPLAY only picks the CDP port (9221 + display), there is no X server.
+ENV DISPLAY=:1
+ENV HOME=/home/rakazo
+ENV LANG=C.UTF-8
+ENV RAKAZO_COMPUTER_HEADLESS=1
+ENV UV_TOOL_DIR=/home/rakazo/.local/share/uv/tools \
+    UV_TOOL_BIN_DIR=/home/rakazo/.local/bin \
+    UV_PYTHON_INSTALL_DIR=/home/rakazo/.local/share/uv/python
+WORKDIR /home/rakazo
+COPY --chmod=755 start.sh /usr/local/bin/rakazo-computer
+COPY --chmod=644 user-env.sh /usr/local/lib/rakazo-user-env.sh
+COPY --chmod=755 rakazo-lightpanda /usr/local/bin/rakazo-lightpanda
+COPY --chmod=755 rakazo-page-browser /usr/local/bin/rakazo-page-browser
+COPY --chmod=644 rakazo-local-bin.sh /etc/profile.d/rakazo-local-bin.sh
+# Anything that asks for "the browser" gets Lightpanda.
+RUN ln -s /usr/local/bin/rakazo-lightpanda /usr/local/bin/rakazo-browser \
+  && sed -i 's/\r$//' /usr/local/bin/rakazo-computer /usr/local/lib/rakazo-user-env.sh /usr/local/bin/rakazo-lightpanda /usr/local/bin/rakazo-page-browser /etc/profile.d/rakazo-local-bin.sh \
+  && ln -s /usr/bin/python3 /usr/local/bin/python
+LABEL rakazo.computer.headless="1"
+ENV LD_PRELOAD=/usr/local/lib/libnss_wrapper.so \
+    NSS_WRAPPER_PASSWD=/tmp/rakazo-nss/passwd \
+    NSS_WRAPPER_GROUP=/tmp/rakazo-nss/group
+USER 1000:1000
+CMD ["/usr/bin/env", "-u", "LD_PRELOAD", "/usr/local/bin/rakazo-computer"]

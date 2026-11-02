@@ -1,0 +1,82 @@
+# Ultra-lean profile: one bot owner on a 1 vCPU / 2 GB / 6 GB box, API models only.
+# Headless computer (shell, files, Coding mode, Lightpanda page browser). No desktop,
+# no takeover, no screen tools, no local models. Images are built elsewhere and loaded
+# (docker load); nothing is built on this box. Needs 2 GB swap.
+#
+#   docker compose --env-file .env -f docker-compose.images.yml -f docker-compose.lite.yml \
+#     -f docker-compose.ultra.yml up -d
+#
+# install-ultra.sh does all of this, plus swap and the IPv6-only egress tunnel.
+#
+# Memory ceilings (approx.): postgres 192m · supervisor 128m · api 384m · worker 448m
+# · web 160m + one headless computer 512m ≈ 1.8 GB, with swap absorbing peaks.
+
+services:
+  postgres:
+    mem_limit: 192m
+    command:
+      - postgres
+      - -c
+      - max_connections=20
+      - -c
+      - shared_buffers=48MB
+      - -c
+      - effective_cache_size=128MB
+      - -c
+      - work_mem=2MB
+      - -c
+      - maintenance_work_mem=16MB
+      - -c
+      - wal_buffers=2MB
+      - -c
+      - max_wal_size=256MB
+      - -c
+      - max_worker_processes=2
+      - -c
+      - max_parallel_workers=1
+      - -c
+      - max_parallel_workers_per_gather=0
+      - -c
+      - jit=off
+
+  computer:
+    image: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-headless}
+    pull_policy: never
+
+  supervisor:
+    mem_limit: 128m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=96
+      RAKAZO_COMPUTER_IMAGE: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-headless}
+      RAKAZO_COMPUTER_MEMORY: ${RAKAZO_COMPUTER_MEMORY:-512m}
+      RAKAZO_COMPUTER_CPUS: ${RAKAZO_COMPUTER_CPUS:-0.8}
+      RAKAZO_COMPUTER_PIDS_LIMIT: ${RAKAZO_COMPUTER_PIDS_LIMIT:-256}
+      RAKAZO_MIN_FREE_MEMORY_MB: ${RAKAZO_MIN_FREE_MEMORY_MB:-300}
+
+  migrate:
+    mem_limit: 512m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=384
+
+  api:
+    mem_limit: 384m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=288
+      UV_THREADPOOL_SIZE: "1"
+      RAKAZO_COMPUTER_HEADLESS: "1"
+
+  worker:
+    mem_limit: 448m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=336
+      UV_THREADPOOL_SIZE: "1"
+      GRAPHILE_WORKER_CONCURRENCY: ${GRAPHILE_WORKER_CONCURRENCY:-1}
+      RAKAZO_COMPUTER_HEADLESS: "1"
+      # One extra model call per long run; leave on unless tokens are tight.
+      RAKAZO_SKILL_LEARNING: ${RAKAZO_SKILL_LEARNING:-on}
+
+  web:
+    mem_limit: 160m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=112
+      RAYON_NUM_THREADS: "1"

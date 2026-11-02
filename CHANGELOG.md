@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - OpenAI-compatible presets in Models settings: OpenRouter, Venice, Featherless, NanoGPT, Together AI, DeepInfra, and local Ollama, llama.cpp, LM Studio, KoboldCpp.
 - Small-model mode (`RAKAZO_SMALL_MODELS`) offers 1–3B models a core tool set.
 - Inline `<think>` reasoning is stripped from replies.
+- Ultra-lean profile for 1 vCPU / 2 GB / 6 GB boxes (`docker-compose.ultra.yml`, `install-ultra.sh`): headless bot computer (`Dockerfile.headless`, Lightpanda page browser, no desktop), images built elsewhere and loaded, 2 GB swap, and a WireGuard IPv4 egress helper for IPv6-only boxes (`ultra-egress.sh`).
 - Bots learn from their own work: after a run with 3 or more tool calls, the bot's model may save or update up to two "learned" skills. It never edits skills you wrote, skips small models, and turns off with `RAKAZO_SKILL_LEARNING=off`.
 - Coding mode asks for proof: the session ends with READY plus evidence, or BLOCKED with what it needs. Unproven results tell the bot to verify before answering, and the workspace's git state comes back with every result.
 - Coding mode stops a session that prints nothing for 40 minutes (notes at 10 and 20; `RAKAZO_CODING_STALL_MINUTES`).
