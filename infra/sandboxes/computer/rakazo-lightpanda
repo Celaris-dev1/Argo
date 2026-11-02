@@ -1,0 +1,55 @@
+#!/bin/sh
+# Lightpanda serves the same CDP port the page browser already uses.
+# It has no window. A second launch attaches to the one already listening.
+set -eu
+DISPLAY_NUM="${DISPLAY:-:1}"
+DISPLAY_NUM="${DISPLAY_NUM#:}"
+DISPLAY_NUM="${DISPLAY_NUM%%.*}"
+case "$DISPLAY_NUM" in
+  ''|*[!0-9]*) DISPLAY_NUM=1 ;;
+esac
+while [ "${DISPLAY_NUM#0}" != "$DISPLAY_NUM" ]; do DISPLAY_NUM="${DISPLAY_NUM#0}"; done
+DISPLAY_NUM="${DISPLAY_NUM:-0}"
+DEBUG_PORT="${RAKAZO_CDP_PORT:-$((9221 + DISPLAY_NUM))}"
+URL=""
+for arg in "$@"; do
+  case "$arg" in
+    http://*|https://*|file:*|about:*) URL="$arg" ;;
+  esac
+done
+ready() {
+  curl -sf -o /dev/null --max-time 0.4 "http://127.0.0.1:${DEBUG_PORT}/json/version"
+}
+started=0
+if ! ready; then
+  nohup /usr/local/bin/lightpanda serve --host 127.0.0.1 --port "$DEBUG_PORT" \
+    >/tmp/rakazo-lightpanda.log 2>&1 &
+  echo $! >/tmp/rakazo-lightpanda.pid
+  started=1
+  i=0
+  while [ "$i" -lt 50 ]; do
+    ready && break
+    i=$((i + 1))
+    sleep 0.1
+  done
+fi
+if [ -n "$URL" ]; then
+  python3 - "$DEBUG_PORT" "$URL" <<'PY'
+import json, sys, urllib.request
+port, url = sys.argv[1], sys.argv[2]
+req = urllib.request.Request(
+    f"http://127.0.0.1:{port}/json/new?{urllib.request.quote(url, safe='')}",
+    method="PUT",
+)
+try:
+    urllib.request.urlopen(req, timeout=3).read()
+except Exception:
+    sys.exit(0)
+PY
+fi
+if [ "$started" -eq 1 ]; then
+  pid="$(cat /tmp/rakazo-lightpanda.pid 2>/dev/null || true)"
+  if [ -n "$pid" ]; then
+    wait "$pid"
+  fi
+fi

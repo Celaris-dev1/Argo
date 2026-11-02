@@ -1,0 +1,246 @@
+#!/usr/bin/env python3
+"""Click a checkbox CAPTCHA in this computer's Chromium.
+
+Uses the browser's own debugging port. Does not read or write the profile,
+cookies, or history. Image grids are left for the model, which can see them.
+"""
+import base64
+import json
+import os
+import socket
+import struct
+import time
+import urllib.request
+
+CAPTCHA_HOSTS = (
+    "challenges.cloudflare.com",
+    "chl.cloudflare.com",
+    "hcaptcha.com",
+    "recaptcha",
+    "google.com/recaptcha",
+    "turnstile",
+    "arkoselabs.com",
+    "funcaptcha.com",
+)
+CLICK_JS = r"""
+(() => {
+  const grid = document.querySelector(
+    ".task-image, .rc-imageselect-target, .challenge-container, #game_children_text"
+  );
+  if (grid) {
+    const r = grid.getBoundingClientRect();
+    if (r.width > 40 && r.height > 40) return { kind: "image" };
+  }
+  const sels = [
+    "input[type=checkbox]",
+    ".ctp-checkbox-label",
+    "#checkbox",
+    ".rc-anchor-checkbox",
+    "#recaptcha-anchor",
+    ".cb-lb",
+    "label"
+  ];
+  for (const sel of sels) {
+    const el = document.querySelector(sel);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) continue;
+    return { kind: "box", x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  }
+  return null;
+})()
+"""
+
+
+def debug_port():
+    raw = os.environ.get("DISPLAY", ":1").lstrip(":").split(".")[0]
+    try:
+        number = int(raw)
+    except ValueError:
+        number = 1
+    return 9221 + number
+
+
+def targets(port):
+    with urllib.request.urlopen(f"http://127.0.0.1:{port}/json/list", timeout=3) as response:
+        return json.load(response)
+
+
+def captcha_targets(items):
+    found = []
+    for item in items:
+        url = item.get("url") or ""
+        if item.get("type") not in ("page", "iframe", "other"):
+            continue
+        if any(host in url for host in CAPTCHA_HOSTS):
+            found.append(item)
+    return found
+
+
+class Cdp:
+    def __init__(self, ws_url):
+        host, port, path = _split_ws(ws_url)
+        self.sock = socket.create_connection((host, port), timeout=5)
+        self.sock.settimeout(8)
+        key = base64.b64encode(os.urandom(16)).decode()
+        request = (
+            f"GET {path} HTTP/1.1\r\n"
+            f"Host: {host}:{port}\r\n"
+            "Upgrade: websocket\r\n"
+            "Connection: Upgrade\r\n"
+            f"Sec-WebSocket-Key: {key}\r\n"
+            "Sec-WebSocket-Version: 13\r\n\r\n"
+        )
+        self.sock.sendall(request.encode())
+        buf = b""
+        while b"\r\n\r\n" not in buf:
+            chunk = self.sock.recv(4096)
+            if not chunk:
+                raise RuntimeError("cdp handshake failed")
+            buf += chunk
+        self.next_id = 1
+
+    def call(self, method, params=None):
+        message_id = self.next_id
+        self.next_id += 1
+        self._send({"id": message_id, "method": method, "params": params or {}})
+        while True:
+            payload = json.loads(self._recv())
+            if payload.get("id") == message_id:
+                if "error" in payload:
+                    raise RuntimeError(payload["error"])
+                return payload.get("result", {})
+
+    def close(self):
+        self.sock.close()
+
+    def _send(self, obj):
+        data = json.dumps(obj).encode()
+        mask = os.urandom(4)
+        length = len(data)
+        header = bytearray([0x81])
+        if length < 126:
+            header.append(0x80 | length)
+        elif length < 65536:
+            header.append(0x80 | 126)
+            header += struct.pack("!H", length)
+        else:
+            header.append(0x80 | 127)
+            header += struct.pack("!Q", length)
+        header += mask
+        masked = bytes(byte ^ mask[index % 4] for index, byte in enumerate(data))
+        self.sock.sendall(header + masked)
+
+    def _recv(self):
+        def readn(size):
+            buf = b""
+            while len(buf) < size:
+                chunk = self.sock.recv(size - len(buf))
+                if not chunk:
+                    raise RuntimeError("cdp closed")
+                buf += chunk
+            return buf
+
+        while True:
+            first, second = readn(2)
+            opcode = first & 0x0F
+            length = second & 0x7F
+            if length == 126:
+                length = struct.unpack("!H", readn(2))[0]
+            elif length == 127:
+                length = struct.unpack("!Q", readn(8))[0]
+            payload = readn(length)
+            if opcode == 9:
+                continue
+            if opcode == 8:
+                raise RuntimeError("cdp closed")
+            return payload.decode()
+
+
+def _split_ws(url):
+    rest = url.split("://", 1)[1]
+    hostport, _, path = rest.partition("/")
+    host, _, port = hostport.partition(":")
+    return host, int(port or 80), "/" + path
+
+
+def click(cdp, x, y):
+    for step in range(1, 4):
+        cdp.call(
+            "Input.dispatchMouseEvent",
+            {"type": "mouseMoved", "x": x * step / 3, "y": y * step / 3},
+        )
+        time.sleep(0.04)
+    cdp.call(
+        "Input.dispatchMouseEvent",
+        {"type": "mousePressed", "x": x, "y": y, "button": "left", "clickCount": 1},
+    )
+    time.sleep(0.05)
+    cdp.call(
+        "Input.dispatchMouseEvent",
+        {"type": "mouseReleased", "x": x, "y": y, "button": "left", "clickCount": 1},
+    )
+
+
+def inspect_target(item):
+    ws = item.get("webSocketDebuggerUrl")
+    if not ws:
+        return None
+    cdp = Cdp(ws)
+    try:
+        result = cdp.call(
+            "Runtime.evaluate",
+            {"expression": CLICK_JS, "returnByValue": True},
+        )
+        value = (result.get("result") or {}).get("value")
+        if value and value.get("kind") == "box":
+            click(cdp, value["x"], value["y"])
+        return value
+    finally:
+        cdp.close()
+
+
+def main():
+    port = debug_port()
+    try:
+        items = targets(port)
+    except Exception as error:
+        print(f"no-browser {error}")
+        return 1
+    found = captcha_targets(items)
+    if not found:
+        print("no-captcha")
+        return 0
+    saw_image = False
+    clicked = False
+    for item in found:
+        try:
+            value = inspect_target(item)
+        except Exception as error:
+            print(f"skip {error}")
+            continue
+        if not value:
+            continue
+        if value.get("kind") == "image":
+            saw_image = True
+        elif value.get("kind") == "box":
+            clicked = True
+    if saw_image and not clicked:
+        print("image-challenge")
+        return 0
+    if not clicked:
+        print("still-blocked")
+        return 0
+    time.sleep(2)
+    try:
+        if captcha_targets(targets(port)):
+            print("clicked-still-there")
+            return 0
+    except Exception:
+        pass
+    print("solved")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
