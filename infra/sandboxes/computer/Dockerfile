@@ -19,6 +19,8 @@ FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2
 # Compilers stay in the builder stage; heavier toolchains are a separate call.
 # The bot browser: chromium by default, or BROWSER=brave (installed below).
 ARG BROWSER=chromium
+# CJK fonts are ~100 MB; WITH_CJK_FONTS=0 drops them (Chinese/Japanese/Korean pages show boxes).
+ARG WITH_CJK_FONTS=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     xvfb \
     x11vnc \
@@ -39,7 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     $([ "$BROWSER" = chromium ] && echo chromium) \
     fonts-liberation \
     fonts-dejavu-core \
-    fonts-noto-cjk \
+    $([ "$WITH_CJK_FONTS" = 1 ] && echo fonts-noto-cjk) \
     fonts-noto-color-emoji \
     locales \
     dbus-x11 \
@@ -56,7 +58,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils \
     pandoc \
     python3-openpyxl \
-  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* \
+  && find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en*' -exec rm -rf {} + \
+  && { [ ! -d /usr/lib/chromium/locales ] || find /usr/lib/chromium/locales -name '*.pak' ! -name 'en-US.pak' -delete; } \
   && pdftotext -v \
   && pdfinfo -v \
   && pandoc --version \
