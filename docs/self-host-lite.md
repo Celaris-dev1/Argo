@@ -51,3 +51,10 @@ lite env) lets you use servers on this machine or your LAN.
   fine-tunes without tool support can chat but can't use the computer.
 - Keep `RAKAZO_LOCAL_CONTEXT_WINDOW` at 8192–16384 on 8 GB. Larger windows use RAM in the
   KV cache.
+
+## Learning, Coding mode and the memory gate
+
+- **Learned skills.** After a run that used 3 or more tools, the bot's own model reviews the work and may save or update up to two skills marked `learned: true`. It only edits or retires skills it wrote, never yours, never stores secrets, and is skipped for models in `RAKAZO_SMALL_MODELS`. It costs one extra model call per qualifying run. Settings: `RAKAZO_SKILL_LEARNING=on|off`, `RAKAZO_SKILL_LEARNING_MIN_TOOLS=3`.
+- **Coding mode proof.** OpenCode is told to finish with `READY:` and `EVIDENCE:` lines, or `BLOCKED:`. The bot gets `verified: true` with the evidence, `blocked` with the missing item, or `verified: false` and an instruction to check the work itself. The branch, last commit and `git status` come back with every result.
+- **Stalls.** A session silent for 10 and 20 minutes posts a status note; at 40 minutes it is stopped so it does not hold the computer for the full six hours (`RAKAZO_CODING_STALL_MINUTES=10,20,40`).
+- **Memory gate.** With `RAKAZO_MIN_FREE_MEMORY_MB=900`, the supervisor refuses to start or wake a computer when the host has less free memory than that, and the bot reports why instead of the machine swapping to a halt. Set 0 to turn it off.

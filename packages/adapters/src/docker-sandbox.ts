@@ -100,6 +100,7 @@ function sandboxGoneError(computer: ComputerRef): Error {
 
 export class DockerSandboxProvider implements SandboxProvider {
   private readonly supervisorToken: string;
+  private readonly headless = /^(1|true|yes|on)$/i.test(process.env.RAKAZO_COMPUTER_HEADLESS ?? "");
 
   constructor(
     private readonly supervisorUrl: string,
@@ -113,13 +114,15 @@ export class DockerSandboxProvider implements SandboxProvider {
       id: "docker",
       contractVersion: "1",
       adapterVersion: "0.1.0",
+      // A headless computer image (ultra-lean profile) has a shell, files and the page browser
+      // but no screen, so the screen tools, takeover and extra screens are not offered.
       capabilities: {
-        graphical: true,
+        graphical: !this.headless,
         pty: true,
         snapshots: true,
-        takeover: true,
+        takeover: !this.headless,
         persistentHome: true,
-        multiScreen: true,
+        multiScreen: !this.headless,
       },
     };
   }
@@ -160,6 +163,12 @@ export class DockerSandboxProvider implements SandboxProvider {
       const limitError = detail.match(/Computer limit reached for space \(max: \d+\)/i)?.[0];
       if (res.status === 429 && limitError) {
         throw new Error(limitError);
+      }
+      const memoryError = detail.match(
+        /Not enough free memory to start another computer[^"]*/i,
+      )?.[0];
+      if (res.status === 503 && memoryError) {
+        throw new Error(memoryError.trim());
       }
       throw new Error(`sandbox provision failed: ${res.status} ${detail}`.trim());
     }

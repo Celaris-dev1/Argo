@@ -26,6 +26,7 @@ import { compactHistory } from "./history-compaction.js";
 import type { MemoryProviderResolver } from "./memory-provider-factory.js";
 import { deliverMessagingOutbound, mirrorMessagingOutbound } from "./messaging-delivery.js";
 import { pollPurchase } from "./purchase-poll.js";
+import { learnFromRun } from "./skill-learning.js";
 import { expireTaughtSkillTeaching } from "./teaching-session.js";
 
 type Tenant = { spaceId: string; userId: string };
@@ -131,6 +132,15 @@ export function createBackgroundJobHandlers(deps: {
           await drainMessaging();
         });
       }
+      // Self-improvement: a finished run may leave the bot a reusable skill. Best effort only.
+      await learnFromRun(
+        {
+          prisma: deps.prisma,
+          runtime: deps.runtime,
+          ...(deps.executor.resolveModel ? { resolveModel: deps.executor.resolveModel } : {}),
+        },
+        payload.runId,
+      );
     }),
     "messaging.credential-cleanup": async ({ installationId, ref }) => {
       await runAsSystem("clean up a retired messaging credential", async () => {

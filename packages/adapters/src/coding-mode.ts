@@ -23,6 +23,60 @@ const CODING_POLL_MS = 4_000;
 const ALONE =
   "Work alone until this is finished. Do not ask the user questions, do not wait for permission, and do not stop to confirm a choice. Decide and continue. If a command fails, fix it and keep going. Stop only when the task is done or you are blocked by something only the user can provide, such as a missing secret. The desktop browser is Chromium; leave its profile in place. If a page shows a CAPTCHA, run rakazo-captcha or click the challenge yourself and continue. Do not ask the user to solve one.";
 
+/**
+ * Finish protocol, after dori-superagent's lanes (https://github.com/sisyphuslabs/dori-superagent,
+ * MIT): no "done" without proof. Rakazo checks for these lines when the session ends.
+ */
+const FINISH =
+  "When you finish, end your last message with these lines:\nREADY: <one line saying what is now true>\nEVIDENCE: <proof, one per line: the test or build command you ran and its result, a commit SHA, a PR or deploy URL, or the files you changed>\nIf you cannot finish, end with BLOCKED: <the one thing only the user can provide> instead. Never write READY without evidence you produced in this session.";
+
+export type CodingVerdict =
+  | { kind: "ready"; result: string; evidence: string[] }
+  | { kind: "blocked"; reason: string }
+  | { kind: "unproven" };
+
+/** Reads the READY / EVIDENCE / BLOCKED lines from the session's final message. */
+export function parseCodingVerdict(summary: string): CodingVerdict {
+  const lines = summary.split("\n").map((line) => line.trim());
+  const blocked = lines.findLast((line) => /^\**BLOCKED\**:/i.test(line));
+  const readyIndex = lines.findLastIndex((line) => /^\**READY\**:/i.test(line));
+  if (blocked && (readyIndex < 0 || lines.lastIndexOf(blocked) > readyIndex)) {
+    return { kind: "blocked", reason: blocked.replace(/^\**BLOCKED\**:\s*/i, "") };
+  }
+  if (readyIndex < 0) return { kind: "unproven" };
+  const result = (lines[readyIndex] ?? "").replace(/^\**READY\**:\s*/i, "");
+  const evidence: string[] = [];
+  let inEvidence = false;
+  for (const line of lines.slice(readyIndex + 1)) {
+    const head = line.match(/^\**EVIDENCE\**:\s*(.*)$/i);
+    if (head) {
+      inEvidence = true;
+      if (head[1]) evidence.push(head[1]);
+      continue;
+    }
+    if (inEvidence && line) evidence.push(line.replace(/^[-*•]\s*/, ""));
+  }
+  if (!result || evidence.length === 0) return { kind: "unproven" };
+  return { kind: "ready", result, evidence };
+}
+
+/** Minutes of silence before a status note, a second note, and stopping the session. */
+export function codingStallMinutes(value = process.env.RAKAZO_CODING_STALL_MINUTES): number[] {
+  const parsed = (value ?? "10,20,40")
+    .split(",")
+    .map((item) => Number(item.trim()))
+    .filter((n) => Number.isFinite(n) && n > 0)
+    .sort((a, b) => a - b);
+  return parsed.length ? parsed : [10, 20, 40];
+}
+
+const EVIDENCE_SESSION = `set -u
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "branch: $(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  echo "head: $(git log -1 --format='%h %s' 2>/dev/null)"
+  git status --porcelain 2>/dev/null | head -40
+fi`;
+
 const START_SESSION = `set -u
 pidfile="$1"
 logfile="$2"
@@ -253,7 +307,7 @@ export const codingTools: ToolHandlers = {
     }
     const pidfile = `/tmp/rakazo-code-${bot.id}.pid`;
     const logfile = `/tmp/rakazo-code-${bot.id}.log`;
-    const task = `${ALONE}\n\n${prompt}`;
+    const task = `${ALONE}\n\n${FINISH}\n\n${prompt}`;
     let summary = "";
     let lastStatus = "";
     let parsedMark = "";
@@ -318,6 +372,11 @@ export const codingTools: ToolHandlers = {
     };
     context.signal.addEventListener("abort", onAbort, { once: true });
     let alive = true;
+    let stalled = false;
+    const stallMinutes = codingStallMinutes();
+    let lastBody = "";
+    let lastProgressAt = Date.now();
+    let stallNotes = 0;
     try {
       const started = await runShort(
         [
@@ -352,6 +411,27 @@ export const codingTools: ToolHandlers = {
         alive = polled.stdout.startsWith("ALIVE");
         takeChunk(body);
         if (!alive) break;
+        // A quiet session gets a note at each threshold and is stopped at the last one, so a
+        // hung agent never holds the computer for the whole six-hour sitting.
+        const tail = body.slice(-400);
+        if (tail !== lastBody) {
+          lastBody = tail;
+          lastProgressAt = Date.now();
+          stallNotes = 0;
+        } else {
+          const quietMinutes = (Date.now() - lastProgressAt) / 60_000;
+          const due = stallMinutes.filter((m) => quietMinutes >= m).length;
+          if (due >= stallMinutes.length) {
+            stalled = true;
+            await stop();
+            alive = false;
+            break;
+          }
+          if (due > stallNotes) {
+            stallNotes = due;
+            void postWorkStatus(ctx, `Coding — no output for ${Math.floor(quietMinutes)} min`);
+          }
+        }
         await new Promise<void>((resolve) => {
           const timer = setTimeout(resolve, CODING_POLL_MS);
           if (context.signal.aborted) {
@@ -384,6 +464,22 @@ export const codingTools: ToolHandlers = {
     }
     const safeSummary = redactSecrets(summary, ctx.secrets);
     const safeError = redactSecrets(stderr, ctx.secrets);
+    const workspace = alive
+      ? ""
+      : redactSecrets(
+          (await runShort(["bash", "-c", EVIDENCE_SESSION], false).catch(() => undefined))
+            ?.stdout ?? "",
+          ctx.secrets,
+        ).trim();
+    if (stalled) {
+      return call.finish({
+        ok: false,
+        stalled: true,
+        summary: clip(safeSummary, SUMMARY_MAX),
+        ...(workspace ? { workspace: clip(workspace, 2_000) } : {}),
+        note: `Coding mode printed nothing for ${stallMinutes[stallMinutes.length - 1]} minutes and was stopped. Check the workspace, then call code again with a narrower instruction that continues from there. Ask the user only if something only they can provide is missing.`,
+      });
+    }
     if (alive) {
       return call.finish({
         ok: true,
@@ -400,10 +496,34 @@ export const codingTools: ToolHandlers = {
         note: "It stopped on its own. If this is something you can fix without the user, call code again and tell it to continue. Do not ask the user.",
       });
     }
+    const verdict = parseCodingVerdict(safeSummary);
+    const proof = workspace ? { workspace: clip(workspace, 2_000) } : {};
+    if (verdict.kind === "blocked") {
+      return call.finish({
+        ok: false,
+        blocked: verdict.reason,
+        summary: clip(safeSummary, SUMMARY_MAX),
+        ...proof,
+        note: "Coding mode stopped because it needs something only the user can provide. Ask the user for exactly that, then call code again to continue.",
+      });
+    }
+    if (verdict.kind === "unproven") {
+      return call.finish({
+        ok: true,
+        verified: false,
+        summary: clip(safeSummary, SUMMARY_MAX),
+        ...proof,
+        note: "Coding mode finished without a READY line and evidence. Before you tell the user it is done, check it yourself: read the changed files and run the tests or build. If something is missing, call code again to finish it. Do not redo the same edits.",
+      });
+    }
     return call.finish({
       ok: true,
+      verified: true,
+      result: verdict.result,
+      evidence: verdict.evidence.slice(0, 12),
       summary: clip(safeSummary, SUMMARY_MAX),
-      note: "Coding mode finished in this workspace. Read the files it changed before you answer. Do not redo the same edits, and do not ask the user a question the work already answered.",
+      ...proof,
+      note: "Coding mode finished with evidence. Read the files it changed before you answer, and give the user the result with its evidence. Do not redo the same edits, and do not ask the user a question the work already answered.",
     });
   },
 };

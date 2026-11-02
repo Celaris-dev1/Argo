@@ -12,3 +12,12 @@ Modifications by Rakazo contributors include, among others:
 - Lite deployment profile for 8 GB machines (infra/compose/docker-compose.lite.yml)
 - OpenAI-compatible provider presets and small-model mode
 - Inline reasoning (<think>) stripping for local and open-weight models
+- Self-improving learned skills after each run (packages/adapters/src/skill-learning.ts)
+- Coding mode finish protocol (READY / EVIDENCE / BLOCKED) and stall detection
+- Host free-memory gate for computers (infra/sandboxes/supervisor/src/memory-gate.ts)
+
+Design credits (ideas, no code copied):
+- The learned-skills loop follows the learning approach of Klex by stagewise
+  (https://github.com/stagewise-io/klex), Apache License 2.0.
+- The coding finish protocol, stall nudges and free-memory admission follow
+  dori-superagent by Sisyphus Labs (https://github.com/sisyphuslabs/dori-superagent), MIT License.

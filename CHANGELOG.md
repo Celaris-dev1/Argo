@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - OpenAI-compatible presets in Models settings: OpenRouter, Venice, Featherless, NanoGPT, Together AI, DeepInfra, and local Ollama, llama.cpp, LM Studio, KoboldCpp.
 - Small-model mode (`RAKAZO_SMALL_MODELS`) offers 1–3B models a core tool set.
 - Inline `<think>` reasoning is stripped from replies.
+- Bots learn from their own work: after a run with 3 or more tool calls, the bot's model may save or update up to two "learned" skills. It never edits skills you wrote, skips small models, and turns off with `RAKAZO_SKILL_LEARNING=off`.
+- Coding mode asks for proof: the session ends with READY plus evidence, or BLOCKED with what it needs. Unproven results tell the bot to verify before answering, and the workspace's git state comes back with every result.
+- Coding mode stops a session that prints nothing for 40 minutes (notes at 10 and 20; `RAKAZO_CODING_STALL_MINUTES`).
+- `RAKAZO_MIN_FREE_MEMORY_MB` stops the supervisor from starting or waking a computer when the host is short on memory (900 MB in the lite profile).
 
 ### Fixed (fork)
 

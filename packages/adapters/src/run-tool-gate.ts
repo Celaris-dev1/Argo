@@ -319,7 +319,8 @@ export async function gateToolCall(
   // That stall kills unattended agents, so anything that would ask (including
   // the user's own computer, which asks in every mode) runs instead. A saved
   // block still refuses.
-  const plan = decided === "ask" || decided === "judge" ? "allow" : decided;
+  // Typed as the full decision so the ask/judge branches below still compile if this is reverted.
+  const plan = (decided === "ask" || decided === "judge" ? "allow" : decided) as typeof decided;
   if (plan === "deny") {
     await auditToolCall(ctx, name, "denied", {
       reason: approvalResolved.decision === "deny" ? "rule" : "never_asks",

@@ -63,6 +63,7 @@ import {
 } from "./computer-spec.js";
 import { EgressNotEnforced, verifyRestrictedEgress } from "./egress-probe.js";
 import { assertComputerHomeWritable } from "./home-ownership.js";
+import { checkHostMemory, memoryRefusal } from "./memory-gate.js";
 import type { ScreenAssignment } from "./supervisor-logic.js";
 import {
   assertRequestIdentity,
@@ -305,7 +306,11 @@ app.post("/computers", async (c) => {
             (await reconnectBotComputer(existing, body.botId, networkOwner, Boolean(endpoint))))
         ) {
           const started = !info.State.Running;
-          if (started) await existing.start();
+          if (started) {
+            const memory = await checkHostMemory();
+            if (!memory.ok) return c.json({ error: memoryRefusal(memory) }, 503);
+            await existing.start();
+          }
           return c.json({
             id: existing.id,
             image: COMPUTER_IMAGE,
@@ -321,6 +326,8 @@ app.post("/computers", async (c) => {
       // Lock order is always bot → space; never take a bot lock while holding a space lock.
       const spaceComputerLimit = resolveSpaceComputerLimit();
       const createComputer = async () => {
+        const memory = await checkHostMemory();
+        if (!memory.ok) return c.json({ error: memoryRefusal(memory) }, 503);
         if (!existing && spaceComputerLimit > 0) {
           const currentCount = await countSpaceContainers(body.spaceId);
           if (currentCount >= spaceComputerLimit) {
