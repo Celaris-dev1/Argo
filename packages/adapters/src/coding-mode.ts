@@ -1,4 +1,9 @@
-import type { AdapterContext, ComputerRef, ProcessEvent, SandboxProvider } from "@rakazo/adapter-kit";
+import type {
+  AdapterContext,
+  ComputerRef,
+  ProcessEvent,
+  SandboxProvider,
+} from "@rakazo/adapter-kit";
 import { redactSecrets } from "@rakazo/core";
 import { shellCommandEnvironment } from "./bot-secrets.js";
 import { resolveBotWorkspaceCwd } from "./computer-support.js";
@@ -16,7 +21,7 @@ const CODING_ALONE_MS = 6 * 60 * 60 * 1000;
 const CODING_POLL_MS = 4_000;
 
 const ALONE =
-  "Work alone until this is finished. Do not ask the user questions, do not wait for permission, and do not stop to confirm a choice. Decide and continue. If a command fails, fix it and keep going. Stop only when the task is done or you are blocked by something only the user can provide, such as a missing secret. The desktop browser is Chromium; leave its profile in place. If a page shows a CAPTCHA, run python3 \"$HOME/.rakazo/captcha.py\" or click the challenge yourself and continue. Do not ask the user to solve one.";
+  "Work alone until this is finished. Do not ask the user questions, do not wait for permission, and do not stop to confirm a choice. Decide and continue. If a command fails, fix it and keep going. Stop only when the task is done or you are blocked by something only the user can provide, such as a missing secret. The desktop browser is Chromium; leave its profile in place. If a page shows a CAPTCHA, run rakazo-captcha or click the challenge yourself and continue. Do not ask the user to solve one.";
 
 const START_SESSION = `set -u
 pidfile="$1"
@@ -32,8 +37,8 @@ else echo "coding mode needs OpenCode or Kilo on this computer" >&2; exit 127
 fi
 if [ -x /usr/local/bin/lightpanda ]; then
   port="\${RAKAZO_CDP_PORT:-9222}"
-  if ! curl -sf -o /dev/null --max-time 0.4 "http://127.0.0.1:\$port/json/version"; then
-    nohup /usr/local/bin/lightpanda serve --host 127.0.0.1 --port "\$port" >/tmp/rakazo-lightpanda.log 2>&1 &
+  if ! curl -sf -o /dev/null --max-time 0.4 "http://127.0.0.1:$port/json/version"; then
+    nohup /usr/local/bin/lightpanda serve --host 127.0.0.1 --port "$port" >/tmp/rakazo-lightpanda.log 2>&1 &
   fi
 fi
 : > "$logfile"
@@ -135,7 +140,12 @@ export function codingEventUpdate(line: string): { status?: string; summary?: st
       ? (record.part as Record<string, unknown>)
       : undefined;
   const type = String(part?.type ?? record.type ?? "");
-  if (type === "step-start" || type === "step_start" || type === "step-finish" || type === "step_finish") {
+  if (
+    type === "step-start" ||
+    type === "step_start" ||
+    type === "step-finish" ||
+    type === "step_finish"
+  ) {
     return {};
   }
   const text = textOf(part?.text);
@@ -153,7 +163,8 @@ export function codingEventUpdate(line: string): { status?: string; summary?: st
     return { status: detail ? `${tool}: ${detail}` : tool };
   }
   if (type === "error" || type === "session.error") {
-    const message = textOf(record.error) || textOf(record.message) || textOf(part?.error) || "failed";
+    const message =
+      textOf(record.error) || textOf(record.message) || textOf(part?.error) || "failed";
     return { status: `error: ${message}` };
   }
   return {};
@@ -165,7 +176,9 @@ function clip(text: string, max: number): string {
   return `${trimmed.slice(0, max - 1).trimEnd()}…`;
 }
 
-async function codingProviderEnv(ctx: RunContext): Promise<{ env: Record<string, string>; model?: string }> {
+async function codingProviderEnv(
+  ctx: RunContext,
+): Promise<{ env: Record<string, string>; model?: string }> {
   const choice = runModelChoice(ctx.run, ctx.bot);
   const provider = choice.modelProvider?.trim();
   const modelId = choice.modelId?.trim();
@@ -321,7 +334,10 @@ export const codingTools: ToolHandlers = {
       );
       if (started.code !== 0) {
         return call.finish({
-          error: redactSecrets(started.stderr || started.stdout || "coding mode failed", ctx.secrets),
+          error: redactSecrets(
+            started.stderr || started.stdout || "coding mode failed",
+            ctx.secrets,
+          ),
         });
       }
       const deadline = Date.now() + CODING_ALONE_MS;
@@ -391,4 +407,3 @@ export const codingTools: ToolHandlers = {
     });
   },
 };
-

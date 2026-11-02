@@ -6530,3 +6530,21 @@ msgstr "आपके आवाज़ प्रोवाइडर का क्�
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "आपके आवाज़ प्रोवाइडर ने कुंजी अस्वीकार कर दी।"
+
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
+
+#: src/pages/Onboarding.tsx
+#: src/pages/model-settings/connection-controls.tsx
+msgid "Required API key"
+msgstr ""

@@ -1,0 +1,118 @@
+# Lite profile: the full Rakazo stack (bots, Team/Private computers, browser, terminal, coding
+# mode, integrations) tuned to fit an 8 GB Linux machine. Layer it on the published-images file:
+#
+#   docker compose --env-file .env -f docker-compose.images.yml -f docker-compose.lite.yml up -d
+#
+# Add a small local model server on the same box with:  --profile local-ai
+# install-lite.sh does all of this for you.
+#
+# Memory ceilings (approx.):  postgres 384m · supervisor 192m · api 640m · worker 768m · web 256m
+# + one bot computer 1.5g  ≈ 3.7 GB, leaving room for the OS and an optional 1–2B local model.
+# Each extra live computer costs RAKAZO_COMPUTER_MEMORY more.
+
+services:
+  postgres:
+    mem_limit: 384m
+    pids_limit: 120
+    # Small-box tuning: fewer connections and smaller caches. Safe for a single user / small team.
+    command:
+      - postgres
+      - -c
+      - max_connections=40
+      - -c
+      - shared_buffers=96MB
+      - -c
+      - effective_cache_size=256MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=32MB
+      - -c
+      - wal_buffers=4MB
+      - -c
+      - max_wal_size=512MB
+      - -c
+      - max_worker_processes=4
+      - -c
+      - max_parallel_workers=2
+      - -c
+      - max_parallel_workers_per_gather=0
+      - -c
+      - jit=off
+
+  computer:
+    # Built locally by install-lite.sh so your Dockerfile changes (OpenCode, Lightpanda,
+    # rakazo-captcha) are actually in the image.
+    image: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-local}
+    pull_policy: never
+
+  supervisor:
+    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    pull_policy: never
+    mem_limit: 192m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=128
+      RAKAZO_COMPUTER_IMAGE: ${RAKAZO_COMPUTER_IMAGE:-rakazo/computer}:${RAKAZO_COMPUTER_IMAGE_TAG:-local}
+      RAKAZO_COMPUTER_MEMORY: ${RAKAZO_COMPUTER_MEMORY:-1536m}
+      RAKAZO_COMPUTER_CPUS: ${RAKAZO_COMPUTER_CPUS:-1.5}
+      RAKAZO_COMPUTER_PIDS_LIMIT: ${RAKAZO_COMPUTER_PIDS_LIMIT:-1024}
+
+  migrate:
+    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    pull_policy: never
+    mem_limit: 768m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=512
+
+  api:
+    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    pull_policy: never
+    mem_limit: 640m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=448
+      UV_THREADPOOL_SIZE: "2"
+      RAKAZO_SMALL_MODELS: ${RAKAZO_SMALL_MODELS:-}
+      RAKAZO_SMALL_MODEL_TOOLS: ${RAKAZO_SMALL_MODEL_TOOLS:-}
+
+  worker:
+    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    pull_policy: never
+    mem_limit: 768m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=576
+      UV_THREADPOOL_SIZE: "2"
+      GRAPHILE_WORKER_CONCURRENCY: ${GRAPHILE_WORKER_CONCURRENCY:-3}
+      RAKAZO_SMALL_MODELS: ${RAKAZO_SMALL_MODELS:-}
+      RAKAZO_SMALL_MODEL_TOOLS: ${RAKAZO_SMALL_MODEL_TOOLS:-}
+
+  web:
+    image: ${RAKAZO_IMAGE:-rakazo/app}:${RAKAZO_IMAGE_TAG:-local}
+    pull_policy: never
+    mem_limit: 256m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=160
+      RAYON_NUM_THREADS: "2"
+
+  # Optional local model server for 1–2B models (qwen3:1.7b, gemma3:1b, llama3.2:1b, or an
+  # abliterated/uncensored build). One model loaded at a time, quantised KV cache.
+  # Start with: --profile local-ai   then: docker compose exec ollama ollama pull <model>
+  ollama:
+    profiles: ["local-ai"]
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    restart: unless-stopped
+    mem_limit: ${OLLAMA_MEMORY:-3g}
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-10m}
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
+      OLLAMA_CONTEXT_LENGTH: ${RAKAZO_LOCAL_CONTEXT_WINDOW:-16384}
+    volumes:
+      - ollama:/root/.ollama
+    networks:
+      - app
+
+volumes:
+  ollama:

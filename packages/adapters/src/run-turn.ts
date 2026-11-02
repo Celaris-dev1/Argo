@@ -32,6 +32,7 @@ import {
   HISTORY_WINDOW_SIZE,
   shouldEnqueueCompaction,
 } from "./history-compaction.js";
+import { stripReasoningFromReply } from "./reasoning-tags.js";
 import {
   backOffRoutineAfterAccountError,
   clearRoutineBackoff,
@@ -715,6 +716,11 @@ export async function completeRun(ctx: RunContext) {
     reply.currentTextSegment = reply.assembled;
   }
   flushPendingTools(reply);
+  // Local and uncensored models often inline <think>…</think>; never show it as the reply.
+  ({ assembled: reply.assembled, blocks: reply.messageSegments } = stripReasoningFromReply(
+    reply.assembled,
+    reply.messageSegments,
+  ));
   // Silent-allowed runs can choose an explicit NO_RESPONSE or finish empty.
   // Other runs still drop a stray sentinel at the edges of a real reply.
   const silentReply = ctx.allowSilentEmptyRun

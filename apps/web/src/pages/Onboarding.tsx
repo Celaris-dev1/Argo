@@ -3,6 +3,7 @@ import type { ModelHeaderRow, ThinkingLevel } from "@rakazo/contracts";
 import {
   CLOUDFLARE_AI_GATEWAY_PROVIDER_ID,
   cloudflareModelRouting,
+  compatiblePresetNeedsKey,
   DEFAULT_MODEL_CONTEXT_WINDOW,
   DEFAULT_MODEL_MAX_TOKENS,
   isCloudflareModelProvider,
@@ -921,9 +922,9 @@ export function OnboardingPage() {
                         aria-label={t`API key`}
                         value={apiKey}
                         onChange={(e) => updateApiKey(e.target.value)}
-                        required={isOllamaCloudBaseUrl(baseUrl)}
+                        required={compatiblePresetNeedsKey(baseUrl)}
                         placeholder={
-                          isOllamaCloudBaseUrl(baseUrl) ? t`Ollama API key` : t`Optional`
+                          compatiblePresetNeedsKey(baseUrl) ? t`Required API key` : t`Optional`
                         }
                         type="password"
                         autoComplete="new-password"

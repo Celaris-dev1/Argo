@@ -159,7 +159,6 @@ import {
   runtimeFallbackModel,
 } from "./run-model.js";
 import { createReplyState } from "./run-progress.js";
-import { startWorkStatusPulse } from "./work-status.js";
 import { DELEGATED_EMPTY_NOTICE, runAllowsSilentEmpty, runReplyGuidance } from "./run-replies.js";
 import {
   notifyRoutineRetryAttemptsExhausted,
@@ -187,6 +186,7 @@ import {
 import { loadAgentScratchpadContext } from "./scratchpad-context.js";
 import { inferScript } from "./scripted-runtime.js";
 import { listAgentSkillRecords } from "./skill-tools.js";
+import { withSmallModelDisabledTools } from "./small-model.js";
 import {
   continueRunClaimFence,
   refreshTakeoverContinuePlan,
@@ -206,6 +206,7 @@ import {
 import { loadAgentTicketContext } from "./ticket-context.js";
 import { appendToolCompletionAudit } from "./tool-completion-audit.js";
 import { createWebProvider } from "./web-provider-factory.js";
+import { startWorkStatusPulse } from "./work-status.js";
 
 export function createRunExecutor(executorDeps: ExecutorDeps) {
   const contextStrategy = executorDeps.contextStrategy ?? DEFAULT_CONTEXT_STRATEGY;
@@ -1062,7 +1063,13 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const graphicalToolsAllowed = graphical && acceptsImages && !heldForTakeover;
         const pageBrowserAllowed =
           graphical && browser.describe().capabilities.page && !heldForTakeover;
-        const disabledBuiltinTools = disabledBuiltinToolSet(bot.disabledBuiltinTools);
+        // Small models get a core tool set (RAKAZO_SMALL_MODELS); everyone else keeps the bot's list.
+        const runDisabledBuiltinTools = withSmallModelDisabledTools(
+          bot.disabledBuiltinTools,
+          runModelProvider,
+          runModelId,
+        );
+        const disabledBuiltinTools = disabledBuiltinToolSet(runDisabledBuiltinTools);
         const userComputerOwnerId = userComputerOwner({
           trigger: run.trigger,
           sourceRole: sourceMessage?.role,
@@ -1104,7 +1111,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             paymentWalletEnabled,
             messagingChannelRun,
             voiceCall,
-            disabledBuiltinTools: bot.disabledBuiltinTools,
+            disabledBuiltinTools: runDisabledBuiltinTools,
             fleetManagement: bot.fleetManagement,
             followUpFromUser: sourceMessage?.role === "user",
             userComputer: userComputer === "connected",

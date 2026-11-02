@@ -6530,3 +6530,21 @@ msgstr "음성 서비스 크레딧이 모두 소진되었습니다."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "음성 서비스에서 키를 거부했습니다."
+
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
+
+#: src/pages/Onboarding.tsx
+#: src/pages/model-settings/connection-controls.tsx
+msgid "Required API key"
+msgstr ""

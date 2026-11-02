@@ -6531,3 +6531,21 @@ msgstr "你的語音供應商額度已用完。"
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "你的語音供應商拒絕了該金鑰。"
+
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
+
+#: src/pages/Onboarding.tsx
+#: src/pages/model-settings/connection-controls.tsx
+msgid "Required API key"
+msgstr ""

@@ -56,6 +56,14 @@ https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
 - Docker, E2B, Daytona, CreateOS, and Boat
 - Composio, Pipedream Connect, MCP, and OpenAPI integrations
 
+## Lite install (8 GB Linux)
+
+```bash
+bash infra/compose/install-lite.sh
+```
+
+Full stack in about 3.7 GB, with custom OpenAI-compatible providers and small-model mode. See [docs/self-host-lite.md](./docs/self-host-lite.md).
+
 ## Quick start (published images)
 
 You need Docker Engine, the Compose plugin, curl, and OpenSSL. No clone or Node install.

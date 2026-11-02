@@ -6530,3 +6530,21 @@ msgstr "Your voice provider is out of credit."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Your voice provider key was rejected."
+
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr "Coding"
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr "Coding mode"
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr "Could not open coding mode"
+
+#: src/pages/Onboarding.tsx
+#: src/pages/model-settings/connection-controls.tsx
+msgid "Required API key"
+msgstr "Required API key"
