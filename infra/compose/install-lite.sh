@@ -60,6 +60,17 @@ if [ -n "$LOCAL_AI" ]; then
   sed -i "s|^ARGO_LOCAL_MODELS=.*|ARGO_LOCAL_MODELS=$LOCAL_MODEL|" "$ENV_FILE"
 fi
 
+# Docker 29's containerd image store keeps packed and unpacked copies of every layer,
+# roughly doubling disk use. The classic overlay2 store fits Argo on a 20 GB disk.
+if docker info --format '{{.DriverStatus}}' 2>/dev/null | grep -q 'io.containerd.snapshotter'; then
+  echo "Note: Docker uses the containerd image store (~2x disk). On small disks set"
+  echo '  {"features":{"containerd-snapshotter":false}} in /etc/docker/daemon.json and restart Docker.'
+fi
+avail_kb=$(df -Pk "$(docker info --format '{{.DockerRootDir}}' 2>/dev/null || echo /var/lib/docker)" 2>/dev/null | awk 'NR==2 {print $4}')
+if [ -n "${avail_kb:-}" ] && [ "$avail_kb" -lt 9000000 ]; then
+  echo "Only $((avail_kb / 1024)) MB free where Docker stores images; the build needs about 9 GB."
+fi
+
 echo "Building the computer image (bot desktop, browser, OpenCode)…"
 docker build -t argo/computer:local "$ROOT/infra/sandboxes/computer"
 echo "Building the app image (this is the slow, memory-hungry step)…"
@@ -69,6 +80,11 @@ cd "$COMPOSE_DIR"
 profile=()
 [ -n "$LOCAL_AI" ] && profile=(--profile local-ai)
 docker compose --env-file .env -f docker-compose.images.yml -f docker-compose.lite.yml "${profile[@]}" up -d
+
+# The build cache (~4-5 GB) is only needed to rebuild faster. ARGO_KEEP_BUILD_CACHE=1 keeps it.
+if [ "${ARGO_KEEP_BUILD_CACHE:-0}" != 1 ]; then
+  docker builder prune -af >/dev/null && echo "Cleared the image build cache."
+fi
 
 if [ -n "$LOCAL_AI" ]; then
   echo "Pulling $LOCAL_MODEL into Ollama…"
