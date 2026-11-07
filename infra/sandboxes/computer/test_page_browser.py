@@ -1600,5 +1600,65 @@ class ScoutCookieProfileTests(unittest.TestCase):
         self.assertEqual([c["name"] for c in running.cookies], ["live"])
 
 
+
+class PageKeeperTests(unittest.TestCase):
+    def test_keeps_one_connection_and_page_across_commands(self):
+        client = Mock(layoutless=False)
+        with patch.object(helper, "wait_for_cdp"), patch.object(helper, "discover_ws_url", return_value="ws://x"), \
+                patch.object(helper, "CdpClient", return_value=client) as made, \
+                patch.object(helper, "attach_page", return_value="s1") as attach, \
+                patch.object(helper, "ensure_world"), patch.object(helper, "restore_cookies"), \
+                patch.object(helper, "save_cookies"), \
+                patch.object(helper, "navigate", return_value={"ok": True}), \
+                patch.object(helper, "snapshot", return_value={"ok": True, "url": "https://a.test/"}) as snap:
+            keeper = helper.PageKeeper(9222)
+            keeper.handle({"command": "navigate", "args": {"url": "https://a.test/"}})
+            keeper.handle({"command": "snapshot"})
+        self.assertEqual(made.call_count, 1)
+        self.assertEqual(attach.call_count, 1)
+        self.assertTrue(client.layoutless)
+        snap.assert_called_once_with(client, "s1")
+
+    def test_reconnects_when_the_browser_restarted(self):
+        with patch.object(helper, "wait_for_cdp"), patch.object(helper, "discover_ws_url", return_value="ws://x"), \
+                patch.object(helper, "CdpClient", side_effect=[Mock(), Mock()]) as made, \
+                patch.object(helper, "attach_page", return_value="s1"), \
+                patch.object(helper, "ensure_world", side_effect=RuntimeError("closed")), \
+                patch.object(helper, "restore_cookies"), patch.object(helper, "snapshot", return_value={"ok": True}):
+            keeper = helper.PageKeeper(9222)
+            keeper.handle({"command": "snapshot"})
+            keeper.handle({"command": "snapshot"})
+        self.assertEqual(made.call_count, 2)
+
+    def test_no_keeper_falls_back_but_a_lost_reply_is_never_retried(self):
+        import tempfile
+        with tempfile.TemporaryDirectory(dir="/tmp") as tmp, patch.dict(os.environ, {"ARGO_PAGE_KEEPER_DIR": tmp}):
+            self.assertIsNone(helper.keeper_request(9222, {"command": "act"}, start=False))
+            server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            server.bind(str(helper.keeper_socket_path(9222)))
+            server.listen(1)
+            import threading
+            def hang_up():
+                conn, _ = server.accept()
+                conn.recv(65536)
+                conn.close()
+            threading.Thread(target=hang_up, daemon=True).start()
+            reply = helper.keeper_request(9222, {"command": "act"}, start=False)
+            server.close()
+        self.assertFalse(reply["ok"])
+        self.assertTrue(reply["uncertain"])
+
+    def test_layoutless_click_goes_to_the_element(self):
+        client = Mock(layoutless=True)
+        with patch.object(helper, "ensure_helpers"), patch.object(helper, "eval_json", return_value=True) as evaluate, \
+                patch.object(helper, "click_at") as click_at, \
+                patch.object(helper, "wait_for_action", return_value=False), \
+                patch.object(helper, "page_mark", return_value=({}, 0)), \
+                patch.object(helper, "snapshot", return_value={"ok": True}):
+            helper.act(client, "s1", [{"kind": "click", "ref": "e1"}])
+        click_at.assert_not_called()
+        self.assertTrue(any("press(" in str(call) for call in evaluate.call_args_list))
+
+
 if __name__ == "__main__":
     unittest.main()

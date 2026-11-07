@@ -141,18 +141,6 @@ RUN set -eux; \
   rm -f "$archive"; \
   chmod 755 /usr/local/bin/opencode; \
   test -x /usr/local/bin/opencode
-# Lightpanda is the page browser. Chromium stays on the image only as a fallback
-# for computers that do not have this binary.
-ARG LIGHTPANDA_VERSION=1.0.2
-RUN set -eux; \
-  case "$TARGETARCH" in \
-    amd64) lp_asset=lightpanda-x86_64-linux; lp_sha256=ae7d01d261efb9e480e18ce3424533332883863bcf70b12a4321b5733f37e19e ;; \
-    arm64) lp_asset=lightpanda-aarch64-linux; lp_sha256=ac546dfc43c533430da92b75ab36f2a29da7d6324d5d38baf606ef2e0d849345 ;; \
-    *) echo "unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
-  esac; \
-  curl -fsSL "https://github.com/lightpanda-io/browser/releases/download/${LIGHTPANDA_VERSION}/${lp_asset}" -o /usr/local/bin/lightpanda; \
-  echo "$lp_sha256  /usr/local/bin/lightpanda" | sha256sum -c -; \
-  chmod 755 /usr/local/bin/lightpanda
 ENV DISPLAY=:1
 ENV HOME=/home/argo
 # Keep UTF-8 explicit (an empty LANG broke non-ASCII file handling in the
@@ -174,7 +162,6 @@ COPY --chmod=755 control.py /usr/local/bin/argo-computer-control
 LABEL argo.control.aimedScroll="1"
 COPY --from=capture-builder /build/libargo-xcapture.so /usr/local/lib/libargo-xcapture.so
 COPY --chmod=755 argo-browser /usr/local/bin/argo-browser
-COPY --chmod=755 argo-lightpanda /usr/local/bin/argo-lightpanda
 COPY --chmod=755 argo-focus-or-launch /usr/local/bin/argo-focus-or-launch
 COPY --chmod=755 argo-page-browser /usr/local/bin/argo-page-browser
 # Checkbox CAPTCHA helper the bot runs itself (see packages/adapters/src/captcha-policy.ts).
@@ -194,7 +181,7 @@ COPY --chmod=644 mobile-keyboard.js /usr/share/novnc/mobile-keyboard.js
 COPY --chmod=644 argo-local-bin.sh /etc/profile.d/argo-local-bin.sh
 # Strip CR so shebangs work even if the build context came from a CRLF checkout.
 RUN ldconfig \
-  && sed -i 's/\r$//' /usr/local/bin/argo-computer /usr/local/lib/argo-user-env.sh /usr/local/bin/argo-computer-control /usr/local/bin/argo-browser /usr/local/bin/argo-lightpanda /usr/local/bin/argo-focus-or-launch /usr/local/bin/argo-page-browser /usr/local/bin/argo-captcha \
+  && sed -i 's/\r$//' /usr/local/bin/argo-computer /usr/local/lib/argo-user-env.sh /usr/local/bin/argo-computer-control /usr/local/bin/argo-browser /usr/local/bin/argo-focus-or-launch /usr/local/bin/argo-page-browser /usr/local/bin/argo-captcha \
     /etc/argo/fluxbox/init /etc/argo/fluxbox/apps /etc/argo/fluxbox/menu \
     /etc/profile.d/argo-local-bin.sh
 # Agent-authored scripts often use the unversioned name. Keep it on the installed Python 3.

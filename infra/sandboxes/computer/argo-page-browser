@@ -16,6 +16,7 @@ import os
 import socket
 import stat
 import struct
+import subprocess
 import sys
 import time
 import threading
@@ -156,6 +157,8 @@ class CdpClient:
         self._buf = bytearray()
         self._next_id = 1
         self.context_id: int | None = None
+        # Set for a browser with no layout (Lightpanda): clicks go to the element, not a screen spot.
+        self.layoutless = False
         self._pending: dict[int, dict[str, Any] | None] = {}
         # Worlds live in Chromium until navigation; rediscover them per CLI process.
         self._contexts: dict[int, dict[str, Any]] = {}
@@ -560,7 +563,7 @@ def cookie_profile_path() -> Path:
     return Path(os.environ.get("ARGO_BROWSER_PROFILE", str(default)))
 
 
-def keeps_cookies_in_memory(port: int) -> bool:
+def lightpanda_browser(port: int) -> bool:
     try:
         browser = http_get_json(f"http://127.0.0.1:{port}/json/version", timeout=1.0).get("Browser")
     except Exception:  # noqa: BLE001
@@ -1173,6 +1176,18 @@ EVAL_HELPERS = r"""
     // After the pointer has moved onto the spot: the page may have reacted by putting something else there.
     // The page's scroll offset comes back too: the browser's own hit-test (check_frame) takes
     // the spot on the page, not in the window.
+    // Lightpanda lays nothing out, so there is no spot to aim at: the element gets the click itself.
+    press(ref) {
+      const el = this.resolve(ref);
+      if (isFileInput(el)) throw settled("This is a file upload. Use upload with the file paths instead of clicking it.");
+      if (el instanceof HTMLSelectElement) {
+        el.focus();
+        return false;
+      }
+      if (typeof el.focus === "function") el.focus();
+      el.click();
+      return true;
+    },
     stillAimed(ref, x, y) {
       checkLanding(this.resolve(ref), x, y, true);
       return { x: window.pageXOffset, y: window.pageYOffset };
@@ -2060,9 +2075,12 @@ def act(client: CdpClient, session_id: str, actions: list[dict[str, Any]]) -> di
                     continue
             if kind == "click":
                 uncertain = True
-                aim = eval_json(client, session_id, f"window.__argoPageBrowser.aim({json.dumps(ref)})")
-                if isinstance(aim, dict) and aim.get("x") is not None:
-                    click_at(client, session_id, ref, aim["x"], aim["y"])
+                if getattr(client, "layoutless", False):
+                    eval_json(client, session_id, f"window.__argoPageBrowser.press({json.dumps(ref)})")
+                else:
+                    aim = eval_json(client, session_id, f"window.__argoPageBrowser.aim({json.dumps(ref)})")
+                    if isinstance(aim, dict) and aim.get("x") is not None:
+                        click_at(client, session_id, ref, aim["x"], aim["y"])
                 completed += 1
                 uncertain = False
                 continue
@@ -2122,7 +2140,175 @@ def read_stdin_line() -> str:
     return data.decode("utf-8")
 
 
+def page_command(client: CdpClient, session_id: str, command: str, args: dict[str, Any]) -> dict[str, Any] | None:
+    """One command on an attached page; None for a command this helper does not know."""
+    if command == "navigate":
+        return navigate(client, session_id, str(args.get("url") or ""))
+    if command == "snapshot":
+        return snapshot(client, session_id)
+    if command == "act":
+        actions = args.get("actions")
+        if not isinstance(actions, list):
+            raise RuntimeError("actions must be an array")
+        return act(client, session_id, actions)
+    return None
+
+
+def unknown_command(command: str) -> dict[str, Any]:
+    return {"ok": False, "error": f"unknown command: {command}", "fallback": "computer_act"}
+
+
+# Lightpanda gives every CDP connection its own browser and drops its pages when the connection
+# closes, so one command per connection would always start on a blank page. For Lightpanda the
+# first command starts a keeper that holds one connection and runs every command over it.
+KEEPER_ENV = "ARGO_PAGE_KEEPER"
+KEEPER_REPLY_TIMEOUT_S = 600.0
+
+
+def keeper_socket_path(port: int) -> Path:
+    base = Path(os.environ.get("ARGO_PAGE_KEEPER_DIR", "/tmp/argo"))
+    return base / f"page-keeper-{port}.sock"
+
+
+def keeper_request(port: int, request: dict[str, Any], start: bool = True) -> dict[str, Any] | None:
+    """Send one command to the keeper, starting it when needed. None when no keeper answers."""
+    path = keeper_socket_path(port)
+    for attempt in range(2):
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as conn:
+            conn.settimeout(KEEPER_REPLY_TIMEOUT_S)
+            try:
+                conn.connect(str(path))
+            except OSError:
+                if attempt or not start:
+                    return None
+                spawn_keeper(port)
+                continue
+            # Sent: the keeper may have acted, so a lost reply is never retried another way.
+            data = bytearray()
+            try:
+                conn.sendall(json.dumps(request).encode("utf-8") + b"\n")
+                while not data.endswith(b"\n"):
+                    chunk = conn.recv(65536)
+                    if not chunk:
+                        break
+                    data += chunk
+                return json.loads(data.decode("utf-8"))
+            except (OSError, ValueError) as exc:
+                return {"ok": False, "error": f"page keeper did not answer: {exc}",
+                        "fallback": "computer_act", "uncertain": request.get("command") == "act"}
+    return None
+
+
+def spawn_keeper(port: int) -> None:
+    path = keeper_socket_path(port)
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    env = {**os.environ, KEEPER_ENV: "1", "ARGO_CDP_PORT": str(port)}
+    env.pop("ARGO_BROWSER_WATCH_STDIN", None)
+    env.pop("ARGO_BROWSER_ARGS_STDIN", None)
+    subprocess.Popen([sys.executable, os.path.abspath(__file__), "__keeper"], env=env,
+                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                     start_new_session=True, close_fds=True)
+    deadline = time.time() + 5.0
+    while time.time() < deadline and not path.exists():
+        time.sleep(0.05)
+
+
+class PageKeeper:
+    """Holds one CDP connection and page so consecutive commands share them."""
+
+    def __init__(self, port: int) -> None:
+        self.port = port
+        self.client: CdpClient | None = None
+        self.session_id = ""
+
+    def drop(self) -> None:
+        if self.client is not None:
+            try:
+                self.client.close()
+            except Exception:  # noqa: BLE001
+                pass
+        self.client = None
+        self.session_id = ""
+
+    def page(self) -> tuple[CdpClient, str]:
+        if self.client is not None:
+            try:
+                ensure_world(self.client, self.session_id)
+                return self.client, self.session_id
+            except Exception:  # noqa: BLE001 - the browser restarted or the page closed
+                self.drop()
+        wait_for_cdp(self.port)
+        client = CdpClient(discover_ws_url(self.port))
+        client.connect()
+        client.layoutless = True  # The keeper only runs for Lightpanda.
+        self.client = client
+        self.session_id = attach_page(client)
+        restore_cookies(client, self.session_id)
+        return client, self.session_id
+
+    def handle(self, request: dict[str, Any]) -> dict[str, Any]:
+        command = str(request.get("command") or "")
+        args = request.get("args") if isinstance(request.get("args"), dict) else {}
+        connected = False
+        try:
+            client, session_id = self.page()
+            connected = True
+            result = page_command(client, session_id, command, args)
+            if result is None:
+                return unknown_command(command)
+            if command in ("navigate", "act"):
+                save_cookies(client, session_id)
+            return result
+        except Exception as exc:  # noqa: BLE001
+            self.drop()
+            return {"ok": False, "error": str(exc), "fallback": "computer_act",
+                    "uncertain": command == "act" and connected}
+
+
+def serve_keeper(port: int) -> int:
+    path = keeper_socket_path(port)
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    try:
+        old_umask = os.umask(0o177)
+        try:
+            tmp = path.with_name(f"{path.name}.{os.getpid()}")
+            server.bind(str(tmp))
+        finally:
+            os.umask(old_umask)
+        server.listen(8)
+        try:
+            os.rename(tmp, path)  # Atomic: a second keeper never steals a live socket mid-bind.
+        except OSError:
+            os.unlink(tmp)
+            return 1
+        keeper = PageKeeper(port)
+        while True:
+            conn, _ = server.accept()
+            with conn:
+                conn.settimeout(30.0)
+                data = bytearray()
+                try:
+                    while not data.endswith(b"\n") and len(data) < 1_048_576:
+                        chunk = conn.recv(65536)
+                        if not chunk:
+                            break
+                        data += chunk
+                    request = json.loads(data.decode("utf-8"))
+                except (OSError, ValueError):
+                    continue
+                reply = keeper.handle(request if isinstance(request, dict) else {})
+                try:
+                    conn.sendall(json.dumps(reply).encode("utf-8") + b"\n")
+                except OSError:
+                    pass
+    finally:
+        server.close()
+
+
 def run(argv: list[str]) -> int:
+    if len(argv) >= 2 and argv[1] == "__keeper" and os.environ.get(KEEPER_ENV) == "1":
+        return serve_keeper(cdp_port())
     stdin_args = (
         read_stdin_line() if os.environ.get("ARGO_BROWSER_ARGS_STDIN") == "1" else None
     )
@@ -2144,39 +2330,26 @@ def run(argv: list[str]) -> int:
     raw_args = stdin_args if stdin_args is not None else (argv[2] if len(argv) >= 3 else "")
     if raw_args.strip():
         args = json.loads(raw_args)
+    if command not in ("navigate", "snapshot", "act"):
+        print(json.dumps(unknown_command(command)))
+        return 2
     port = cdp_port()
     # Set once the browser answers: before that, no action can have reached the page.
     connected = False
     try:
         wait_for_cdp(port)
+        if lightpanda_browser(port):
+            reply = keeper_request(port, {"command": command, "args": args})
+            if reply is not None:
+                print(json.dumps(reply))
+                return 0
         ws_url = discover_ws_url(port)
         client = CdpClient(ws_url)
         client.connect()
         connected = True
         try:
             session_id = attach_page(client)
-            profile = keeps_cookies_in_memory(port)
-            if profile:
-                restore_cookies(client, session_id)
-            if command == "navigate":
-                result = navigate(client, session_id, str(args.get("url") or ""))
-            elif command == "snapshot":
-                result = snapshot(client, session_id)
-            elif command == "act":
-                actions = args.get("actions")
-                if not isinstance(actions, list):
-                    raise RuntimeError("actions must be an array")
-                result = act(client, session_id, actions)
-            else:
-                result = {
-                    "ok": False,
-                    "error": f"unknown command: {command}",
-                    "fallback": "computer_act",
-                }
-                print(json.dumps(result))
-                return 2
-            if profile and command in ("navigate", "act"):
-                save_cookies(client, session_id)
+            result = page_command(client, session_id, command, args)
             print(json.dumps(result))
             return 0  # Structured failures preserve partial action progress.
         finally:
