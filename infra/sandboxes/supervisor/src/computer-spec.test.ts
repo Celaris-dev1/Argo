@@ -394,7 +394,7 @@ describe("graphical computer spec", () => {
       Name: computerNetworkNameFor("bot_1"),
       Driver: "bridge",
       CheckDuplicate: true,
-      Labels: { "argo.exampleputerOwner": "owner", "argo.botId": "bot_1" },
+      Labels: { "argo.computerOwner": "owner", "argo.botId": "bot_1" },
     });
     expect(open).not.toHaveProperty("Options");
 

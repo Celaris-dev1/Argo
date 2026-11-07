@@ -500,10 +500,22 @@ def attach_page(client: CdpClient) -> str:
         except Exception:
             continue
     focused = [session for session, focus in candidates if focus]
+    headless = os.environ.get("ARGO_COMPUTER_HEADLESS", "").lower() in ("1", "true", "yes", "on")
     if len(focused) == 1:
         selected = focused[0]
     elif len(candidates) == 1:
         selected = candidates[0][0]
+    elif headless and candidates:
+        # No screen, so nobody can pick a tab by hand: drive the newest page.
+        selected = candidates[-1][0]
+    elif headless:
+        # A fresh headless browser (Lightpanda, chrome-headless-shell) may have no page yet.
+        created = client.call("Target.createTarget", {"url": "about:blank"})
+        attached = client.call("Target.attachToTarget", {
+            "targetId": created["targetId"], "flatten": True,
+        })
+        selected = attached["sessionId"]
+        client.call("Page.enable", session_id=selected)
     else:
         raise RuntimeError("No unambiguous visible browser tab. Use desktop tools to select a tab.")
     ensure_world(client, selected)

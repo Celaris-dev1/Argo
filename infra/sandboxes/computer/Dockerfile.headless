@@ -4,8 +4,12 @@
 # (set ARGO_COMPUTER_HEADLESS=1 on api and worker so bots are not offered them).
 #
 #   docker build -f infra/sandboxes/computer/Dockerfile.headless -t argo/computer:headless infra/sandboxes/computer
+# Navigator (headless + real Chrome engine, chrome-headless-shell, amd64 only):
+#   docker build -f infra/sandboxes/computer/Dockerfile.headless --build-arg PAGE_BROWSER=chrome \
+#     -t argo/computer:navigator infra/sandboxes/computer
 FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
 ARG WITH_PANDOC=0
+ARG PAGE_BROWSER=lightpanda
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-openpyxl \
@@ -20,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     poppler-utils \
     $([ "$WITH_PANDOC" = 1 ] && echo pandoc) \
+    $([ "$PAGE_BROWSER" = chrome ] && echo "libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2 libpango-1.0-0 libcairo2 libdbus-1-3 libexpat1 libxshmfence1 fonts-liberation fonts-noto-color-emoji") \
   && rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* \
   && groupadd --gid 1000 argo \
   && useradd --uid 1000 --gid argo --create-home --shell /bin/bash argo
@@ -73,6 +78,7 @@ RUN set -eux; \
 # for computers that do not have this binary.
 ARG LIGHTPANDA_VERSION=1.0.2
 RUN set -eux; \
+  if [ "$PAGE_BROWSER" = chrome ]; then echo "page browser: chrome-headless-shell"; exit 0; fi; \
   case "$TARGETARCH" in \
     amd64) lp_asset=lightpanda-x86_64-linux; lp_sha256=ae7d01d261efb9e480e18ce3424533332883863bcf70b12a4321b5733f37e19e ;; \
     arm64) lp_asset=lightpanda-aarch64-linux; lp_sha256=ac546dfc43c533430da92b75ab36f2a29da7d6324d5d38baf606ef2e0d849345 ;; \
@@ -81,6 +87,20 @@ RUN set -eux; \
   curl -fsSL "https://github.com/lightpanda-io/browser/releases/download/${LIGHTPANDA_VERSION}/${lp_asset}" -o /usr/local/bin/lightpanda; \
   echo "$lp_sha256  /usr/local/bin/lightpanda" | sha256sum -c -; \
   chmod 755 /usr/local/bin/lightpanda
+# Navigator: chrome-headless-shell from Chrome for Testing (latest Stable at build time,
+# or pin CHROME_VERSION). Google publishes linux64 only.
+ARG CHROME_VERSION=
+RUN set -eux; \
+  if [ "$PAGE_BROWSER" != chrome ]; then exit 0; fi; \
+  [ "$TARGETARCH" = amd64 ] || { echo "chrome-headless-shell is amd64 only" >&2; exit 1; }; \
+  ver="$CHROME_VERSION"; \
+  if [ -z "$ver" ]; then ver="$(curl -fsSL https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json | python3 -c 'import json,sys; print(json.load(sys.stdin)["channels"]["Stable"]["version"])')"; fi; \
+  archive="$(mktemp)"; \
+  curl -fsSL "https://storage.googleapis.com/chrome-for-testing-public/${ver}/linux64/chrome-headless-shell-linux64.zip" -o "$archive"; \
+  unzip -q "$archive" -d /opt; \
+  mv /opt/chrome-headless-shell-linux64 /opt/chrome-headless-shell; \
+  rm -f "$archive"; \
+  /opt/chrome-headless-shell/chrome-headless-shell --version || true
 # DISPLAY only picks the CDP port (9221 + display), there is no X server.
 ENV DISPLAY=:1
 ENV HOME=/home/argo
@@ -93,13 +113,14 @@ WORKDIR /home/argo
 COPY --chmod=755 start.sh /usr/local/bin/argo-computer
 COPY --chmod=644 user-env.sh /usr/local/lib/argo-user-env.sh
 COPY --chmod=755 argo-lightpanda /usr/local/bin/argo-lightpanda
+COPY --chmod=755 argo-chrome-headless /usr/local/bin/argo-chrome-headless
 COPY --chmod=755 argo-page-browser /usr/local/bin/argo-page-browser
 COPY --chmod=644 argo-local-bin.sh /etc/profile.d/argo-local-bin.sh
 # Anything that asks for "the browser" gets Lightpanda.
-RUN ln -s /usr/local/bin/argo-lightpanda /usr/local/bin/argo-browser \
-  && sed -i 's/\r$//' /usr/local/bin/argo-computer /usr/local/lib/argo-user-env.sh /usr/local/bin/argo-lightpanda /usr/local/bin/argo-page-browser /etc/profile.d/argo-local-bin.sh \
+RUN ln -s "/usr/local/bin/$([ "$PAGE_BROWSER" = chrome ] && echo argo-chrome-headless || echo argo-lightpanda)" /usr/local/bin/argo-browser \
+  && sed -i 's/\r$//' /usr/local/bin/argo-computer /usr/local/lib/argo-user-env.sh /usr/local/bin/argo-lightpanda /usr/local/bin/argo-chrome-headless /usr/local/bin/argo-page-browser /etc/profile.d/argo-local-bin.sh \
   && ln -s /usr/bin/python3 /usr/local/bin/python
-LABEL argo.exampleputer.headless="1"
+LABEL argo.computer.headless="1"
 ENV LD_PRELOAD=/usr/local/lib/libnss_wrapper.so \
     NSS_WRAPPER_PASSWD=/tmp/argo-nss/passwd \
     NSS_WRAPPER_GROUP=/tmp/argo-nss/group

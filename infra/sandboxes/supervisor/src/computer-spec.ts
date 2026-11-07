@@ -449,7 +449,7 @@ export function computerNetworkCreateOptions(
     Name: computerNetworkNameFor(botId),
     Driver: "bridge",
     CheckDuplicate: true,
-    Labels: { "argo.exampleputerOwner": owner, "argo.botId": botId },
+    Labels: { "argo.computerOwner": owner, "argo.botId": botId },
     ...(egress === "restricted"
       ? { Options: { "com.docker.network.bridge.name": computerBridgeNameFor(botId) } }
       : {}),

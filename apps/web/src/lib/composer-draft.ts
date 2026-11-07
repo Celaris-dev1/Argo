@@ -1,8 +1,8 @@
 import type { ComposerMentionBinding } from "@argo/core";
 import { validateComposerMentionBindings } from "@argo/core";
 
-export const COMPOSER_DRAFT_STORAGE_PREFIX = "argo.exampleposerDraft.";
-const COMPOSER_BINDINGS_STORAGE_PREFIX = "argo.exampleposerBindings.";
+export const COMPOSER_DRAFT_STORAGE_PREFIX = "argo.composerDraft.";
+const COMPOSER_BINDINGS_STORAGE_PREFIX = "argo.composerBindings.";
 
 type ComposerDraftSubmission = { text: string; bindingRecord: string | null };
 const pendingSubmissions = new Map<string, ComposerDraftSubmission>();

@@ -1794,7 +1794,7 @@ export async function reclaimIdleComputerNetworks() {
   const runtime = await inspectSupervisorContainer();
   const owner = computerNetworkOwnerFor(dataDir, runtime);
   const networks = await docker.listNetworks({
-    filters: { label: [`argo.exampleputerOwner=${owner}`] },
+    filters: { label: [`argo.computerOwner=${owner}`] },
   });
   for (const { Name, Labels } of networks) {
     const botId = Labels?.["argo.botId"];
