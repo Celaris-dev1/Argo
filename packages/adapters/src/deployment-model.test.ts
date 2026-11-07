@@ -50,6 +50,19 @@ describe("resolveDeploymentModel", () => {
     });
   });
 
+  it("runs the operator's own model server once it serves the default model", () => {
+    const local = { PI_DEFAULT_PROVIDER: "local", PI_DEFAULT_MODEL: "qwen-uncensored" };
+    expect(
+      resolveDeploymentModel({ ...local, ARGO_LOCAL_MODELS: "qwen-uncensored, other" }).configured,
+    ).toBe(true);
+    // Not served there, or no model named: nothing to run.
+    expect(resolveDeploymentModel({ ...local, ARGO_LOCAL_MODELS: "other" }).configured).toBe(false);
+    expect(
+      resolveDeploymentModel({ PI_DEFAULT_PROVIDER: "local", ARGO_LOCAL_MODELS: "qwen" })
+        .configured,
+    ).toBe(false);
+  });
+
   it("runs a provider that authenticates from the host without a key", () => {
     vi.stubEnv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", "/v2/credentials/example");
     const taskRole = {
