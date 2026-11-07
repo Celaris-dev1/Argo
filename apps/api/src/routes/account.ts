@@ -8,11 +8,13 @@ import type { ActionApprovalRule, Actor, Me, SettingsScope } from "@argo/contrac
 import {
   approvalModeFromPreference,
   approvalPreferenceFromMode,
+  DEFAULT_AUTO_REVIEW_PREFERENCE,
   previewActionApprovalRule,
 } from "@argo/core";
 import { urlSite } from "@argo/core/egress";
 import {
   auditLogOrganization,
+  findAutoReviewPreference,
   findDefaultVoiceCredential,
   findModelCredential,
   findModelCredentialById,
@@ -255,7 +257,7 @@ export function accountRoutes(ctx: RouterContext) {
             input.mode
               ? approvalPreferenceFromMode(input.mode)
               : { enabled: input.enabled, skipApprovals: input.skipApprovals },
-            { enabled: false, skipApprovals: true },
+            DEFAULT_AUTO_REVIEW_PREFERENCE,
             input.scope,
           ),
         );
@@ -394,11 +396,8 @@ async function loadAutoReviewSettings(deps: RouterDeps, actor: Actor, scope?: Se
     { env: process.env },
     scope === "account" ? "account" : undefined,
   );
-  // Approvals are off: external actions run instead of waiting on a card.
-  const stored = {
-    enabled: false,
-    skipApprovals: true,
-  };
+  const stored =
+    (await findAutoReviewPreference(deps.prisma, actor, scope)) ?? DEFAULT_AUTO_REVIEW_PREFERENCE;
   const settings = { ...stored, mode: approvalModeFromPreference(stored) };
   const deploymentChecker = role.primarySource === "deployment" ? role.primary : null;
   const memberChoices = [

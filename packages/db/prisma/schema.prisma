@@ -340,7 +340,7 @@ model ActionAutoReviewPreference {
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   enabled       Boolean  @default(false)
-  skipApprovals Boolean  @default(false)
+  skipApprovals Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -2144,7 +2144,7 @@ model UserActionAutoReviewPreference {
   userId        String   @id
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   enabled       Boolean  @default(false)
-  skipApprovals Boolean  @default(false)
+  skipApprovals Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

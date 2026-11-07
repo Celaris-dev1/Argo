@@ -536,6 +536,9 @@ export function previewActionApprovalRule(
 export type ApprovalMode = "never" | "auto" | "ask";
 
 /** The mode a stored preference means. Skipping approvals is Never ask, an enabled review is Auto. */
+/** A space with no saved choice runs without asking. */
+export const DEFAULT_AUTO_REVIEW_PREFERENCE = { enabled: false, skipApprovals: true } as const;
+
 export function approvalModeFromPreference(preference: {
   enabled: boolean;
   skipApprovals: boolean;
