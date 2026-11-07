@@ -83,6 +83,47 @@ export class ComputerLimitError extends Error {
   }
 }
 
+/** Per-user ceiling on live (non-archived) bots across all their Spaces, or 0 when unset. */
+export function resolveMaxBotsPerUser(value = process.env.ARGO_MAX_BOTS_PER_USER): number {
+  if (value === undefined || value.trim() === "" || value.trim() === "0") return 0;
+  const limit = Number(value);
+  if (!Number.isSafeInteger(limit) || limit < 1) {
+    throw new Error("ARGO_MAX_BOTS_PER_USER must be a positive integer, or 0 for no cap");
+  }
+  return limit;
+}
+
+export class BotLimitError extends Error {
+  constructor(limit: number) {
+    super(
+      limit === 1
+        ? "You can have 1 bot for now. Archive it to make a new one."
+        : `You can have ${limit} bots for now. Archive one to make a new one.`,
+    );
+    this.name = "BotLimitError";
+  }
+}
+
+/**
+ * Refuses one more live bot past ARGO_MAX_BOTS_PER_USER. Every bot counts, including ones
+ * other bots create: each can run on its own. Holds the user's quota lock until the
+ * transaction ends, so two creates cannot both take the last slot.
+ */
+export async function assertBotQuota(
+  tx: Pick<Prisma.TransactionClient, "$queryRaw" | "bot">,
+  userId: string,
+): Promise<void> {
+  const limit = resolveMaxBotsPerUser();
+  if (limit <= 0) return;
+  await lockUserForComputerQuota(tx, userId);
+  const live = await runAsSystemInTransaction(
+    tx as Pick<PrismaClient, "$queryRaw">,
+    "bot quota across the user's Spaces",
+    () => tx.bot.count({ where: { userId, archivedAt: null } }),
+  );
+  if (live >= limit) throw new BotLimitError(limit);
+}
+
 /**
  * Computers a user still backs with a live (non-archived) bot.
  *
@@ -163,7 +204,10 @@ export async function restoreBotUnderComputerQuota(
 ): Promise<void> {
   const limit = resolveMaxComputersPerUser();
 
+  const botLimit = resolveMaxBotsPerUser();
+
   async function restore(tx: RestoreTx) {
+    if (botLimit > 0) await assertBotQuota(tx, input.userId);
     if (limit > 0) {
       await lockUserForComputerQuota(tx, input.userId);
       await assertComputerQuotaForRestore(tx, input);
@@ -174,7 +218,7 @@ export async function restoreBotUnderComputerQuota(
   if (isTransactionClient(prisma)) {
     return restore(prisma as RestoreTx);
   }
-  if (limit <= 0) {
+  if (limit <= 0 && botLimit <= 0) {
     await prisma.bot.update({ where: { id: input.botId }, data: { archivedAt: null } });
     return;
   }

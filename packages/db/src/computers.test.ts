@@ -1,11 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { PrismaClient } from "./client.js";
 import {
+  assertBotQuota,
   assertComputerQuotaForRestore,
+  BotLimitError,
   ComputerLimitError,
   computerHomeKey,
   computerScopeKey,
   ensureComputerRecord,
+  resolveMaxBotsPerUser,
   resolveMaxComputersPerUser,
   restoreBotUnderComputerQuota,
 } from "./computers.js";
@@ -246,7 +249,10 @@ const baseInput = {
 };
 
 const savedEnv = process.env.SANDBOX_MAX_COMPUTERS_PER_USER;
+const savedBotEnv = process.env.ARGO_MAX_BOTS_PER_USER;
 afterEach(() => {
+  if (savedBotEnv === undefined) delete process.env.ARGO_MAX_BOTS_PER_USER;
+  else process.env.ARGO_MAX_BOTS_PER_USER = savedBotEnv;
   if (savedEnv === undefined) delete process.env.SANDBOX_MAX_COMPUTERS_PER_USER;
   else process.env.SANDBOX_MAX_COMPUTERS_PER_USER = savedEnv;
   vi.restoreAllMocks();
@@ -490,5 +496,36 @@ describe("restoreBotUnderComputerQuota", () => {
       computerId: "computer-a",
     });
     expect(inUse()).toBe(1);
+  });
+});
+
+describe("bot quota", () => {
+  const fakeTx = (live: number) => {
+    const count = vi.fn().mockResolvedValue(live);
+    const queryRaw = vi.fn().mockResolvedValue([]);
+    return { tx: { $queryRaw: queryRaw, bot: { count } } as never, count, queryRaw };
+  };
+
+  it("parses the cap like the computer cap", () => {
+    expect(resolveMaxBotsPerUser(undefined)).toBe(0);
+    expect(resolveMaxBotsPerUser("0")).toBe(0);
+    expect(resolveMaxBotsPerUser("1")).toBe(1);
+    for (const value of ["-1", "1.5", "two"])
+      expect(() => resolveMaxBotsPerUser(value)).toThrow(/positive integer/);
+  });
+
+  it("checks nothing without a cap", async () => {
+    delete process.env.ARGO_MAX_BOTS_PER_USER;
+    const { tx, count } = fakeTx(50);
+    await assertBotQuota(tx, "user-1");
+    expect(count).not.toHaveBeenCalled();
+  });
+
+  it("allows the first bot and refuses the second at a cap of 1", async () => {
+    process.env.ARGO_MAX_BOTS_PER_USER = "1";
+    await expect(assertBotQuota(fakeTx(0).tx, "user-1")).resolves.toBeUndefined();
+    const { tx, count } = fakeTx(1);
+    await expect(assertBotQuota(tx, "user-1")).rejects.toThrow(BotLimitError);
+    expect(count).toHaveBeenCalledWith({ where: { userId: "user-1", archivedAt: null } });
   });
 });

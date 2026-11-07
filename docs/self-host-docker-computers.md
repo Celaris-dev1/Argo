@@ -28,6 +28,8 @@ Two caps bound how many computers exist. `SANDBOX_MAX_COMPUTERS_PER_USER` caps t
 user's bots may have, and `SANDBOX_MAX_COMPUTERS_PER_SPACE` caps concurrent computer containers per
 Space. `SANDBOX_TEAM_SCREEN_LIMIT` caps active bot desktops on one Team Computer; desktops and
 browsers otherwise start only when needed. `0`, the default, leaves each to the machine.
+`ARGO_MAX_BOTS_PER_USER` caps the live bots one person may have across their Spaces, counting bots
+other bots create; archiving one frees its slot.
 
 The supervisor reaches Docker at `/var/run/docker.sock` (or `//./pipe/docker_engine` on Windows). Set
 `DOCKER_SOCKET` for rootless Docker, Colima or another path; `DOCKER_HOST` wins when both are set.

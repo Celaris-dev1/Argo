@@ -1,5 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { ORPCError } from "@orpc/server";
 import { runContinueJob } from "@argo/adapter-kit";
 import type { getBotSecretMetadata } from "@argo/adapters";
 import {
@@ -17,17 +16,12 @@ import {
   toComputerRef,
   validateBotModelChange,
 } from "@argo/adapters";
-import type {
-  Actor,
-  Bot,
-  BotSecretMetadata,
-  SettingsScope,
-  VaultPutInput,
-} from "@argo/contracts";
+import type { Actor, Bot, BotSecretMetadata, SettingsScope, VaultPutInput } from "@argo/contracts";
 import { BotSecretAuth, resolveBotAvatarSet } from "@argo/contracts";
 import { ACTIVE_RUN_STATUSES, displayName } from "@argo/core";
 import type { Prisma } from "@argo/db";
 import {
+  BotLimitError,
   BotSectionNameConflictError,
   botProfileLabelsChanged,
   ComputerLimitError,
@@ -42,6 +36,7 @@ import {
   settingsTarget,
 } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 import type { AgentImportServices } from "../agent-import.js";
 import { agentImportSetupState, createImportedBot, previewAgentImport } from "../agent-import.js";
 import { deleteAgentSecret, listAgentSecrets, putAgentSecret } from "../agent-secrets.js";
@@ -57,7 +52,7 @@ function mapSpaceLifecycleError(error: unknown): unknown {
   if (error instanceof SpaceDeletionInProgressError) {
     return new ORPCError("CONFLICT", { message: error.message });
   }
-  if (error instanceof ComputerLimitError) {
+  if (error instanceof ComputerLimitError || error instanceof BotLimitError) {
     return new ORPCError("BAD_REQUEST", { message: error.message });
   }
   return error;
