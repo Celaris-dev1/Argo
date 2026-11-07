@@ -3,7 +3,8 @@
 # No X server, VNC, window manager or Chromium: screen tools and takeover are off
 # (set ARGO_COMPUTER_HEADLESS=1 on api and worker so bots are not offered them).
 #
-#   docker build -f infra/sandboxes/computer/Dockerfile.headless -t argo/computer:headless infra/sandboxes/computer
+# Scout (the default, Lightpanda):
+#   docker build -f infra/sandboxes/computer/Dockerfile.headless -t argo/computer:scout infra/sandboxes/computer
 # Navigator (headless + real Chrome engine, chrome-headless-shell, amd64 only):
 #   docker build -f infra/sandboxes/computer/Dockerfile.headless --build-arg PAGE_BROWSER=chrome \
 #     -t argo/computer:navigator infra/sandboxes/computer

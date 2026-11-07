@@ -548,6 +548,60 @@ def write_last_target(target_id: str) -> None:
         pass
 
 
+# Lightpanda keeps cookies only while it runs, so Scout saves them to the bot's home and loads them
+# back into a fresh browser: logins and consent choices survive a restart. Chrome keeps its own
+# profile on disk and is left alone.
+COOKIE_FIELDS = ("name", "value", "domain", "path", "expires", "httpOnly", "secure", "sameSite")
+MAX_SAVED_COOKIES = 3000
+
+
+def cookie_profile_path() -> Path:
+    default = Path(os.environ.get("HOME", "/home/argo")) / ".config" / "argo-profile" / "cookies.json"
+    return Path(os.environ.get("ARGO_BROWSER_PROFILE", str(default)))
+
+
+def keeps_cookies_in_memory(port: int) -> bool:
+    try:
+        browser = http_get_json(f"http://127.0.0.1:{port}/json/version", timeout=1.0).get("Browser")
+    except Exception:  # noqa: BLE001
+        return False
+    return isinstance(browser, str) and browser.startswith("Lightpanda")
+
+
+def restore_cookies(client: CdpClient, session_id: str) -> None:
+    try:
+        if client.call("Network.getAllCookies", session_id=session_id).get("cookies"):
+            return  # Already loaded into this browser.
+        saved = json.loads(cookie_profile_path().read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 - a bad profile never stops the page
+        return
+    now = time.time()
+    cookies = [
+        {k: c[k] for k in COOKIE_FIELDS if k in c}
+        for c in saved if isinstance(c, dict) and isinstance(c.get("name"), str)
+        and not (isinstance(c.get("expires"), (int, float)) and 0 < c["expires"] < now)
+    ][:MAX_SAVED_COOKIES]
+    if cookies:
+        try:
+            client.call("Network.setCookies", {"cookies": cookies}, session_id=session_id)
+        except Exception:  # noqa: BLE001
+            pass
+
+
+def save_cookies(client: CdpClient, session_id: str) -> None:
+    try:
+        cookies = client.call("Network.getAllCookies", session_id=session_id).get("cookies") or []
+        path = cookie_profile_path()
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as out:
+            json.dump([{k: c[k] for k in COOKIE_FIELDS if k in c} for c in cookies[:MAX_SAVED_COOKIES]], out)
+        os.replace(tmp, path)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def ensure_world(client: CdpClient, session_id: str) -> None:
     # Rediscover only an isolated context bound to this frame and CDP session.
     # Never run helpers in a page-owned default context with the same name.
@@ -2101,6 +2155,9 @@ def run(argv: list[str]) -> int:
         connected = True
         try:
             session_id = attach_page(client)
+            profile = keeps_cookies_in_memory(port)
+            if profile:
+                restore_cookies(client, session_id)
             if command == "navigate":
                 result = navigate(client, session_id, str(args.get("url") or ""))
             elif command == "snapshot":
@@ -2118,6 +2175,8 @@ def run(argv: list[str]) -> int:
                 }
                 print(json.dumps(result))
                 return 2
+            if profile and command in ("navigate", "act"):
+                save_cookies(client, session_id)
             print(json.dumps(result))
             return 0  # Structured failures preserve partial action progress.
         finally:

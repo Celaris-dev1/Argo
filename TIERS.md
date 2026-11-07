@@ -4,7 +4,7 @@ One codebase; pick the computer image at install time.
 
 | Image | Browser | Install |
 |---|---|---|
-| `argo/computer:headless` | Lightpanda, no screen | `build-ultra-images.sh`, then `install-ultra.sh` |
+| `argo/computer:scout` (default) | Lightpanda, no screen, lightest | `build-ultra-images.sh`, then `install-ultra.sh` |
 | `argo/computer:navigator` | chrome-headless-shell, no screen, amd64 only | `PAGE_BROWSER=chrome build-ultra-images.sh`, then `install-ultra.sh` |
 | `argo/computer:slim` | Full desktop with live screen and takeover | `infra/compose/install-lite.sh` |
 

@@ -50,7 +50,9 @@ fi
 echo "Loading images…"
 gunzip -c "$IMAGES" | docker load
 # Use whichever computer image the bundle carried (Navigator if build-ultra-images.sh built it).
-COMPUTER_TAG=headless
+COMPUTER_TAG=scout
+# Archives built before Scout was named carry the same image as argo/computer:headless.
+docker image inspect argo/computer:scout >/dev/null 2>&1 || COMPUTER_TAG=headless
 docker image inspect argo/computer:navigator >/dev/null 2>&1 && COMPUTER_TAG=navigator
 docker image prune -f >/dev/null
 

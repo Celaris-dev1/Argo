@@ -1490,8 +1490,6 @@ class PageBrowserTest(unittest.TestCase):
                 self.assertIn(("Network.enable", {"maxPostDataSize": 1}), sent)
 
 
-if __name__ == "__main__":
-    unittest.main()
 
 
 class HeadlessTabClient:
@@ -1546,3 +1544,61 @@ class HeadlessAttachTests(unittest.TestCase):
         with patch.dict(os.environ, {"ARGO_COMPUTER_HEADLESS": ""}):
             with self.assertRaises(RuntimeError):
                 helper.attach_page(HeadlessTabClient(["a", "b"]))
+
+
+class CookieJarClient:
+    def __init__(self, cookies=None):
+        self.cookies = list(cookies or [])
+
+    def call(self, method, params=None, *, session_id=None, timeout_s=30.0):
+        if method == "Network.getAllCookies":
+            return {"cookies": list(self.cookies)}
+        if method == "Network.setCookies":
+            self.cookies.extend(params["cookies"])
+            return {}
+        raise AssertionError(method)
+
+
+class ScoutCookieProfileTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.dir = tempfile.TemporaryDirectory()
+        self.path = Path(self.dir.name) / "profile" / "cookies.json"
+        self.env = patch.dict(os.environ, {"ARGO_BROWSER_PROFILE": str(self.path)})
+        self.env.start()
+
+    def tearDown(self):
+        self.env.stop()
+        self.dir.cleanup()
+
+    def test_saves_cookies_only_the_owner_can_read_and_loads_them_into_a_fresh_browser(self):
+        helper.save_cookies(CookieJarClient([{"name": "sid", "value": "x", "domain": "a.test", "path": "/", "size": 4}]), "s")
+        self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)
+        fresh = CookieJarClient()
+        helper.restore_cookies(fresh, "s")
+        self.assertEqual(fresh.cookies, [{"name": "sid", "value": "x", "domain": "a.test", "path": "/"}])
+
+    def test_skips_expired_cookies(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.write_text(json.dumps([
+            {"name": "old", "value": "1", "domain": "a.test", "path": "/", "expires": 1},
+            {"name": "session", "value": "2", "domain": "a.test", "path": "/", "expires": -1},
+        ]))
+        fresh = CookieJarClient()
+        helper.restore_cookies(fresh, "s")
+        self.assertEqual([c["name"] for c in fresh.cookies], ["session"])
+
+    def test_leaves_a_running_browser_and_a_broken_profile_alone(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.write_text("not json")
+        fresh = CookieJarClient()
+        helper.restore_cookies(fresh, "s")
+        self.assertEqual(fresh.cookies, [])
+        self.path.write_text(json.dumps([{"name": "a", "value": "1", "domain": "a.test", "path": "/"}]))
+        running = CookieJarClient([{"name": "live", "value": "1", "domain": "a.test", "path": "/"}])
+        helper.restore_cookies(running, "s")
+        self.assertEqual([c["name"] for c in running.cookies], ["live"])
+
+
+if __name__ == "__main__":
+    unittest.main()

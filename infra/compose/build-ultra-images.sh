@@ -2,7 +2,7 @@
 # Build the ultra-lean images on a bigger box (8 GB is plenty) and pack them for a small one.
 # The 2 GB box never builds: it only runs `docker load`.
 #
-#   bash infra/compose/build-ultra-images.sh             # writes argo-ultra-images.tar.gz
+#   bash infra/compose/build-ultra-images.sh             # Scout (Lightpanda); writes argo-ultra-images.tar.gz
 #   PAGE_BROWSER=chrome bash infra/compose/build-ultra-images.sh   # Navigator: chrome-headless-shell, amd64
 #   scp argo-ultra-images.tar.gz root@[2001:db8::10]:/root/
 set -euo pipefail
@@ -10,7 +10,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="${1:-argo-ultra-images.tar.gz}"
 PAGE_BROWSER="${PAGE_BROWSER:-lightpanda}"
 case "$PAGE_BROWSER" in
-  lightpanda) COMPUTER_TAG=headless ;;
+  lightpanda) COMPUTER_TAG=scout ;;
   chrome) COMPUTER_TAG=navigator ;;
   *) echo "PAGE_BROWSER must be lightpanda or chrome" >&2; exit 1 ;;
 esac
