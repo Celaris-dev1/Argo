@@ -5,8 +5,8 @@ import { openAICompletionsApi } from "@earendil-works/pi-ai/api/openai-completio
 import { declaredVisionModelIds, inputModalities } from "./model-modalities.js";
 /**
  * Local OpenAI-compatible model server (Ollama, LM Studio, llama.cpp, MLX).
- * The server is keyless, but `resolve` returns a placeholder because Models
- * hides providers with no resolvable auth.
+ * Keyless servers get a placeholder because Models hides providers with no
+ * resolvable auth; a keyed deployment endpoint uses ARGO_LOCAL_MODELS_KEY.
  */
 export const LOCAL_PROVIDER_ID = "local";
 
@@ -33,6 +33,16 @@ export function localBaseUrl(): string {
     throw new Error("ARGO_LOCAL_MODELS_URL must be an absolute HTTP(S) URL");
   }
   return value;
+}
+
+/** Bearer key for a keyed deployment endpoint. Stays on the server: runs send it, clients never see it. */
+function localApiKey(): string {
+  return process.env.ARGO_LOCAL_MODELS_KEY?.trim() || "local";
+}
+
+/** The name members see for the deployment's models. Set, it replaces the endpoint in disclosures. */
+export function localModelsName(): string | undefined {
+  return process.env.ARGO_LOCAL_MODELS_NAME?.trim() || undefined;
 }
 
 /** Throws instead of `Number(x) || default`, which would swallow a typo or accept a negative window. */
@@ -76,13 +86,13 @@ export function localProvider(): Provider | undefined {
   if (!ids.length) return undefined;
   return createProvider({
     id: LOCAL_PROVIDER_ID,
-    name: "Local (Ollama / LM Studio)",
+    name: localModelsName() ?? "Local (Ollama / LM Studio)",
     baseUrl: localBaseUrl(),
     auth: {
       apiKey: {
         name: "Local model server",
         resolve: async () => ({
-          auth: { apiKey: "local", baseUrl: localBaseUrl() },
+          auth: { apiKey: localApiKey(), baseUrl: localBaseUrl() },
           source: "local model server",
         }),
       },

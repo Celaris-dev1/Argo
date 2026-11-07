@@ -47,4 +47,21 @@ describe("mobile AI recipient disclosure", () => {
     ).toContain("http://127.0.0.1:11434");
     expect(fetch).not.toHaveBeenCalled();
   });
+
+  it("names a named deployment endpoint without its address", () => {
+    const saved = { ...process.env };
+    process.env.ARGO_LOCAL_MODELS = "crow-uncensored";
+    process.env.ARGO_LOCAL_MODELS_URL = "https://models.example.test/v1";
+    process.env.ARGO_LOCAL_MODELS_NAME = "Argo";
+    try {
+      const recipient = aiRecipient({
+        provider: "local",
+        use: "model",
+        modelId: "crow-uncensored",
+      });
+      expect(recipient?.name).not.toContain("example.test");
+    } finally {
+      process.env = saved;
+    }
+  });
 });

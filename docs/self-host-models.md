@@ -77,6 +77,14 @@ On Docker Desktop, a bot computer shell can often reach services bound to host `
 through that same hostname. Do not run sensitive unauthenticated services on loopback while
 bots run, or firewall / block that path. Linux does not get `host.docker.internal` the same
 way by default.
+For a keyed endpoint, such as a hosted gateway, add its key and the name members see. The key
+stays on the server, and the name replaces the endpoint address in the data-sharing prompt:
+
+```env
+ARGO_LOCAL_MODELS_KEY=sk-...
+ARGO_LOCAL_MODELS_NAME=Example Models
+```
+
 Only configure an endpoint you control: prompts, attachments, and tool results sent to that model
 leave Argo through this URL. Leave `ARGO_LOCAL_MODELS` blank to disable the provider.
 

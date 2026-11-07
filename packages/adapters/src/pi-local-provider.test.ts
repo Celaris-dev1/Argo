@@ -12,6 +12,8 @@ const ENV_KEYS = [
   "ARGO_LOCAL_MODELS_URL",
   "ARGO_LOCAL_CONTEXT_WINDOW",
   "ARGO_LOCAL_MAX_TOKENS",
+  "ARGO_LOCAL_MODELS_KEY",
+  "ARGO_LOCAL_MODELS_NAME",
 ] as const;
 
 const saved = new Map<string, string | undefined>();
@@ -113,5 +115,19 @@ describe("local model provider", () => {
     setModels("qwen3:4b");
     const withLocal = registerLocalProvider(builtinModels());
     expect(withLocal.getModel(LOCAL_PROVIDER_ID, "qwen3:4b")).toBeDefined();
+  });
+
+  it("sends the deployment key and shows the operator's name", async () => {
+    setModels("crow-uncensored");
+    process.env.ARGO_LOCAL_MODELS_URL = "https://models.example.test/v1";
+    process.env.ARGO_LOCAL_MODELS_KEY = "sk-test-placeholder";
+    process.env.ARGO_LOCAL_MODELS_NAME = "Argo";
+    const provider = localProvider()!;
+    expect(provider.name).toBe("Argo");
+    const resolved = await provider.auth.apiKey!.resolve({} as never);
+    expect(resolved?.auth).toEqual({
+      apiKey: "sk-test-placeholder",
+      baseUrl: "https://models.example.test/v1",
+    });
   });
 });
