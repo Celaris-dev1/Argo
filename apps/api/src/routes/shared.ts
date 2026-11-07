@@ -32,6 +32,9 @@ export async function meDto(deps: RouterDeps, actor: Actor): Promise<Me> {
     modelSetup(deps, actor),
     isAdmin(deps, actor.userId),
   ]);
+  const pendingTerms = (await termsAccepted(deps, actor.userId))
+    ? null
+    : (deps.env.termsOfUse ?? null);
   return {
     ticketBoardEnabled: deps.env.ticketBoardEnabled === true,
     phoneCallsEnabled: deps.env.phoneCallsEnabled === true,
@@ -72,7 +75,19 @@ export async function meDto(deps: RouterDeps, actor: Actor): Promise<Me> {
     paymentWalletProvider: deps.paymentWallet
       ? { id: deps.paymentWallet.describe().id, name: deps.paymentWallet.displayName }
       : null,
+    pendingTerms,
   };
+}
+
+/** Whether this account accepted the operator's current Terms of Use, or none are configured. */
+export async function termsAccepted(deps: RouterDeps, userId: string): Promise<boolean> {
+  const terms = deps.env.termsOfUse;
+  if (!terms) return true;
+  const row = await deps.prisma.termsAcceptance.findUnique({
+    where: { userId_version: { userId, version: terms.version } },
+    select: { userId: true },
+  });
+  return row !== null;
 }
 
 function computerHostFor(

@@ -1,4 +1,9 @@
 export const ES_MESSAGES: Record<string, string> = {
+  "Terms of Use": "Términos de uso",
+  "I'm 18 or older and agree to the Terms of Use.":
+    "Tengo 18 años o más y acepto los Términos de uso.",
+  Read: "Leer",
+  Agree: "Aceptar",
   "How other bots see it": "Cómo lo ven otros bots",
   "Share to": "Compartir en",
   "{count} files": "{count} archivos",

@@ -7,6 +7,17 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Acceptance of the operator's Terms of Use (TERMS_OF_USE_URL) at a version.
+model TermsAcceptance {
+  userId     String
+  version    String
+  acceptedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, version])
+  @@map("terms_acceptances")
+}
+
 model AiDataConsent {
   userId String
   spaceId String
@@ -23,6 +34,7 @@ model AiDataConsent {
 
 model User {
   aiDataConsents AiDataConsent[]
+  termsAcceptances TermsAcceptance[]
   id                          String                       @id
   name                        String
   email                       String

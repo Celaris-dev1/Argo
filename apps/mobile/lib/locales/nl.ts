@@ -1,4 +1,9 @@
 export const NL_MESSAGES: Record<string, string> = {
+  "Terms of Use": "Gebruiksvoorwaarden",
+  "I'm 18 or older and agree to the Terms of Use.":
+    "Ik ben 18 jaar of ouder en ga akkoord met de Gebruiksvoorwaarden.",
+  Read: "Lezen",
+  Agree: "Akkoord",
   "How other bots see it": "Hoe andere bots deze zien",
   "Share to": "Delen met",
   "{count} files": "{count} bestanden",

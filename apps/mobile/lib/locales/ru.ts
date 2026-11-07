@@ -1,4 +1,9 @@
 export const RU_MESSAGES: Record<string, string> = {
+  "Terms of Use": "Условия использования",
+  "I'm 18 or older and agree to the Terms of Use.":
+    "Мне исполнилось 18 лет, и я принимаю Условия использования.",
+  Read: "Прочитать",
+  Agree: "Принять",
   "How other bots see it": "Как его видят другие боты",
   "Share to": "Отправить в",
   "{count} files": "Файлов: {count}",
@@ -1070,8 +1075,7 @@ export const RU_MESSAGES: Record<string, string> = {
   Work: "Работа",
   Both: "И то, и другое",
   "How will you use Argo?": "Как вы будете использовать Argo?",
-  "What do you most want Argo to help with?":
-    "С чем Argo должен помогать вам в первую очередь?",
+  "What do you most want Argo to help with?": "С чем Argo должен помогать вам в первую очередь?",
   "How big is your team?": "Сколько человек в вашей команде?",
   "How did you hear about us?": "Как вы о нас узнали?",
   "Welcome to Argo": "Добро пожаловать в Argo",

@@ -6548,3 +6548,11 @@ msgstr ""
 #: src/pages/model-settings/connection-controls.tsx
 msgid "Required API key"
 msgstr ""
+
+#: src/components/TermsGate.tsx
+msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
+msgstr "我已年满 18 岁，并同意<0>使用条款</0>。"
+
+#: src/components/TermsGate.tsx
+msgid "Terms of Use"
+msgstr "使用条款"

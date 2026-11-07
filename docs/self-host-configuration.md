@@ -70,6 +70,8 @@ retries let long turns survive brief provider failures.
 | `USER_DEVICES_ENABLED` | on | `false` stops signed-in desktop apps from letting bots run commands on the user's own computer. Set it on the API and worker. |
 | `PI_SESSION_RECORDING` | off | `true` records agent sessions as JSONL under `DATA_DIR/pi-sessions`. The files are not encrypted, so do not use it on a shared or multi-tenant install. |
 | `PRIVACY_POLICY_URL` | Argo's policy | The privacy policy linked from the AI data-sharing notice. Set it on the API. |
+| `TERMS_OF_USE_URL` | off | Your Terms of Use. When set, every account must confirm it is 18 or older and accept them before bots answer. Set it on the API. |
+| `TERMS_OF_USE_VERSION` | `1` | Change it after editing your terms to ask every account to accept them again. |
 
 ## Database roles
 

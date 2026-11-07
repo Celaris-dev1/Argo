@@ -1,4 +1,3 @@
-import { implement, ORPCError } from "@orpc/server";
 import {
   applyCodexLiveCatalog,
   applyProviderLiveCatalog,
@@ -35,8 +34,11 @@ import {
   canonicalPiProviderId,
   modelSupportsRole,
   OPENAI_COMPATIBLE_PROVIDER_ID,
+  TERMS_REQUIRED,
 } from "@argo/contracts";
+import { aiDataUsesForProcedure } from "@argo/core";
 import { createGroupRepos, createRepos, recordSecurityEvent, runAsTenant } from "@argo/db";
+import { implement, ORPCError } from "@orpc/server";
 import { createAgentImportServices } from "../agent-import-services.js";
 import { createAgentSkillsService } from "../agent-skills.js";
 import { createBotRemoval } from "../bot-removal.js";
@@ -46,7 +48,7 @@ import type { RouterDeps } from "../router.js";
 import { createRoutineAnnouncer } from "../routines.js";
 import { procedureSecurityEvent } from "../security-audit.js";
 import { createTaughtSkillsService } from "../taught-skills.js";
-import { meDto } from "./shared.js";
+import { meDto, termsAccepted } from "./shared.js";
 
 /**
  * Runs an authenticated procedure with row-level security scoped to the actor's
@@ -347,6 +349,13 @@ export function createRouterContext(deps: RouterDeps) {
       return asTenant(actor, () => next({ context: { ...context, actor } }));
     })
     .use(async ({ context, next, path }, input) => {
+      // The operator's Terms of Use gate every request that can start AI processing.
+      if (
+        deps.env?.termsOfUse &&
+        aiDataUsesForProcedure(path.join("/"), input).length > 0 &&
+        !(await termsAccepted(deps, context.actor.userId))
+      )
+        throw new ORPCError("FORBIDDEN", { message: TERMS_REQUIRED });
       const result = await next();
       const event = procedureSecurityEvent(path, input, context.actor);
       if (event) await recordSecurityEvent(event);

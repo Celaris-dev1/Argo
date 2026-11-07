@@ -89,6 +89,7 @@ import {
   subscribeSessionGeneration,
 } from "../lib/session";
 import { useSplitView } from "../lib/split-view";
+import { promptTerms } from "../lib/terms";
 import { useArchivedCount } from "../lib/use-archived-count";
 import { useCollapsedSections } from "../lib/use-collapsed-sections";
 import { useHomeHeader } from "../lib/use-home-header";
@@ -243,6 +244,7 @@ function Home({ embedded, onSelectSpace, onShareSelect }: InboxPaneProps & { emb
         apiBase !== currentApiBase()
       )
         return;
+      if (nextMe.pendingTerms) promptTerms(nextMe.pendingTerms);
       if (nextMe.billingEnabled) {
         void rpc("billing/status")
           .then((billing) => {

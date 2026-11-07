@@ -1751,6 +1751,11 @@ export const ServerUpdateRequestSchema = z.object({
 });
 export type ServerUpdateRequest = z.infer<typeof ServerUpdateRequestSchema>;
 
+export const TermsOfUseSchema = z.object({ url: z.string().url(), version: z.string().min(1) });
+export type TermsOfUse = z.infer<typeof TermsOfUseSchema>;
+/** Refusal message for AI requests from an account that has not accepted the current terms. */
+export const TERMS_REQUIRED = "Accept the Terms of Use to continue.";
+
 export const MeSchema = z.object({
   maxUploadSizeBytes: z.number().int().positive().optional(),
   maxAttachmentsPerMessage: z.number().int().positive().optional(),
@@ -1789,6 +1794,8 @@ export const MeSchema = z.object({
   needsSignupSurvey: z.boolean().optional(),
   /** The wallet bots can spend from, when this deployment offers one. Absent from older servers. */
   paymentWalletProvider: z.object({ id: z.string(), name: z.string() }).nullable().optional(),
+  /** Operator Terms of Use this account has not accepted yet; AI requests are refused until it does. */
+  pendingTerms: TermsOfUseSchema.nullable().optional(),
 });
 export type Me = z.infer<typeof MeSchema>;
 

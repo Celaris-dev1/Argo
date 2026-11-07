@@ -256,6 +256,12 @@ export const appContract = {
       .output(AiConsentStatusSchema),
     revoke: oc.input(z.object({ key: z.string().nullable() })).output(AiConsentStatusSchema),
   },
+  terms: {
+    /** Accept the operator's Terms of Use at this version; also confirms the user is 18 or older. */
+    accept: oc
+      .input(z.object({ version: z.string().min(1).max(100) }))
+      .output(z.object({ ok: z.literal(true) })),
+  },
   health: oc.output(z.object({ ok: z.literal(true), version: z.string() })),
   me: oc.output(MeSchema),
   billing: {

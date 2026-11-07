@@ -1,8 +1,8 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { LinkFavicons } from "@argo/chat-ui/web";
 import { LinkFaviconsContext, RemoteImagesContext } from "@argo/chat-ui/web";
 import { analyticsScreen } from "@argo/core";
 import { Button } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Suspense,
   useEffect,
@@ -17,6 +17,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MarkdownLinkPrompt } from "./components/markdown-link-prompt";
 import { PageLoading } from "./components/PageLoading";
 import { SubscriptionGate } from "./components/SubscriptionGate";
+import { TermsGate } from "./components/TermsGate";
 import { authClient } from "./lib/auth";
 import { getTicketBoardEnabled, subscribeTicketBoardEnabled } from "./lib/bootstrap";
 import { syncCallIdentity } from "./lib/call-session";
@@ -255,7 +256,9 @@ function SessionApp() {
                 element={
                   user ? (
                     <SubscriptionGate fallback={<PageLoading />}>
-                      <Outlet />
+                      <TermsGate fallback={<PageLoading />}>
+                        <Outlet />
+                      </TermsGate>
                     </SubscriptionGate>
                   ) : (
                     <Navigate to="/sign-in" replace />
