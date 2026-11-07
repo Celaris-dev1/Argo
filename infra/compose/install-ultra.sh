@@ -49,6 +49,9 @@ fi
 # 4. Images.
 echo "Loading images…"
 gunzip -c "$IMAGES" | docker load
+# Use whichever computer image the bundle carried (Navigator if build-ultra-images.sh built it).
+COMPUTER_TAG=headless
+docker image inspect argo/computer:navigator >/dev/null 2>&1 && COMPUTER_TAG=navigator
 docker image prune -f >/dev/null
 
 # 5. Environment.
@@ -62,7 +65,7 @@ if [ ! -f "$ENV_FILE" ]; then
     printf 'SANDBOX_SUPERVISOR_TOKEN=%s\n' "$(openssl rand -hex 32)"
     printf 'SANDBOX_PROVIDER=docker\n'
     printf 'POSTGRES_IMAGE=postgres:16\n'
-    printf 'ARGO_COMPUTER_IMAGE_TAG=headless\n'
+    printf 'ARGO_COMPUTER_IMAGE_TAG=%s\n' "$COMPUTER_TAG"
     printf 'ARGO_COMPUTER_HEADLESS=1\n'
     [ -f "$COMPOSE_DIR/.env.lite.example" ] && grep -v '^ARGO_COMPUTER_IMAGE_TAG=' "$COMPOSE_DIR/.env.lite.example"
   } > "$ENV_FILE"
@@ -81,5 +84,5 @@ cd "$COMPOSE_DIR"
 docker compose --env-file .env -f docker-compose.images.yml -f docker-compose.lite.yml \
   -f docker-compose.ultra.yml up -d --pull never
 echo
-echo "Argo ultra is starting at http://127.0.0.1:5173 (headless computer, API models)."
+echo "Argo ultra is starting at http://127.0.0.1:5173 ($COMPUTER_TAG computer, API models)."
 echo "Put Cloudflare (proxied) or Caddy in front so IPv4 users can reach this IPv6 box."

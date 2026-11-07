@@ -9,6 +9,7 @@ fallback computer_act.
 from __future__ import annotations
 
 import base64
+from pathlib import Path
 import hashlib
 import json
 import os
@@ -496,18 +497,20 @@ def attach_page(client: CdpClient) -> str:
             ensure_world(client, session_id)
             if eval_json(client, session_id, 'document.visibilityState === "visible"'):
                 focused = eval_json(client, session_id, "document.hasFocus()")
-                candidates.append((session_id, focused))
+                candidates.append((session_id, focused, page["targetId"]))
         except Exception:
             continue
-    focused = [session for session, focus in candidates if focus]
+    focused = [session for session, focus, _ in candidates if focus]
     headless = os.environ.get("ARGO_COMPUTER_HEADLESS", "").lower() in ("1", "true", "yes", "on")
     if len(focused) == 1:
         selected = focused[0]
     elif len(candidates) == 1:
         selected = candidates[0][0]
     elif headless and candidates:
-        # No screen, so nobody can pick a tab by hand: drive the newest page.
-        selected = candidates[-1][0]
+        # No screen, so nobody can pick a tab by hand: keep driving the page used last time, else
+        # the first one the browser lists. Target order is not a creation order, so never guess "newest".
+        last = read_last_target()
+        selected = next((s for s, _, t in candidates if t == last), candidates[0][0])
     elif headless:
         # A fresh headless browser (Lightpanda, chrome-headless-shell) may have no page yet.
         created = client.call("Target.createTarget", {"url": "about:blank"})
@@ -516,10 +519,33 @@ def attach_page(client: CdpClient) -> str:
         })
         selected = attached["sessionId"]
         client.call("Page.enable", session_id=selected)
+        candidates.append((selected, False, created["targetId"]))
     else:
         raise RuntimeError("No unambiguous visible browser tab. Use desktop tools to select a tab.")
+    if headless:
+        write_last_target(next(t for s, _, t in candidates if s == selected))
     ensure_world(client, selected)
     return selected
+
+
+def last_target_path() -> Path:
+    return Path(os.environ.get("ARGO_PAGE_BROWSER_STATE", "/tmp/argo/page-browser-target"))
+
+
+def read_last_target() -> str:
+    try:
+        return last_target_path().read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+
+
+def write_last_target(target_id: str) -> None:
+    try:
+        path = last_target_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(target_id, encoding="utf-8")
+    except OSError:
+        pass
 
 
 def ensure_world(client: CdpClient, session_id: str) -> None:

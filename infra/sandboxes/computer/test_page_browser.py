@@ -1492,3 +1492,57 @@ class PageBrowserTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HeadlessTabClient:
+    """Minimal CDP stand-in: pages that are visible but never focused, as in a headless browser."""
+
+    def __init__(self, target_ids):
+        self.target_ids = list(target_ids)
+        self.created = []
+
+    def call(self, method, params=None, session_id=None):
+        if method == "Target.getTargets":
+            return {"targetInfos": [{"type": "page", "targetId": t} for t in self.target_ids]}
+        if method == "Target.attachToTarget":
+            return {"sessionId": "s-" + params["targetId"]}
+        if method == "Target.createTarget":
+            self.created.append(params["url"])
+            return {"targetId": "new"}
+        return {}
+
+
+class HeadlessAttachTests(unittest.TestCase):
+    def setUp(self):
+        self.state = Path(self.id().replace(".", "_") + ".state").absolute()
+        self.addCleanup(lambda: self.state.unlink(missing_ok=True))
+        env = patch.dict(os.environ, {"ARGO_COMPUTER_HEADLESS": "1", "ARGO_PAGE_BROWSER_STATE": str(self.state)})
+        env.start()
+        self.addCleanup(env.stop)
+        for name, value in (("ensure_world", None), ("eval_json", None)):
+            p = patch.object(helper, name, side_effect=self.fake_eval if name == "eval_json" else None)
+            p.start()
+            self.addCleanup(p.stop)
+
+    @staticmethod
+    def fake_eval(_client, _session, expression):
+        return "visibilityState" in expression
+
+    def test_keeps_driving_the_last_page_among_several(self):
+        self.state.write_text("b", encoding="utf-8")
+        self.assertEqual(helper.attach_page(HeadlessTabClient(["a", "b", "c"])), "s-b")
+
+    def test_without_history_picks_the_first_listed_page_and_remembers_it(self):
+        self.assertEqual(helper.attach_page(HeadlessTabClient(["a", "b"])), "s-a")
+        self.assertEqual(self.state.read_text(encoding="utf-8"), "a")
+
+    def test_creates_a_page_when_the_browser_has_none(self):
+        client = HeadlessTabClient([])
+        self.assertEqual(helper.attach_page(client), "s-new")
+        self.assertEqual(client.created, ["about:blank"])
+        self.assertEqual(self.state.read_text(encoding="utf-8"), "new")
+
+    def test_with_a_screen_several_unfocused_pages_still_need_a_choice(self):
+        with patch.dict(os.environ, {"ARGO_COMPUTER_HEADLESS": ""}):
+            with self.assertRaises(RuntimeError):
+                helper.attach_page(HeadlessTabClient(["a", "b"]))

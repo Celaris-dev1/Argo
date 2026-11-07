@@ -1,5 +1,7 @@
 #!/bin/sh
 # Navigator page browser: chrome-headless-shell on the same CDP port Lightpanda uses.
+# --no-sandbox: Chrome's own sandbox needs user namespaces the computer container does not grant;
+# the container (non-root uid, no host mounts) is the boundary.
 # No window. A second launch attaches to the one already listening.
 set -eu
 DISPLAY_NUM="${DISPLAY:-:1}"
@@ -21,6 +23,9 @@ ready() {
   curl -sf -o /dev/null --max-time 0.4 "http://127.0.0.1:${DEBUG_PORT}/json/version"
 }
 started=0
+# One launcher at a time per port, so two callers never start two browsers on the same port.
+exec 9>"/tmp/argo-chrome-$DEBUG_PORT.lock"
+flock 9
 if ! ready; then
   mkdir -p "$HOME/.config/argo-chrome"
   nohup /opt/chrome-headless-shell/chrome-headless-shell \
@@ -29,22 +34,27 @@ if ! ready; then
     --no-sandbox --no-first-run --no-default-browser-check --disable-dev-shm-usage \
     --disable-gpu --window-size=1280,800 --renderer-process-limit=4 \
     ${ARGO_CHROME_FLAGS:-} about:blank \
-    >/tmp/argo-chrome.log 2>&1 &
+    >/tmp/argo-chrome.log 2>&1 9>&- &
   echo $! >/tmp/argo-chrome.pid
   started=1
   i=0
-  while [ "$i" -lt 100 ]; do
-    ready && break
+  until ready; do
     i=$((i + 1))
+    if [ "$i" -ge 100 ]; then
+      echo "chrome-headless-shell did not open CDP on port $DEBUG_PORT" >&2
+      exit 1
+    fi
     sleep 0.1
   done
 fi
+flock -u 9
 if [ -n "$URL" ]; then
   python3 - "$DEBUG_PORT" "$URL" <<'PY'
 import sys, urllib.request
+from urllib.parse import quote
 port, url = sys.argv[1], sys.argv[2]
 req = urllib.request.Request(
-    f"http://127.0.0.1:{port}/json/new?{urllib.request.quote(url, safe='')}",
+    f"http://127.0.0.1:{port}/json/new?{quote(url, safe='')}",
     method="PUT",
 )
 try:
