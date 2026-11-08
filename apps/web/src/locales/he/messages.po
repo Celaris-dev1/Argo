@@ -665,6 +665,10 @@ msgstr "כל הזמנים"
 msgid "Allow"
 msgstr "לאפשר"
 
+#: src/lib/dictation.ts
+msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
+msgstr ""
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Allow cross-space bot communication"
 msgstr ""
@@ -676,10 +680,6 @@ msgstr ""
 #: src/components/AskCard.tsx
 msgid "Allow once"
 msgstr "אישור חד-פעמי"
-
-#: src/lib/dictation.ts
-msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
-msgstr ""
 
 #: src/components/ApprovalRulePreview.tsx
 msgid "Allow rule"
@@ -860,6 +860,19 @@ msgstr "בארכיון"
 msgid "Archived"
 msgstr "בארכיון"
 
+#: src/pages/shell/avatar-studio-popover.tsx
+msgid "Argo"
+msgstr "Argo"
+
+#: src/components/ModelCredits.tsx
+#: src/pages/Onboarding.tsx
+msgid "Argo credits"
+msgstr ""
+
+#: src/pages/memory-providers/HonchoSettingsForm.tsx
+msgid "argo-shared and IDs starting with bot- are reserved for Argo."
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "ארגומנטים"
@@ -970,6 +983,7 @@ msgstr "Avatar Studio"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/create-bot-dialog.tsx
 msgid "Back"
 msgstr "חזרה"
 
@@ -1428,6 +1442,15 @@ msgctxt "email sign-in"
 msgid "Code"
 msgstr "קוד"
 
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Collapse {0}"
@@ -1679,6 +1702,7 @@ msgstr "מגבלת הקשר"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/integrations/IntegrationSetup.tsx
 #: src/components/SignupSurvey.tsx
+#: src/components/TermsGate.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/shell/agent-import.tsx
@@ -2024,6 +2048,10 @@ msgstr "לא ניתן להתנתק. יש לנסות שוב."
 #: src/pages/Paywall.tsx
 msgid "Could not open billing"
 msgstr "לא ניתן לפתוח את החיוב"
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
 
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not play a test clip"
@@ -3176,6 +3204,10 @@ msgstr "איך לבדוק"
 msgid "How will you use Argo?"
 msgstr ""
 
+#: src/components/TermsGate.tsx
+msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
+msgstr "אני בן/בת 18 ומעלה ומסכים/ה ל<0>תנאי השימוש</0>."
+
 #: src/pages/shell/computer-release-actions.tsx
 msgid "I’m done"
 msgstr "סיימתי"
@@ -3790,6 +3822,10 @@ msgstr "מזהה מודל"
 msgid "Model options"
 msgstr "אפשרויות מודל"
 
+#: src/pages/shell/composer.tsx
+msgid "Model: {modelName}"
+msgstr ""
+
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/settings-nav.ts
 #: src/pages/SpaceSettingOverrides.tsx
@@ -4186,12 +4222,6 @@ msgstr "תוקף OAuth פג"
 msgid "Offline"
 msgstr ""
 
-#: src/pages/model-settings/connection-controls.tsx
-#: src/pages/Onboarding.tsx
-msgid "Ollama API key"
-msgstr ""
-
-#: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 msgid "Ollama Cloud"
 msgstr ""
@@ -4557,19 +4587,6 @@ msgstr "Pull request"
 msgid "Queued"
 msgstr "בתור"
 
-#: src/pages/shell/avatar-studio-popover.tsx
-msgid "Argo"
-msgstr "Argo"
-
-#: src/components/ModelCredits.tsx
-#: src/pages/Onboarding.tsx
-msgid "Argo credits"
-msgstr ""
-
-#: src/pages/memory-providers/HonchoSettingsForm.tsx
-msgid "argo-shared and IDs starting with bot- are reserved for Argo."
-msgstr ""
-
 #: src/pages/shell/message-hover-actions.tsx
 msgid "React"
 msgstr "הוספת אמוג׳י"
@@ -4871,6 +4888,11 @@ msgstr "יש לבקש קוד חדש"
 msgid "Requests"
 msgstr ""
 
+#: src/pages/model-settings/connection-controls.tsx
+#: src/pages/Onboarding.tsx
+msgid "Required API key"
+msgstr ""
+
 #: src/pages/shell/message-cards.tsx
 msgid "Research & writing"
 msgstr "מחקר וכתיבה"
@@ -4958,15 +4980,15 @@ msgstr "לנסות שוב עכשיו"
 msgid "Retry screen"
 msgstr "טעינת המסך מחדש"
 
-#. placeholder {0}: call.botName
-#: src/components/call/CallCard.tsx
-msgid "Return to call with {0}"
-msgstr ""
-
 #: src/pages/McpOAuthCallback.tsx
 #: src/pages/SlackInstallCallback.tsx
 msgid "Return to Argo"
 msgstr "חזרה ל-Argo"
+
+#. placeholder {0}: call.botName
+#: src/components/call/CallCard.tsx
+msgid "Return to call with {0}"
+msgstr ""
 
 #: src/lib/model-connection-preflight.ts
 msgid "Review provider settings and test again."
@@ -5702,6 +5724,10 @@ msgstr "הודעת Teams"
 msgid "Teams not enabled"
 msgstr "Teams לא מופעל"
 
+#: src/components/TermsGate.tsx
+msgid "Terms of Use"
+msgstr "תנאי שימוש"
+
 #: src/components/teach/SkillDraftCard.tsx
 msgid "Test"
 msgstr "בדיקה"
@@ -6194,6 +6220,10 @@ msgstr "השתמש ב-{oauthEnvReference} עבור אסימון הגישה."
 msgid "Use a found model"
 msgstr "שימוש במודל שנמצא"
 
+#: src/components/ModelCredits.tsx
+msgid "Use Argo credits"
+msgstr ""
+
 #: src/lib/model-connection-preflight.ts
 msgid "Use Connect to verify the key."
 msgstr "יש ללחוץ על חיבור כדי לאמת את המפתח."
@@ -6221,10 +6251,6 @@ msgstr ""
 #: src/components/teach/TeachRecordingChrome.tsx
 msgid "Use Protected input for passwords."
 msgstr "לסיסמאות יש להשתמש בקלט מוגן."
-
-#: src/components/ModelCredits.tsx
-msgid "Use Argo credits"
-msgstr ""
 
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "Use space default"
@@ -6374,6 +6400,10 @@ msgstr ""
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
 msgstr "במה להתחיל קודם?"
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "What kind of bot?"
+msgstr ""
 
 #: src/components/teach/TeachComputerOverlay.tsx
 msgid "What result will you demonstrate?"
@@ -6530,29 +6560,3 @@ msgstr "לספק הקול שלך נגמר הקרדיט."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "ספק הקול שלך דחה את המפתח."
-
-#: src/pages/shell/composer.tsx
-#: src/pages/shell/computer-overlay.tsx
-msgid "Coding"
-msgstr ""
-
-#: src/pages/shell/composer.tsx
-msgid "Coding mode"
-msgstr ""
-
-#: src/pages/Shell.tsx
-msgid "Could not open coding mode"
-msgstr ""
-
-#: src/pages/Onboarding.tsx
-#: src/pages/model-settings/connection-controls.tsx
-msgid "Required API key"
-msgstr ""
-
-#: src/components/TermsGate.tsx
-msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
-msgstr "אני בן/בת 18 ומעלה ומסכים/ה ל<0>תנאי השימוש</0>."
-
-#: src/components/TermsGate.tsx
-msgid "Terms of Use"
-msgstr "תנאי שימוש"

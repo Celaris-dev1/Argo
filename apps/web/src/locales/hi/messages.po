@@ -665,6 +665,10 @@ msgstr ""
 msgid "Allow"
 msgstr "अनुमति दें"
 
+#: src/lib/dictation.ts
+msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
+msgstr ""
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Allow cross-space bot communication"
 msgstr ""
@@ -676,10 +680,6 @@ msgstr ""
 #: src/components/AskCard.tsx
 msgid "Allow once"
 msgstr "एक बार अनुमति दें"
-
-#: src/lib/dictation.ts
-msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
-msgstr ""
 
 #: src/components/ApprovalRulePreview.tsx
 msgid "Allow rule"
@@ -860,6 +860,19 @@ msgstr "आर्काइव किया गया"
 msgid "Archived"
 msgstr "आर्काइव किया गया"
 
+#: src/pages/shell/avatar-studio-popover.tsx
+msgid "Argo"
+msgstr "Argo"
+
+#: src/components/ModelCredits.tsx
+#: src/pages/Onboarding.tsx
+msgid "Argo credits"
+msgstr ""
+
+#: src/pages/memory-providers/HonchoSettingsForm.tsx
+msgid "argo-shared and IDs starting with bot- are reserved for Argo."
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "आर्ग्युमेंट"
@@ -970,6 +983,7 @@ msgstr "अवतार स्टूडियो"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/create-bot-dialog.tsx
 msgid "Back"
 msgstr "वापस"
 
@@ -1428,6 +1442,15 @@ msgctxt "email sign-in"
 msgid "Code"
 msgstr "कोड"
 
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Collapse {0}"
@@ -1679,6 +1702,7 @@ msgstr "कॉन्टेक्स्ट सीमा"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/integrations/IntegrationSetup.tsx
 #: src/components/SignupSurvey.tsx
+#: src/components/TermsGate.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/shell/agent-import.tsx
@@ -2023,6 +2047,10 @@ msgstr "लॉग आउट नहीं हो सका। फिर से �
 #: src/pages/Onboarding.tsx
 #: src/pages/Paywall.tsx
 msgid "Could not open billing"
+msgstr ""
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
 msgstr ""
 
 #: src/pages/VoiceSettingsOverlay.tsx
@@ -3176,6 +3204,10 @@ msgstr "जांच कैसे करें"
 msgid "How will you use Argo?"
 msgstr ""
 
+#: src/components/TermsGate.tsx
+msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
+msgstr "मेरी उम्र 18 वर्ष या उससे अधिक है और मैं <0>उपयोग की शर्तों</0> से सहमत हूँ।"
+
 #: src/pages/shell/computer-release-actions.tsx
 msgid "I’m done"
 msgstr "मेरा काम हो गया"
@@ -3790,6 +3822,10 @@ msgstr "मॉडल आईडी"
 msgid "Model options"
 msgstr "मॉडल विकल्प"
 
+#: src/pages/shell/composer.tsx
+msgid "Model: {modelName}"
+msgstr ""
+
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/settings-nav.ts
 #: src/pages/SpaceSettingOverrides.tsx
@@ -4186,12 +4222,6 @@ msgstr "OAuth की समय-सीमा समाप्त हो गई"
 msgid "Offline"
 msgstr ""
 
-#: src/pages/model-settings/connection-controls.tsx
-#: src/pages/Onboarding.tsx
-msgid "Ollama API key"
-msgstr ""
-
-#: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 msgid "Ollama Cloud"
 msgstr ""
@@ -4557,19 +4587,6 @@ msgstr "पुल अनुरोध"
 msgid "Queued"
 msgstr "कतार में"
 
-#: src/pages/shell/avatar-studio-popover.tsx
-msgid "Argo"
-msgstr "Argo"
-
-#: src/components/ModelCredits.tsx
-#: src/pages/Onboarding.tsx
-msgid "Argo credits"
-msgstr ""
-
-#: src/pages/memory-providers/HonchoSettingsForm.tsx
-msgid "argo-shared and IDs starting with bot- are reserved for Argo."
-msgstr ""
-
 #: src/pages/shell/message-hover-actions.tsx
 msgid "React"
 msgstr "प्रतिक्रिया दें"
@@ -4871,6 +4888,11 @@ msgstr "नया कोड मँगाएँ"
 msgid "Requests"
 msgstr ""
 
+#: src/pages/model-settings/connection-controls.tsx
+#: src/pages/Onboarding.tsx
+msgid "Required API key"
+msgstr ""
+
 #: src/pages/shell/message-cards.tsx
 msgid "Research & writing"
 msgstr ""
@@ -4958,15 +4980,15 @@ msgstr "अभी पुनः प्रयास करें"
 msgid "Retry screen"
 msgstr ""
 
-#. placeholder {0}: call.botName
-#: src/components/call/CallCard.tsx
-msgid "Return to call with {0}"
-msgstr "{0} के साथ कॉल पर लौटें"
-
 #: src/pages/McpOAuthCallback.tsx
 #: src/pages/SlackInstallCallback.tsx
 msgid "Return to Argo"
 msgstr "Argo पर लौटें"
+
+#. placeholder {0}: call.botName
+#: src/components/call/CallCard.tsx
+msgid "Return to call with {0}"
+msgstr "{0} के साथ कॉल पर लौटें"
 
 #: src/lib/model-connection-preflight.ts
 msgid "Review provider settings and test again."
@@ -5702,6 +5724,10 @@ msgstr ""
 msgid "Teams not enabled"
 msgstr ""
 
+#: src/components/TermsGate.tsx
+msgid "Terms of Use"
+msgstr "उपयोग की शर्तें"
+
 #: src/components/teach/SkillDraftCard.tsx
 msgid "Test"
 msgstr "टेस्ट करें"
@@ -6194,6 +6220,10 @@ msgstr "एक्सेस टोकन के लिए {oauthEnvReference} क
 msgid "Use a found model"
 msgstr "मिला हुआ मॉडल उपयोग करें"
 
+#: src/components/ModelCredits.tsx
+msgid "Use Argo credits"
+msgstr ""
+
 #: src/lib/model-connection-preflight.ts
 msgid "Use Connect to verify the key."
 msgstr "कुंजी जाँचने के लिए कनेक्ट करें का उपयोग करें।"
@@ -6220,10 +6250,6 @@ msgstr ""
 
 #: src/components/teach/TeachRecordingChrome.tsx
 msgid "Use Protected input for passwords."
-msgstr ""
-
-#: src/components/ModelCredits.tsx
-msgid "Use Argo credits"
 msgstr ""
 
 #: src/pages/model-settings/space-bots-model.tsx
@@ -6373,6 +6399,10 @@ msgstr ""
 
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "What kind of bot?"
 msgstr ""
 
 #: src/components/teach/TeachComputerOverlay.tsx
@@ -6530,29 +6560,3 @@ msgstr "आपके आवाज़ प्रोवाइडर का क्�
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "आपके आवाज़ प्रोवाइडर ने कुंजी अस्वीकार कर दी।"
-
-#: src/pages/shell/composer.tsx
-#: src/pages/shell/computer-overlay.tsx
-msgid "Coding"
-msgstr ""
-
-#: src/pages/shell/composer.tsx
-msgid "Coding mode"
-msgstr ""
-
-#: src/pages/Shell.tsx
-msgid "Could not open coding mode"
-msgstr ""
-
-#: src/pages/Onboarding.tsx
-#: src/pages/model-settings/connection-controls.tsx
-msgid "Required API key"
-msgstr ""
-
-#: src/components/TermsGate.tsx
-msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
-msgstr "मेरी उम्र 18 वर्ष या उससे अधिक है और मैं <0>उपयोग की शर्तों</0> से सहमत हूँ।"
-
-#: src/components/TermsGate.tsx
-msgid "Terms of Use"
-msgstr "उपयोग की शर्तें"

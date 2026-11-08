@@ -894,7 +894,7 @@ export const Composer = memo(function Composer({
               data-testid="composer-model-button"
               disabled={disabled}
               onClick={() => onOpenModels()}
-              className="h-8 max-w-40 gap-1 rounded-full px-3 text-[13px] text-muted-foreground"
+              className="hidden h-8 max-w-40 gap-1 rounded-full px-3 text-[13px] text-muted-foreground sm:inline-flex"
             >
               <span className="truncate">{modelName}</span>
               <ChevronDown size={14} aria-hidden="true" />

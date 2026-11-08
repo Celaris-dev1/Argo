@@ -666,6 +666,10 @@ msgstr "不限時間"
 msgid "Allow"
 msgstr "允許"
 
+#: src/lib/dictation.ts
+msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
+msgstr ""
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Allow cross-space bot communication"
 msgstr "允許跨空間機器人通訊"
@@ -677,10 +681,6 @@ msgstr ""
 #: src/components/AskCard.tsx
 msgid "Allow once"
 msgstr "允許一次"
-
-#: src/lib/dictation.ts
-msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
-msgstr ""
 
 #: src/components/ApprovalRulePreview.tsx
 msgid "Allow rule"
@@ -861,6 +861,19 @@ msgstr "已封存"
 msgid "Archived"
 msgstr "已封存"
 
+#: src/pages/shell/avatar-studio-popover.tsx
+msgid "Argo"
+msgstr "Argo"
+
+#: src/components/ModelCredits.tsx
+#: src/pages/Onboarding.tsx
+msgid "Argo credits"
+msgstr "Argo 額度"
+
+#: src/pages/memory-providers/HonchoSettingsForm.tsx
+msgid "argo-shared and IDs starting with bot- are reserved for Argo."
+msgstr "argo-shared 與以 bot- 開頭的 ID 保留給 Argo 使用。"
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "參數"
@@ -971,6 +984,7 @@ msgstr "頭像工作室"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/create-bot-dialog.tsx
 msgid "Back"
 msgstr "返回"
 
@@ -1429,6 +1443,15 @@ msgctxt "email sign-in"
 msgid "Code"
 msgstr "驗證碼"
 
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Collapse {0}"
@@ -1680,6 +1703,7 @@ msgstr "上下文長度限制"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/integrations/IntegrationSetup.tsx
 #: src/components/SignupSurvey.tsx
+#: src/components/TermsGate.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/shell/agent-import.tsx
@@ -2025,6 +2049,10 @@ msgstr "無法登出，請再試一次。"
 #: src/pages/Paywall.tsx
 msgid "Could not open billing"
 msgstr "無法開啟帳務頁面"
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
 
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not play a test clip"
@@ -3177,6 +3205,10 @@ msgstr "如何檢查"
 msgid "How will you use Argo?"
 msgstr "你會如何使用 Argo？"
 
+#: src/components/TermsGate.tsx
+msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
+msgstr "我已年滿 18 歲，並同意<0>使用條款</0>。"
+
 #: src/pages/shell/computer-release-actions.tsx
 msgid "I’m done"
 msgstr "我做完了"
@@ -3791,6 +3823,10 @@ msgstr "模型 ID"
 msgid "Model options"
 msgstr "模型選項"
 
+#: src/pages/shell/composer.tsx
+msgid "Model: {modelName}"
+msgstr ""
+
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/settings-nav.ts
 #: src/pages/SpaceSettingOverrides.tsx
@@ -4187,12 +4223,6 @@ msgstr "OAuth 已過期"
 msgid "Offline"
 msgstr ""
 
-#: src/pages/model-settings/connection-controls.tsx
-#: src/pages/Onboarding.tsx
-msgid "Ollama API key"
-msgstr "Ollama API 金鑰"
-
-#: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 msgid "Ollama Cloud"
 msgstr "Ollama Cloud"
@@ -4558,19 +4588,6 @@ msgstr "Pull request"
 msgid "Queued"
 msgstr "排隊中"
 
-#: src/pages/shell/avatar-studio-popover.tsx
-msgid "Argo"
-msgstr "Argo"
-
-#: src/components/ModelCredits.tsx
-#: src/pages/Onboarding.tsx
-msgid "Argo credits"
-msgstr "Argo 額度"
-
-#: src/pages/memory-providers/HonchoSettingsForm.tsx
-msgid "argo-shared and IDs starting with bot- are reserved for Argo."
-msgstr "argo-shared 與以 bot- 開頭的 ID 保留給 Argo 使用。"
-
 #: src/pages/shell/message-hover-actions.tsx
 msgid "React"
 msgstr "回應"
@@ -4872,6 +4889,11 @@ msgstr "請重新獲取驗證碼"
 msgid "Requests"
 msgstr "請求"
 
+#: src/pages/model-settings/connection-controls.tsx
+#: src/pages/Onboarding.tsx
+msgid "Required API key"
+msgstr ""
+
 #: src/pages/shell/message-cards.tsx
 msgid "Research & writing"
 msgstr "調研和寫作"
@@ -4959,15 +4981,15 @@ msgstr "立即重試"
 msgid "Retry screen"
 msgstr "重新連線螢幕"
 
-#. placeholder {0}: call.botName
-#: src/components/call/CallCard.tsx
-msgid "Return to call with {0}"
-msgstr "返回與 {0} 的通話"
-
 #: src/pages/McpOAuthCallback.tsx
 #: src/pages/SlackInstallCallback.tsx
 msgid "Return to Argo"
 msgstr "返回 Argo"
+
+#. placeholder {0}: call.botName
+#: src/components/call/CallCard.tsx
+msgid "Return to call with {0}"
+msgstr "返回與 {0} 的通話"
 
 #: src/lib/model-connection-preflight.ts
 msgid "Review provider settings and test again."
@@ -5703,6 +5725,10 @@ msgstr "Teams 訊息"
 msgid "Teams not enabled"
 msgstr "未啟用 Teams"
 
+#: src/components/TermsGate.tsx
+msgid "Terms of Use"
+msgstr "使用條款"
+
 #: src/components/teach/SkillDraftCard.tsx
 msgid "Test"
 msgstr "測試"
@@ -6195,6 +6221,10 @@ msgstr "存取權杖請使用 {oauthEnvReference}。"
 msgid "Use a found model"
 msgstr "使用找到的模型"
 
+#: src/components/ModelCredits.tsx
+msgid "Use Argo credits"
+msgstr "使用 Argo 額度"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Use Connect to verify the key."
 msgstr "請使用「連線」驗證金鑰。"
@@ -6222,10 +6252,6 @@ msgstr "使用我的訂閱或 API 金鑰"
 #: src/components/teach/TeachRecordingChrome.tsx
 msgid "Use Protected input for passwords."
 msgstr "輸入密碼時，請使用受保護的輸入。"
-
-#: src/components/ModelCredits.tsx
-msgid "Use Argo credits"
-msgstr "使用 Argo 額度"
 
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "Use space default"
@@ -6375,6 +6401,10 @@ msgstr "你最希望 Argo 幫你做什麼？"
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
 msgstr "你想讓我先做什麼？"
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "What kind of bot?"
+msgstr ""
 
 #: src/components/teach/TeachComputerOverlay.tsx
 msgid "What result will you demonstrate?"
@@ -6531,29 +6561,3 @@ msgstr "你的語音供應商額度已用完。"
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "你的語音供應商拒絕了該金鑰。"
-
-#: src/pages/shell/composer.tsx
-#: src/pages/shell/computer-overlay.tsx
-msgid "Coding"
-msgstr ""
-
-#: src/pages/shell/composer.tsx
-msgid "Coding mode"
-msgstr ""
-
-#: src/pages/Shell.tsx
-msgid "Could not open coding mode"
-msgstr ""
-
-#: src/pages/Onboarding.tsx
-#: src/pages/model-settings/connection-controls.tsx
-msgid "Required API key"
-msgstr ""
-
-#: src/components/TermsGate.tsx
-msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
-msgstr "我已年滿 18 歲，並同意<0>使用條款</0>。"
-
-#: src/components/TermsGate.tsx
-msgid "Terms of Use"
-msgstr "使用條款"
