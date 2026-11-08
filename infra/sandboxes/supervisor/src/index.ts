@@ -110,44 +110,28 @@ import {
 loadRootEnv();
 
 const dockerSocketPath = resolveDockerSocketPath();
-const docker = dockerSocketPath
-  ? new Docker({ socketPath: dockerSocketPath })
-  : new Docker();
+const docker = dockerSocketPath ? new Docker({ socketPath: dockerSocketPath }) : new Docker();
 const computerContext =
   process.env.ARGO_COMPUTER_CONTEXT ??
   path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../computer");
-const ensureComputerImage = computerImageEnsurer(
-  docker,
-  COMPUTER_IMAGE,
-  computerContext,
-);
-const repositoryRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../../..",
-);
+const ensureComputerImage = computerImageEnsurer(docker, COMPUTER_IMAGE, computerContext);
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const dataDir = path.resolve(repositoryRoot, process.env.DATA_DIR ?? "./data");
 let supervisorInfo: Docker.ContainerInspectInfo | undefined;
 let dockerApiVersion: string | undefined;
 const supervisorToken = resolveSupervisorToken(process.env);
-const screenNetworkMode = resolveScreenNetworkMode(
-  process.env.SANDBOX_SCREEN_NETWORK,
-);
+const screenNetworkMode = resolveScreenNetworkMode(process.env.SANDBOX_SCREEN_NETWORK);
 const computerEgressSetting = resolveComputerEgressMode();
 // `auto` starts open and becomes restricted once the probe shows the host rules are in place.
 let computerEgressMode: ComputerEgressMode =
   computerEgressSetting === "restricted" ? "restricted" : "open";
 const computerDns = resolveComputerDns();
-const computerMounts = resolveComputerMounts(undefined, [
-  dataDir,
-  dockerSocketPath,
-]);
+const computerMounts = resolveComputerMounts(undefined, [dataDir, dockerSocketPath]);
 // Docker follows symlinks in a bind source, so also check where a locally visible source points.
 assertComputerMountSources(
   computerMounts.map((mount) => ({
     ...mount,
-    source: existsSync(mount.source)
-      ? realpathSync(mount.source)
-      : mount.source,
+    source: existsSync(mount.source) ? realpathSync(mount.source) : mount.source,
   })),
   [dataDir, dockerSocketPath],
 );
@@ -192,8 +176,7 @@ export function supervisorFileWriteSchema(maxBytes = maxUploadSizeBytes) {
 const limitSupervisorRequestBody: MiddlewareHandler = async (c, next) => {
   return bodyLimit({
     maxSize: supervisorRequestBodyLimit(c.req.method, c.req.path),
-    onError: (context) =>
-      context.json({ error: "Request body is too large." }, 413),
+    onError: (context) => context.json({ error: "Request body is too large." }, 413),
   })(c, next);
 };
 
@@ -210,17 +193,10 @@ export function resolveDockerSocketPath(
   if (env.DOCKER_HOST) return undefined;
   if (env.DOCKER_SOCKET) return env.DOCKER_SOCKET;
   if (platform === "darwin") {
-    const userSocket = path.join(
-      env.HOME ?? homedir(),
-      ".docker",
-      "run",
-      "docker.sock",
-    );
+    const userSocket = path.join(env.HOME ?? homedir(), ".docker", "run", "docker.sock");
     if (existsSync(userSocket)) return userSocket;
   }
-  return platform === "win32"
-    ? "//./pipe/docker_engine"
-    : "/var/run/docker.sock";
+  return platform === "win32" ? "//./pipe/docker_engine" : "/var/run/docker.sock";
 }
 
 app.get("/health", (c) => c.json({ ok: true, image: COMPUTER_IMAGE }));
@@ -249,14 +225,10 @@ app.post("/computers", async (c) => {
     })
     .parse(await c.req.json());
   try {
-    assertRequestIdentity(
-      c.req.header("x-argo-bot-id"),
-      c.req.header("x-argo-space-id"),
-      {
-        botId: body.botId,
-        spaceId: body.spaceId,
-      },
-    );
+    assertRequestIdentity(c.req.header("x-argo-bot-id"), c.req.header("x-argo-space-id"), {
+      botId: body.botId,
+      spaceId: body.spaceId,
+    });
     return await withBotLifecycleLock(body.botId, async () => {
       await ensureComputerImage();
       await ensureRestrictedEgressEnforced();
@@ -276,17 +248,11 @@ app.post("/computers", async (c) => {
       // do so as the same user, but a root supervisor must never create or chown
       // user-controlled paths at runtime; Compose data-init handles legacy data.
       if (hostUid !== 0) await mkdir(serviceHomePath, { recursive: true });
-      const storage = computerHomeStorage(
-        serviceHomePath,
-        dataDir,
-        runtimeInfo,
-      );
+      const storage = computerHomeStorage(serviceHomePath, dataDir, runtimeInfo);
       if (storage.homeVolume) {
         assertVolumeSubpathSupport((await docker.version()).ApiVersion);
       }
-      const computerUser = runtimeInfo
-        ? COMPUTER_USER
-        : hostComputerUser(hostUid, hostGid);
+      const computerUser = runtimeInfo ? COMPUTER_USER : hostComputerUser(hostUid, hostGid);
       const existing = await findBotContainer(body.botId, body.spaceId);
       if (existing) {
         const info = await existing.inspect();
@@ -296,15 +262,10 @@ app.post("/computers", async (c) => {
           controlViaLoopback,
         );
         const botNetwork =
-          networkMode === computerNetworkNameFor(body.botId)
-            ? networkMode
-            : undefined;
-        const endpoint = botNetwork
-          ? info.NetworkSettings?.Networks?.[botNetwork]
-          : undefined;
+          networkMode === computerNetworkNameFor(body.botId) ? networkMode : undefined;
+        const endpoint = botNetwork ? info.NetworkSettings?.Networks?.[botNetwork] : undefined;
         const botNetworkInfo =
-          botNetwork &&
-          (computerEgressMode === "restricted" || !info.State.Running)
+          botNetwork && (computerEgressMode === "restricted" || !info.State.Running)
             ? await inspectNetworkIfPresent(botNetwork)
             : undefined;
         // A stop gives the network back after disconnecting the computer, and a
@@ -331,8 +292,7 @@ app.post("/computers", async (c) => {
           // NetworkSettings is empty, and resuming that yields no connectivity.
           (!networkMode ||
             (info.HostConfig.NetworkMode === networkMode &&
-              (reconnect ||
-                Boolean(info.NetworkSettings?.Networks?.[networkMode])))) &&
+              (reconnect || Boolean(info.NetworkSettings?.Networks?.[networkMode])))) &&
           restrictedBridgeOk &&
           info.Config.User === computerUser &&
           // DNS is fixed when a container is created, so a changed setting replaces it.
@@ -340,22 +300,15 @@ app.post("/computers", async (c) => {
           // So are host mounts: an added, changed or removed one replaces the computer.
           computerMountsMatch(info, computerMounts) &&
           controlPublishOk &&
-          (!storage.homeVolume ||
-            homeVolumeMatches(info.HostConfig.Mounts, storage.homeVolume)) &&
+          (!storage.homeVolume || homeVolumeMatches(info.HostConfig.Mounts, storage.homeVolume)) &&
           // A computer that cannot rejoin its network is replaced below instead.
           (!reconnect ||
-            (await reconnectBotComputer(
-              existing,
-              body.botId,
-              networkOwner,
-              Boolean(endpoint),
-            )))
+            (await reconnectBotComputer(existing, body.botId, networkOwner, Boolean(endpoint))))
         ) {
           const started = !info.State.Running;
           if (started) {
             const memory = await checkHostMemory();
-            if (!memory.ok)
-              return c.json({ error: memoryRefusal(memory) }, 503);
+            if (!memory.ok) return c.json({ error: memoryRefusal(memory) }, 503);
             await existing.start();
           }
           return c.json({
@@ -379,9 +332,7 @@ app.post("/computers", async (c) => {
           const currentCount = await countSpaceContainers(body.spaceId);
           if (currentCount >= spaceComputerLimit) {
             return c.json(
-              {
-                error: `Computer limit reached for space (max: ${spaceComputerLimit})`,
-              },
+              { error: `Computer limit reached for space (max: ${spaceComputerLimit})` },
               429,
             );
           }
@@ -392,24 +343,14 @@ app.post("/computers", async (c) => {
         // privileged filesystem mutations that could escape via concurrent renames.
         // Match hostComputerUser(): missing/root host identity falls back to 1000:1000.
         const effectiveUid =
-          runtimeInfo ||
-          hostUid === undefined ||
-          hostGid === undefined ||
-          hostUid === 0
+          runtimeInfo || hostUid === undefined || hostGid === undefined || hostUid === 0
             ? COMPUTER_UID
             : hostUid;
         const effectiveGid =
-          runtimeInfo ||
-          hostUid === undefined ||
-          hostGid === undefined ||
-          hostUid === 0
+          runtimeInfo || hostUid === undefined || hostGid === undefined || hostUid === 0
             ? COMPUTER_GID
             : hostGid;
-        await assertComputerHomeWritable(
-          serviceHomePath,
-          effectiveUid,
-          effectiveGid,
-        );
+        await assertComputerHomeWritable(serviceHomePath, effectiveUid, effectiveGid);
         const name = containerNameFor(body.botId);
         const createdNetwork =
           screenNetworkMode === "internal"
@@ -420,11 +361,7 @@ app.post("/computers", async (c) => {
           if (existing) {
             await withComputerScreenLock(existing.id, async () => {
               await existing.remove({ force: true }).catch(() => undefined);
-              clearComputerScreenRegistry(
-                computerScreens,
-                computerScreenBoots,
-                existing.id,
-              );
+              clearComputerScreenRegistry(computerScreens, computerScreenBoots, existing.id);
             });
           }
           container = await docker.createContainer(
@@ -507,11 +444,9 @@ app.post("/computers/:id/exec", async (c) => {
       c.req.header("x-argo-space-id"),
     );
     // Docker would fail the exec inside the stream; answer up front so the caller can boot it.
-    if (!managed.info.State.Running)
-      return c.json({ error: "computer is not running" }, 409);
+    if (!managed.info.State.Running) return c.json({ error: "computer is not running" }, 409);
     container = managed.container;
-    const screenId =
-      c.req.header("x-argo-screen-id") || c.req.header("x-argo-bot-id") || id;
+    const screenId = c.req.header("x-argo-screen-id") || c.req.header("x-argo-bot-id") || id;
     const screenIndex = computerScreens.get(id)?.get(screenId)?.index ?? 0;
     layout = screenPorts(screenIndex);
   } catch (error) {
@@ -557,10 +492,7 @@ app.post("/computers/:id/exec", async (c) => {
         if (result.stderr.startsWith(streamedStderr)) {
           const extra = result.stderr.slice(streamedStderr.length);
           if (extra) send({ type: "stderr", data: extra });
-        } else if (
-          result.stderr.endsWith(timeoutNote) &&
-          !streamedStderr.endsWith(timeoutNote)
-        ) {
+        } else if (result.stderr.endsWith(timeoutNote) && !streamedStderr.endsWith(timeoutNote)) {
           send({ type: "stderr", data: timeoutNote });
         }
         send({ type: "exit", code: result.code });
@@ -603,9 +535,7 @@ app.post("/computers/:id/browser", async (c) => {
           .refine((value) => {
             if (!URL.canParse(value)) return false;
             const url = new URL(value);
-            return (
-              /^https?:$/.test(url.protocol) && !url.username && !url.password
-            );
+            return /^https?:$/.test(url.protocol) && !url.username && !url.password;
           }),
       }),
       z.object({ command: z.literal("snapshot") }),
@@ -614,10 +544,7 @@ app.post("/computers/:id/browser", async (c) => {
         actions: z
           .array(
             z.discriminatedUnion("kind", [
-              z.object({
-                kind: z.literal("click"),
-                ref: z.string().min(1).max(200),
-              }),
+              z.object({ kind: z.literal("click"), ref: z.string().min(1).max(200) }),
               z.object({
                 kind: z.literal("upload"),
                 ref: z.string().min(1).max(200),
@@ -637,15 +564,10 @@ app.post("/computers/:id/browser", async (c) => {
                   text: z.string().max(32_000),
                   origin: z.string().url().max(2048).optional(),
                   field: z.enum(["username", "password", "card"]).optional(),
-                  cardField: z
-                    .enum(["number", "expiry", "cvc", "postal_code"])
-                    .optional(),
+                  cardField: z.enum(["number", "expiry", "cvc", "postal_code"]).optional(),
                 })
                 // The field decides which input types the helper accepts for a saved login or card.
-                .refine(
-                  (step) => !step.origin || step.field,
-                  "A saved login fill needs its field",
-                )
+                .refine((step) => !step.origin || step.field, "A saved login fill needs its field")
                 // A card detail is hidden and checked only when bound to the merchant's origin.
                 .refine(
                   (step) => step.field !== "card" || step.origin,
@@ -654,9 +576,7 @@ app.post("/computers/:id/browser", async (c) => {
                 .refine(
                   (step) =>
                     step.cardField
-                      ? step.kind === "fill" &&
-                        step.field === "card" &&
-                        !step.ref
+                      ? step.kind === "fill" && step.field === "card" && !step.ref
                       : Boolean(step.ref),
                   "A fill needs either its ref or, for a card, its card field",
                 ),
@@ -668,8 +588,7 @@ app.post("/computers/:id/browser", async (c) => {
     ])
     .parse(await c.req.json());
   const carriesSavedLogin =
-    body.command === "act" &&
-    body.actions.some((step) => "origin" in step && step.origin);
+    body.command === "act" && body.actions.some((step) => "origin" in step && step.origin);
   const screen = (reuseRecent: boolean) =>
     managedScreen(
       c.req.param("id"),
@@ -704,9 +623,7 @@ app.post("/computers/:id/browser", async (c) => {
           "ARGO_BROWSER_WATCH_STDIN=1",
           "ARGO_BROWSER_ARGS_STDIN=1",
           ...(process.env.ARGO_BROWSER_UPLOAD_MAX_BYTES !== undefined
-            ? [
-                `ARGO_BROWSER_UPLOAD_MAX_BYTES=${process.env.ARGO_BROWSER_UPLOAD_MAX_BYTES}`,
-              ]
+            ? [`ARGO_BROWSER_UPLOAD_MAX_BYTES=${process.env.ARGO_BROWSER_UPLOAD_MAX_BYTES}`]
             : []),
         ],
         timeoutMs: 25_000,
@@ -722,10 +639,7 @@ app.post("/computers/:id/browser", async (c) => {
       c.req.header("x-argo-space-id"),
     );
     if (await isHeadlessComputer(c.req.param("id"), container)) {
-      const result = await runHelper({
-        container,
-        layout: HEADLESS_BROWSER_LAYOUT,
-      });
+      const result = await runHelper({ container, layout: HEADLESS_BROWSER_LAYOUT });
       if (result.code !== 0 || Buffer.byteLength(result.stdout) > 512 * 1024) {
         throw new Error(
           /command timed out/.test(result.stderr)
@@ -788,8 +702,7 @@ app.post("/computers/:id/observe", async (c) => {
               true,
               0,
             );
-            if (!result.observation)
-              throw new Error("computer control returned no observation");
+            if (!result.observation) throw new Error("computer control returned no observation");
             return result.observation;
           }
         : undefined,
@@ -820,9 +733,7 @@ app.post("/computers/:id/actions", async (c) => {
     );
     const endpoint = computerControlEndpoint(info);
     const control =
-      endpoint && controlHandlesActions(info.Config.Labels, body.actions)
-        ? endpoint
-        : undefined;
+      endpoint && controlHandlesActions(info.Config.Labels, body.actions) ? endpoint : undefined;
     const attempt = await attemptComputerControl(
       control
         ? () =>
@@ -839,12 +750,7 @@ app.post("/computers/:id/actions", async (c) => {
     if (attempt.status === "failed") throw attempt.error;
     const controlResult = attempt.status === "ok" ? attempt.value : undefined;
     if (shouldReplayComputerActions(attempt) && body.actions.length)
-      await applyContainerActions(
-        container,
-        body.actions,
-        layout.display,
-        browserProfile,
-      );
+      await applyContainerActions(container, body.actions, layout.display, browserProfile);
     if (shouldReplayComputerActions(attempt) && body.settleMs)
       await new Promise((resolve) => setTimeout(resolve, body.settleMs));
     return c.json({
@@ -853,8 +759,7 @@ app.post("/computers/:id/actions", async (c) => {
         ? {}
         : {
             observation:
-              controlResult?.observation ??
-              (await observeContainer(container, layout.display)),
+              controlResult?.observation ?? (await observeContainer(container, layout.display)),
           }),
     });
   } catch (error) {
@@ -874,12 +779,8 @@ app.get("/computers/:id/files", async (c) => {
     const target = workspaceTarget(relative);
     if (c.req.query("mode") === "read") {
       const maxBytesRaw = c.req.query("maxBytes");
-      const maxBytes =
-        maxBytesRaw === undefined ? undefined : Number(maxBytesRaw);
-      if (
-        maxBytes !== undefined &&
-        (!Number.isSafeInteger(maxBytes) || maxBytes < 0)
-      ) {
+      const maxBytes = maxBytesRaw === undefined ? undefined : Number(maxBytesRaw);
+      if (maxBytes !== undefined && (!Number.isSafeInteger(maxBytes) || maxBytes < 0)) {
         return c.json({ error: "invalid maxBytes" }, 400);
       }
       const script = [
@@ -898,13 +799,9 @@ app.get("/computers/:id/files", async (c) => {
         String(maxBytes ?? -1),
       ]);
       if (result.code === 42) {
-        return c.json(
-          { error: `computer file exceeds ${maxBytes} bytes` },
-          413,
-        );
+        return c.json({ error: `computer file exceeds ${maxBytes} bytes` }, 413);
       }
-      if (result.code !== 0)
-        return c.json({ error: result.stderr || "file not found" }, 404);
+      if (result.code !== 0) return c.json({ error: result.stderr || "file not found" }, 404);
       return c.json({ content: result.stdout.trim() });
     }
     const script = [
@@ -925,8 +822,7 @@ app.get("/computers/:id/files", async (c) => {
       target,
       relative,
     ]);
-    if (result.code !== 0)
-      return c.json({ error: result.stderr || "directory not found" }, 404);
+    if (result.code !== 0) return c.json({ error: result.stderr || "directory not found" }, 404);
     return c.json(JSON.parse(result.stdout));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -967,11 +863,7 @@ app.get("/computers/:id/screen", async (c) => {
       c.req.header("x-argo-screen-lease-id"),
       false,
     );
-    const screenUrl = await publishedScreenUrl(
-      container,
-      info,
-      layout.viewPort,
-    );
+    const screenUrl = await publishedScreenUrl(container, info, layout.viewPort);
     return c.redirect(screenUrlWithToken(screenUrl, viewToken));
   } catch {
     return c.json({ error: "computer not found" }, 404);
@@ -1034,10 +926,7 @@ app.post("/computers/:id/screen-mode", async (c) => {
       body.interactive ? layout.controlPort : layout.viewPort,
     );
     return c.json({
-      screenUrl: screenUrlWithToken(
-        screenUrl,
-        body.interactive ? body.controlToken! : viewToken,
-      ),
+      screenUrl: screenUrlWithToken(screenUrl, body.interactive ? body.controlToken! : viewToken),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -1076,29 +965,16 @@ app.post("/computers/:id/terminal", async (c) => {
         [
           "bash",
           "-c",
-          terminalCommand(
-            body.controlToken,
-            terminalToken,
-            cwd,
-            undefined,
-            screen.layout,
-          ),
+          terminalCommand(body.controlToken, terminalToken, cwd, undefined, screen.layout),
         ],
         { env: computerCommandEnv(screen.layout) },
       );
       if (result.code === 75) throw new TerminalControlReleasedError();
-      if (result.code !== 0)
-        throw new Error(result.stderr || "terminal failed to start");
+      if (result.code !== 0) throw new Error(result.stderr || "terminal failed to start");
       return screen.layout;
     });
-    const screenUrl = await publishedScreenUrl(
-      container,
-      info,
-      layout.controlPort,
-    );
-    return c.json({
-      terminalUrl: screenUrlWithToken(screenUrl, terminalToken),
-    });
+    const screenUrl = await publishedScreenUrl(container, info, layout.controlPort);
+    return c.json({ terminalUrl: screenUrlWithToken(screenUrl, terminalToken) });
   } catch (error) {
     if (error instanceof TerminalControlReleasedError) {
       return c.json({ error: "screen control is not active" }, 409);
@@ -1162,11 +1038,9 @@ app.delete("/computers/:id/screen", async (c) => {
       c.req.header("x-argo-space-id"),
     );
     containerFound = true;
-    const screenId =
-      c.req.header("x-argo-screen-id") || c.req.header("x-argo-bot-id") || id;
+    const screenId = c.req.header("x-argo-screen-id") || c.req.header("x-argo-bot-id") || id;
     const cancelRunWork = c.req.header("x-argo-cancel-run-work") === "1";
-    const keepScreenWarm =
-      c.req.header("x-argo-preserve-screen") === "1" && !cancelRunWork;
+    const keepScreenWarm = c.req.header("x-argo-preserve-screen") === "1" && !cancelRunWork;
     const screenLeaseId = c.req.header("x-argo-screen-lease-id");
     await withComputerScreenLock(id, async () => {
       const info = await container.inspect();
@@ -1176,9 +1050,7 @@ app.delete("/computers/:id/screen", async (c) => {
         id,
         info.State?.StartedAt,
       );
-      const index = assigned
-        ? releaseAssignedScreen(assigned, screenId, screenLeaseId)
-        : undefined;
+      const index = assigned ? releaseAssignedScreen(assigned, screenId, screenLeaseId) : undefined;
       if (keepScreenWarm) {
         if (assigned && index !== undefined) {
           let controlReleased = false;
@@ -1219,11 +1091,7 @@ app.delete("/computers/:id/screen", async (c) => {
             { retainBrowser: !cancelRunWork },
           );
         } else if (stop) {
-          const result = await runContainerCommand(container, [
-            "bash",
-            "-c",
-            stop,
-          ]);
+          const result = await runContainerCommand(container, ["bash", "-c", stop]);
           if (result.code !== 0) {
             throw new Error(result.stderr || "computer screen failed to stop");
           }
@@ -1254,11 +1122,7 @@ app.post("/computers/:id/stop", async (c) => {
   const id = c.req.param("id");
   const botId = c.req.header("x-argo-bot-id");
   try {
-    const { container } = await managedContainer(
-      id,
-      botId,
-      c.req.header("x-argo-space-id"),
-    );
+    const { container } = await managedContainer(id, botId, c.req.header("x-argo-space-id"));
     await withComputerScreenLock(id, async () => {
       const info = await container.inspect();
       if (info.State.Running) {
@@ -1288,12 +1152,7 @@ app.post("/computers/:id/stop", async (c) => {
   } catch (error) {
     if (error instanceof ComputerIdentityError)
       return c.json({ error: "invalid computer identity" }, 403);
-    if (
-      error &&
-      typeof error === "object" &&
-      "statusCode" in error &&
-      error.statusCode === 404
-    )
+    if (error && typeof error === "object" && "statusCode" in error && error.statusCode === 404)
       return c.json({ error: "computer not found" }, 404);
     return c.json({ error: "computer failed to stop" }, 500);
   }
@@ -1305,16 +1164,11 @@ app.delete("/computers/:id", async (c) => {
   try {
     if (!botId) throw new Error("missing computer identity");
     return await withBotLifecycleLock(botId, async () => {
-      const { container } = await managedContainer(
-        id,
-        botId,
-        c.req.header("x-argo-space-id"),
-      );
+      const { container } = await managedContainer(id, botId, c.req.header("x-argo-space-id"));
       await withComputerScreenLock(id, async () => {
         await container.remove({ force: true }).catch((error) => {
           // Already gone is deleted; any other failure may leave the computer running.
-          if ((error as { statusCode?: number })?.statusCode !== 404)
-            throw error;
+          if ((error as { statusCode?: number })?.statusCode !== 404) throw error;
         });
         clearComputerScreenRegistry(computerScreens, computerScreenBoots, id);
       });
@@ -1344,17 +1198,12 @@ function startSupervisor() {
     void ensureComputerImage()
       .then(ensureRestrictedEgressEnforced)
       .catch((error) => logger.error("computer egress probe failed", error));
-  } else if (
-    computerEgressMode === "restricted" &&
-    screenNetworkMode !== "internal"
-  ) {
+  } else if (computerEgressMode === "restricted" && screenNetworkMode !== "internal") {
     // Report a missing host ruleset at startup too, not only on the first provision.
     void ensureComputerImage()
       .then(ensureRestrictedEgressEnforced)
       .then(() => logger.info("restricted computer egress verified"))
-      .catch((error) =>
-        logger.error("restricted computer egress unavailable", error),
-      );
+      .catch((error) => logger.error("restricted computer egress unavailable", error));
   }
   void reclaimIdleComputerNetworks().catch((error) => {
     logger.error("computer network reclaim failed", error);
@@ -1362,10 +1211,7 @@ function startSupervisor() {
   const port = Number(process.env.SUPERVISOR_PORT ?? 7091);
   const hostname = process.env.SUPERVISOR_HOST ?? "127.0.0.1";
   const server = serve({ fetch: app.fetch, hostname, port }, () => {
-    logger.info("supervisor listening", {
-      "http.host": hostname,
-      "http.port": port,
-    });
+    logger.info("supervisor listening", { "http.host": hostname, "http.port": port });
   });
   let stopping = false;
   const shutdown = async () => {
@@ -1390,10 +1236,7 @@ function closeListeningServer(server: {
   });
 }
 
-if (
-  process.argv[1] &&
-  fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
-) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   startSupervisor();
 }
 
@@ -1410,11 +1253,7 @@ let autoEgressSettled: Promise<void> | undefined;
 async function ensureRestrictedEgressEnforced() {
   if (screenNetworkMode === "internal") return;
   if (computerEgressSetting === "auto") {
-    autoEgressSettled ??= verifyRestrictedEgress(
-      docker,
-      COMPUTER_IMAGE,
-      computerDns,
-    ).then(
+    autoEgressSettled ??= verifyRestrictedEgress(docker, COMPUTER_IMAGE, computerDns).then(
       () => {
         computerEgressMode = "restricted";
         getLogger().info("restricted computer egress verified");
@@ -1424,25 +1263,20 @@ async function ensureRestrictedEgressEnforced() {
           autoEgressSettled = undefined;
           throw error;
         }
-        getLogger().warn(
-          "computer egress is open: the host firewall rules are not installed",
-          {
-            error: error.message,
-          },
-        );
+        getLogger().warn("computer egress is open: the host firewall rules are not installed", {
+          error: error.message,
+        });
       },
     );
     return autoEgressSettled;
   }
   if (computerEgressMode !== "restricted") return;
-  restrictedEgressVerified ??= verifyRestrictedEgress(
-    docker,
-    COMPUTER_IMAGE,
-    computerDns,
-  ).catch((error) => {
-    restrictedEgressVerified = undefined;
-    throw error;
-  });
+  restrictedEgressVerified ??= verifyRestrictedEgress(docker, COMPUTER_IMAGE, computerDns).catch(
+    (error) => {
+      restrictedEgressVerified = undefined;
+      throw error;
+    },
+  );
   await restrictedEgressVerified;
 }
 
@@ -1484,8 +1318,7 @@ async function isManagedSpaceContainer(
     const listedSpaceId = labels["argo.spaceId"] ?? labels["argo.workspaceId"];
     // Labeled for another space (or no space identity) cannot count toward this cap.
     if (listedSpaceId !== spaceId) return false;
-    if (labels["argo.managed"] === "true" || item.Image === COMPUTER_IMAGE)
-      return true;
+    if (labels["argo.managed"] === "true" || item.Image === COMPUTER_IMAGE) return true;
     // Space matches but Image may be an ID after the tag moved — confirm via inspect.
   }
   // Missing list Labels: inspect with the same managed rule as isArgoContainer.
@@ -1493,10 +1326,8 @@ async function isManagedSpaceContainer(
     const info = await docker.getContainer(item.Id).inspect();
     const infoLabels = info.Config?.Labels ?? {};
     const managed =
-      infoLabels["argo.managed"] === "true" ||
-      info.Config?.Image === COMPUTER_IMAGE;
-    const infoSpaceId =
-      infoLabels["argo.spaceId"] ?? infoLabels["argo.workspaceId"];
+      infoLabels["argo.managed"] === "true" || info.Config?.Image === COMPUTER_IMAGE;
+    const infoSpaceId = infoLabels["argo.spaceId"] ?? infoLabels["argo.workspaceId"];
     return managed && infoSpaceId === spaceId;
   } catch {
     // Container might have been removed concurrently
@@ -1514,19 +1345,14 @@ const headlessComputers = new Map<string, boolean>();
 async function isHeadlessComputer(id: string, container: Docker.Container) {
   const known = headlessComputers.get(id);
   if (known !== undefined) return known;
-  const probe = await runContainerCommand(container, [
-    "bash",
-    "-c",
-    "command -v Xvfb",
-  ]);
+  const probe = await runContainerCommand(container, ["bash", "-c", "command -v Xvfb"]);
   const headless = probe.code !== 0;
   headlessComputers.set(id, headless);
   return headless;
 }
 
 async function managedContainer(id: string, botId?: string, spaceId?: string) {
-  if (!botId || !spaceId)
-    throw new ComputerIdentityError("missing computer identity");
+  if (!botId || !spaceId) throw new ComputerIdentityError("missing computer identity");
   const container = docker.getContainer(id);
   const info = await container.inspect();
   if (!isArgoContainer(info, botId, spaceId))
@@ -1546,13 +1372,7 @@ async function managedScreen(
   const { container } = await managedContainer(id, botId, spaceId);
   return withComputerScreenLock(id, async () => {
     if (reuseRecent) {
-      const recent = await recentManagedScreen(
-        id,
-        container,
-        botId,
-        screenId,
-        screenLeaseId,
-      );
+      const recent = await recentManagedScreen(id, container, botId, screenId, screenLeaseId);
       if (recent) return recent;
     }
     const screen = await ensureManagedScreen(
@@ -1577,25 +1397,13 @@ async function recentManagedScreen(
 ) {
   const info = await container.inspect();
   const startedAt = info.State?.StartedAt;
-  const assigned = currentComputerScreens(
-    computerScreens,
-    computerScreenBoots,
-    id,
-    startedAt,
-  );
+  const assigned = currentComputerScreens(computerScreens, computerScreenBoots, id, startedAt);
   const screenKey = screenId || botId || id;
   const slot = assigned?.get(screenKey);
-  if (!assigned || !startedAt || computerScreenBoots.get(id) !== startedAt)
-    return undefined;
-  if (!slot?.viewToken || !screenRecentlyEnsured(slot, Date.now()))
-    return undefined;
+  if (!assigned || !startedAt || computerScreenBoots.get(id) !== startedAt) return undefined;
+  if (!slot?.viewToken || !screenRecentlyEnsured(slot, Date.now())) return undefined;
   // Still fence the lease: an older execution must not drive this screen.
-  const index = nextScreenIndex(
-    assigned,
-    screenKey,
-    screenLeaseId,
-    teamScreenLimit,
-  );
+  const index = nextScreenIndex(assigned, screenKey, screenLeaseId, teamScreenLimit);
   return {
     container,
     info,
@@ -1629,8 +1437,7 @@ async function ensureManagedScreen(
     const info = await container.inspect();
     if (info.State?.StartedAt === screen.info.State?.StartedAt) {
       // Confirm the pending boot marker only after setup completes against the same boot.
-      if (info.State?.StartedAt)
-        computerScreenBoots.set(id, info.State.StartedAt);
+      if (info.State?.StartedAt) computerScreenBoots.set(id, info.State.StartedAt);
       const slot = computerScreens.get(id)?.get(screen.screenKey);
       if (slot) slot.ensuredAt = Date.now();
       try {
@@ -1667,56 +1474,36 @@ async function ensureManagedScreenAttempt(
       "-c",
       resetManagedScreensCommand(),
     ]);
-    if (reset.code !== 0)
-      throw new Error(reset.stderr || "computer screens failed to reset");
+    if (reset.code !== 0) throw new Error(reset.stderr || "computer screens failed to reset");
     assigned = new Map();
     computerScreens.set(id, assigned);
     // Remember the inspected boot even if setup or teardown fails before confirmation.
-    if (info.State?.StartedAt)
-      computerScreenBoots.set(id, info.State.StartedAt);
+    if (info.State?.StartedAt) computerScreenBoots.set(id, info.State.StartedAt);
   }
   const screenKey = screenId || botId || id;
   if (!assigned.has(screenKey)) {
-    const usedIndexes = new Set(
-      [...assigned.values()].map((slot) => slot.index),
+    const usedIndexes = new Set([...assigned.values()].map((slot) => slot.index));
+    const hasFreeIndex = Array.from({ length: teamScreenLimit }, (_, index) => index).some(
+      (index) => !usedIndexes.has(index),
     );
-    const hasFreeIndex = Array.from(
-      { length: teamScreenLimit },
-      (_, index) => index,
-    ).some((index) => !usedIndexes.has(index));
     if (!hasFreeIndex) {
       const evictedScreenId = oldestIdleScreen(assigned, teamScreenLimit);
-      const evicted = evictedScreenId
-        ? assigned.get(evictedScreenId)
-        : undefined;
+      const evicted = evictedScreenId ? assigned.get(evictedScreenId) : undefined;
       if (evictedScreenId && evicted) {
-        const evictedIndex = releaseAssignedScreen(
-          assigned,
-          evictedScreenId,
-          evicted.leaseId,
-        );
+        const evictedIndex = releaseAssignedScreen(assigned, evictedScreenId, evicted.leaseId);
         if (evictedIndex !== undefined) {
-          await teardownReleasedScreen(
-            assigned,
-            evictedScreenId,
-            evictedIndex,
-            () =>
-              runContainerCommand(container, [
-                "bash",
-                "-c",
-                stopExtraScreenCommand(evictedIndex, evictedScreenId),
-              ]),
+          await teardownReleasedScreen(assigned, evictedScreenId, evictedIndex, () =>
+            runContainerCommand(container, [
+              "bash",
+              "-c",
+              stopExtraScreenCommand(evictedIndex, evictedScreenId),
+            ]),
           );
         }
       }
     }
   }
-  const index = nextScreenIndex(
-    assigned,
-    screenKey,
-    screenLeaseId,
-    teamScreenLimit,
-  );
+  const index = nextScreenIndex(assigned, screenKey, screenLeaseId, teamScreenLimit);
   const layout = screenPorts(index);
   const slot = assigned.get(screenKey)!;
   slot.viewToken ??= randomUUID();
@@ -1734,21 +1521,11 @@ async function ensureManagedScreenAttempt(
     ]).catch(() => ({ stdout: "", stderr: "", code: 1 }));
     releaseAssignedScreen(assigned, screenKey);
     await teardownReleasedScreen(assigned, screenKey, index, () =>
-      runContainerCommand(container, [
-        "bash",
-        "-c",
-        stopExtraScreenCommand(index, screenKey),
-      ]),
+      runContainerCommand(container, ["bash", "-c", stopExtraScreenCommand(index, screenKey)]),
     );
-    if (assigned.size === 0)
-      clearComputerScreenRegistry(computerScreens, computerScreenBoots, id);
-    const detail = [ensured.stderr, browserLog.stdout]
-      .filter(Boolean)
-      .join("\n")
-      .trim();
-    throw new Error(
-      detail || `computer screen ${layout.display} failed to start`,
-    );
+    if (assigned.size === 0) clearComputerScreenRegistry(computerScreens, computerScreenBoots, id);
+    const detail = [ensured.stderr, browserLog.stdout].filter(Boolean).join("\n").trim();
+    throw new Error(detail || `computer screen ${layout.display} failed to start`);
   }
   // Ensuring the view must also recover an active human lease after its VNC process dies.
   if (restoreControl && slot.controlToken) {
@@ -1765,14 +1542,9 @@ async function ensureManagedScreenAttempt(
   };
 }
 
-function isArgoContainer(
-  info: Docker.ContainerInspectInfo,
-  botId: string,
-  spaceId: string,
-) {
+function isArgoContainer(info: Docker.ContainerInspectInfo, botId: string, spaceId: string) {
   const labels = info.Config.Labels ?? {};
-  const managed =
-    labels["argo.managed"] === "true" || info.Config.Image === COMPUTER_IMAGE;
+  const managed = labels["argo.managed"] === "true" || info.Config.Image === COMPUTER_IMAGE;
   return managed && hasComputerIdentity(labels, botId, spaceId);
 }
 
@@ -1809,9 +1581,7 @@ export async function controlDesktop(
   observe: boolean,
   settleMs: number,
 ) {
-  const signal = AbortSignal.timeout(
-    computerControlTimeoutMs(actions, settleMs),
-  );
+  const signal = AbortSignal.timeout(computerControlTimeoutMs(actions, settleMs));
   let response: Response;
   try {
     response = await fetch(endpoint.url, {
@@ -1844,8 +1614,7 @@ export async function controlDesktop(
     observation?: unknown;
     error?: unknown;
   }>(response, MAX_COMPUTER_CONTROL_RESPONSE_BYTES, signal);
-  if (!response.ok)
-    throw new Error(String(payload.error ?? "computer control failed"));
+  if (!response.ok) throw new Error(String(payload.error ?? "computer control failed"));
   if (typeof payload.completed !== "number")
     throw new Error("computer control returned no completion count");
   return {
@@ -1859,22 +1628,15 @@ const SCREEN_READY_TIMEOUT_MS = 45_000;
 // Docker publishes the port mapping before websockify inside the container is
 // serving, and a bare TCP connect can succeed before it is too. Polling the same
 // embed.html the iframe loads keeps the frontend from hitting "socket hang up".
-export async function waitForScreenReady(
-  host: string,
-  port: number,
-  timeoutMs: number,
-) {
+export async function waitForScreenReady(host: string, port: number, timeoutMs: number) {
   const deadline = Date.now() + timeoutMs;
   do {
     const ready = await new Promise<boolean>((resolve) => {
-      const req = http.get(
-        { host, port, path: "/embed.html", timeout: 1_500 },
-        (res) => {
-          res.resume();
-          const status = res.statusCode ?? 0;
-          resolve(status >= 200 && status < 300);
-        },
-      );
+      const req = http.get({ host, port, path: "/embed.html", timeout: 1_500 }, (res) => {
+        res.resume();
+        const status = res.statusCode ?? 0;
+        resolve(status >= 200 && status < 300);
+      });
       req.once("timeout", () => {
         req.destroy();
         resolve(false);
@@ -1893,20 +1655,17 @@ async function publishedScreenUrl(
   containerPort = "6080",
 ) {
   for (let i = 0; i < 30; i += 1) {
-    const info =
-      i === 0 && initialInfo ? initialInfo : await container.inspect();
+    const info = i === 0 && initialInfo ? initialInfo : await container.inspect();
     if (screenNetworkMode === "isolated") {
       const runtime = supervisorInfo ?? (await inspectSupervisorContainer());
       const networkName = info.HostConfig.NetworkMode;
-      if (runtime && networkName)
-        await connectComposeScreenPeers(networkName, runtime);
+      if (runtime && networkName) await connectComposeScreenPeers(networkName, runtime);
     }
     const target = resolveScreenPublishTarget({
       screenNetwork: screenNetworkMode,
       networkMode: info.HostConfig.NetworkMode,
       networks: info.NetworkSettings?.Networks,
-      hostPort:
-        info.NetworkSettings?.Ports?.[`${containerPort}/tcp`]?.[0]?.HostPort,
+      hostPort: info.NetworkSettings?.Ports?.[`${containerPort}/tcp`]?.[0]?.HostPort,
       containerPort,
       screenHost: SCREEN_HOST,
     });
@@ -1916,8 +1675,7 @@ async function publishedScreenUrl(
         Number(target.port),
         SCREEN_READY_TIMEOUT_MS,
       );
-      if (!ready)
-        throw new Error("computer screen did not become ready in time");
+      if (!ready) throw new Error("computer screen did not become ready in time");
       return screenUrlFor(target.port, target.host);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -1933,8 +1691,7 @@ async function rejoinComputerNetwork(info: Docker.ContainerInspectInfo) {
   if (screenNetworkMode !== "isolated") return;
   const runtime = supervisorInfo ?? (await inspectSupervisorContainer());
   const networkName = info.HostConfig.NetworkMode;
-  if (runtime && networkName)
-    await connectComposeScreenPeers(networkName, runtime);
+  if (runtime && networkName) await connectComposeScreenPeers(networkName, runtime);
 }
 
 async function setInteractiveScreen(
@@ -1948,23 +1705,15 @@ async function setInteractiveScreen(
     "-c",
     interactiveScreenCommand(interactive, controlToken, layout),
   ]);
-  if (result.code !== 0)
-    throw new Error(result.stderr || "control screen failed to start");
-  return (
-    interactive ||
-    !controlToken ||
-    result.stdout.includes("ARGO_CONTROL_RELEASED\n")
-  );
+  if (result.code !== 0) throw new Error(result.stderr || "control screen failed to start");
+  return interactive || !controlToken || result.stdout.includes("ARGO_CONTROL_RELEASED\n");
 }
 
 // Each bot's computer gets its own Docker network so containers cannot reach
 // one another (Docker's default "bridge" network allows any container to
 // dial any other container's exposed ports, which would let one bot's
 // computer reach another bot's desktop/VNC endpoint with no authentication).
-function computerNetworkName(
-  botId: string,
-  info: Docker.ContainerInspectInfo | undefined,
-) {
+function computerNetworkName(botId: string, info: Docker.ContainerInspectInfo | undefined) {
   if (screenNetworkMode === "internal") {
     // The supervisor itself runs in this shared network in that topology and
     // needs to address child containers by their in-network IP, so children
@@ -1972,9 +1721,7 @@ function computerNetworkName(
     return info ? Object.keys(info.NetworkSettings.Networks)[0] : undefined;
   }
   if (screenNetworkMode === "isolated" && !info) {
-    throw new Error(
-      "isolated Compose screens require a containerized supervisor",
-    );
+    throw new Error("isolated Compose screens require a containerized supervisor");
   }
   return computerNetworkNameFor(botId);
 }
@@ -1986,10 +1733,7 @@ async function composeScreenPeerIds(info: Docker.ContainerInspectInfo) {
     const webContainers = await docker.listContainers({
       all: true,
       filters: {
-        label: [
-          `com.docker.compose.project=${project}`,
-          "com.docker.compose.service=web",
-        ],
+        label: [`com.docker.compose.project=${project}`, "com.docker.compose.service=web"],
       },
     });
     for (const container of webContainers) peerIds.add(container.Id);
@@ -1997,17 +1741,12 @@ async function composeScreenPeerIds(info: Docker.ContainerInspectInfo) {
   return peerIds;
 }
 
-async function connectComposeScreenPeers(
-  networkName: string,
-  info: Docker.ContainerInspectInfo,
-) {
+async function connectComposeScreenPeers(networkName: string, info: Docker.ContainerInspectInfo) {
   const peerIds = await composeScreenPeerIds(info);
   const network = docker.getNetwork(networkName);
   const networkInfo = await network.inspect();
   const connectedIds = new Set(Object.keys(networkInfo.Containers ?? {}));
-  const missingPeerIds = [...peerIds].filter(
-    (containerId) => !connectedIds.has(containerId),
-  );
+  const missingPeerIds = [...peerIds].filter((containerId) => !connectedIds.has(containerId));
   if (missingPeerIds.length === 0) return;
   let apiVersion = dockerApiVersion;
   if (!apiVersion) {
@@ -2022,12 +1761,9 @@ async function connectComposeScreenPeers(
   }
   await Promise.all(
     missingPeerIds.map((containerId) =>
-      network
-        .connect(screenPeerNetworkConnectOptions(containerId, apiVersion))
-        .catch((error) => {
-          if (!/already exists|already connected/i.test(String(error)))
-            throw error;
-        }),
+      network.connect(screenPeerNetworkConnectOptions(containerId, apiVersion)).catch((error) => {
+        if (!/already exists|already connected/i.test(String(error))) throw error;
+      }),
     ),
   );
 }
@@ -2040,8 +1776,7 @@ async function inspectNetworkIfPresent(name: string) {
     .inspect()
     .catch((error) => {
       const status = (error as { statusCode?: number })?.statusCode;
-      if (status === 404 || /no such network|not found/i.test(String(error)))
-        return undefined;
+      if (status === 404 || /no such network|not found/i.test(String(error))) return undefined;
       throw error;
     });
 }
@@ -2059,18 +1794,12 @@ async function reconnectBotComputer(
   await ensureBotNetwork(botId, owner);
   const network = docker.getNetwork(computerNetworkNameFor(botId));
   if (staleEndpoint) {
-    await network
-      .disconnect({ Container: container.id, Force: true })
-      .catch((error) => {
-        // Already gone is fine. Anything else fails the provision: a stale endpoint
-        // left in place would make the connect below look unattachable.
-        const status = (error as { statusCode?: number })?.statusCode;
-        if (
-          status !== 404 &&
-          !/not connected|not found|no such/i.test(String(error))
-        )
-          throw error;
-      });
+    await network.disconnect({ Container: container.id, Force: true }).catch((error) => {
+      // Already gone is fine. Anything else fails the provision: a stale endpoint
+      // left in place would make the connect below look unattachable.
+      const status = (error as { statusCode?: number })?.statusCode;
+      if (status !== 404 && !/not connected|not found|no such/i.test(String(error))) throw error;
+    });
   }
   return network.connect({ Container: container.id }).then(
     () => true,
@@ -2080,9 +1809,7 @@ async function reconnectBotComputer(
       const unattachable =
         status === 404 ||
         status === 409 ||
-        /not found|no such|already exists|already connected/i.test(
-          String(error),
-        );
+        /not found|no such|already exists|already connected/i.test(String(error));
       if (!unattachable) throw error;
       getLogger().error("computer network reconnect failed", error);
       return false;
@@ -2106,9 +1833,7 @@ export async function reclaimIdleComputerNetworks() {
   for (const { Name, Labels } of networks) {
     const botId = Labels?.["argo.botId"];
     if (!botId || Name !== computerNetworkNameFor(botId)) continue;
-    await withBotLifecycleLock(botId, () =>
-      removeUnusedComputerNetwork(Name),
-    ).catch((error) => {
+    await withBotLifecycleLock(botId, () => removeUnusedComputerNetwork(Name)).catch((error) => {
       getLogger().error("computer network reclaim failed", error);
     });
   }
@@ -2117,10 +1842,7 @@ export async function reclaimIdleComputerNetworks() {
 // The supervisor and Compose web proxy join isolated computer networks to reach
 // screens and rejoin lazily, so they do not keep a network in use.
 async function screenPeerIds() {
-  const runtime =
-    screenNetworkMode === "isolated"
-      ? await inspectSupervisorContainer()
-      : undefined;
+  const runtime = screenNetworkMode === "isolated" ? await inspectSupervisorContainer() : undefined;
   return runtime ? await composeScreenPeerIds(runtime) : new Set<string>();
 }
 
@@ -2130,18 +1852,12 @@ async function screenPeerIds() {
 // network cannot start again. Each user is disconnected first, and a failed
 // disconnect keeps the network for the same reason.
 async function removeUnusedComputerNetwork(name: string, computerId?: string) {
-  const users = await docker.listContainers({
-    all: true,
-    filters: { network: [name] },
-  });
+  const users = await docker.listContainers({ all: true, filters: { network: [name] } });
   const peerIds = await screenPeerIds();
-  if (users.some((user) => user.Id !== computerId && !peerIds.has(user.Id)))
-    return;
+  if (users.some((user) => user.Id !== computerId && !peerIds.has(user.Id))) return;
   const network = docker.getNetwork(name);
   // The computer goes first: it must be able to rejoin when it resumes.
-  users.sort(
-    (a, b) => Number(b.Id === computerId) - Number(a.Id === computerId),
-  );
+  users.sort((a, b) => Number(b.Id === computerId) - Number(a.Id === computerId));
   for (const user of users) {
     await network.disconnect({ Container: user.Id });
   }
@@ -2154,34 +1870,24 @@ async function removeUnusedComputerNetwork(name: string, computerId?: string) {
 // Every computer network holds a subnet from Docker's address pools, which run
 // out after a few dozen networks, so a stopped computer gives its network back.
 // It is reconnected when it resumes, and screen peers rejoin lazily.
-async function reclaimComputerNetwork(
-  container: Docker.Container,
-  botId: string,
-) {
+async function reclaimComputerNetwork(container: Docker.Container, botId: string) {
   // The bot lock keeps a provision from resuming the computer meanwhile.
   await withBotLifecycleLock(botId, async () => {
     const name = computerNetworkNameFor(botId);
     const computer = await container.inspect();
-    if (computer.State.Running || !(await inspectNetworkIfPresent(name)))
-      return;
+    if (computer.State.Running || !(await inspectNetworkIfPresent(name))) return;
     await removeUnusedComputerNetwork(name, computer.Id);
   });
 }
 
 async function ensureBotNetwork(botId: string, owner: string) {
   return docker
-    .createNetwork(
-      computerNetworkCreateOptions(botId, owner, computerEgressMode),
-    )
+    .createNetwork(computerNetworkCreateOptions(botId, owner, computerEgressMode))
     .catch(async (error) => {
       // Existing networks and concurrent provision requests are both safe.
       if (!/already exists/i.test(String(error))) throw error;
       if (computerEgressMode === "restricted") {
-        await rekeyRestrictedBotNetwork(
-          computerNetworkNameFor(botId),
-          botId,
-          owner,
-        );
+        await rekeyRestrictedBotNetwork(computerNetworkNameFor(botId), botId, owner);
       }
     });
 }
@@ -2191,11 +1897,7 @@ async function ensureBotNetwork(botId: string, owner: string) {
 // callers attach the computer afterwards (the create path replaces it, a resume
 // reconnects it), and supervisor/web screen peers rejoin lazily via
 // connectComposeScreenPeers.
-async function rekeyRestrictedBotNetwork(
-  name: string,
-  botId: string,
-  owner: string,
-) {
+async function rekeyRestrictedBotNetwork(name: string, botId: string, owner: string) {
   const expectedBridge = computerBridgeNameFor(botId);
   const inspect = () =>
     docker
@@ -2209,9 +1911,7 @@ async function rekeyRestrictedBotNetwork(
     const network = docker.getNetwork(name);
     const containerIds = Object.keys(info.Containers ?? {});
     for (const containerId of containerIds) {
-      await network
-        .disconnect({ Container: containerId, Force: true })
-        .catch(() => undefined);
+      await network.disconnect({ Container: containerId, Force: true }).catch(() => undefined);
     }
     const removed = await network.remove().then(
       () => true,
@@ -2222,9 +1922,7 @@ async function rekeyRestrictedBotNetwork(
     // Stop this bot's containers in case disconnect left one running there.
     if (!removed) {
       await stopBotContainers(containerIds, botId);
-      throw new Error(
-        `cannot restrict egress: failed to replace unrestricted network ${name}`,
-      );
+      throw new Error(`cannot restrict egress: failed to replace unrestricted network ${name}`);
     }
   }
   if (!info || !hasNamedBridge(info)) {
@@ -2235,9 +1933,7 @@ async function rekeyRestrictedBotNetwork(
       });
   }
   if (!hasNamedBridge(await inspect())) {
-    throw new Error(
-      `cannot restrict egress: network ${name} is missing the named bridge`,
-    );
+    throw new Error(`cannot restrict egress: network ${name} is missing the named bridge`);
   }
 }
 
@@ -2255,8 +1951,7 @@ async function stopBotContainers(containerIds: string[], botId: string) {
       const inspected = await container.inspect().catch(() => undefined);
       // A failed inspect is not proof this endpoint belongs to someone else.
       // Only a successful inspect of a different bot may skip the stop.
-      if (inspected && inspected.Config.Labels?.["argo.botId"] !== botId)
-        return;
+      if (inspected && inspected.Config.Labels?.["argo.botId"] !== botId) return;
       if (!inspected) return;
       await stopContainer(container);
       stoppedIds.add(containerId);
@@ -2296,17 +1991,13 @@ async function removeBotNetwork(botId: string) {
       const owner = labels["argo.botId"];
       owners.push(owner);
       if (owner === botId) {
-        await network
-          .disconnect({ Container: containerId, Force: true })
-          .catch(() => undefined);
+        await network.disconnect({ Container: containerId, Force: true }).catch(() => undefined);
       }
     }
     if (!legacyNetworkOwnedSolelyBy(botId, owners)) continue;
     const remaining = await network.inspect().catch(() => undefined);
     for (const containerId of Object.keys(remaining?.Containers ?? {})) {
-      await network
-        .disconnect({ Container: containerId, Force: true })
-        .catch(() => undefined);
+      await network.disconnect({ Container: containerId, Force: true }).catch(() => undefined);
     }
     await network.remove().catch(() => undefined);
   }
@@ -2318,29 +2009,20 @@ const spaceComputerLocks = new Map<string, Promise<unknown>>();
 
 // Serialize create/delete for one bot so DELETE cannot remove a per-bot network
 // while POST still needs it between ensureBotNetwork and container attach.
-async function withBotLifecycleLock<T>(
-  botId: string,
-  task: () => Promise<T>,
-): Promise<T> {
+async function withBotLifecycleLock<T>(botId: string, task: () => Promise<T>): Promise<T> {
   return withKeyedLock(botLifecycleLocks, botId, task);
 }
 
 // Serialize screen claim/release/cancel for one computer so a restart-orphan
 // cancel cannot race a replacement claim and kill the newer Chromium session.
-async function withComputerScreenLock<T>(
-  computerId: string,
-  task: () => Promise<T>,
-): Promise<T> {
+async function withComputerScreenLock<T>(computerId: string, task: () => Promise<T>): Promise<T> {
   return withKeyedLock(computerScreenLocks, computerId, task);
 }
 
 // Serialize per-space create admission (count + create) so different bots cannot
 // race past SANDBOX_MAX_COMPUTERS_PER_SPACE. Callers must already hold the bot
 // lifecycle lock; never acquire a bot lock while holding this lock.
-async function withSpaceComputerLock<T>(
-  spaceId: string,
-  task: () => Promise<T>,
-): Promise<T> {
+async function withSpaceComputerLock<T>(spaceId: string, task: () => Promise<T>): Promise<T> {
   return withKeyedLock(spaceComputerLocks, spaceId, task);
 }
 
@@ -2368,8 +2050,7 @@ async function runContainerCommand(
     onOutput?: (chunk: { stream: "stdout" | "stderr"; data: string }) => void;
   } = {},
 ): Promise<{ stdout: string; stderr: string; code: number }> {
-  if (options.stdin !== undefined && !options.signal)
-    throw new Error("stdin requires a signal");
+  if (options.stdin !== undefined && !options.signal) throw new Error("stdin requires a signal");
   options.signal?.throwIfAborted();
   const timeoutMs = options.timeoutMs;
   const completionMarker = timeoutMs
@@ -2392,10 +2073,7 @@ async function runContainerCommand(
     ],
   });
   options.signal?.throwIfAborted();
-  const stream = await exec.start({
-    hijack: true,
-    stdin: Boolean(options.signal),
-  });
+  const stream = await exec.start({ hijack: true, stdin: Boolean(options.signal) });
   if (options.stdin !== undefined) stream.write(options.stdin);
   const chunks: Buffer[] = [];
   const demuxer = options.onOutput ? createDockerStreamDemuxer() : undefined;
@@ -2446,10 +2124,7 @@ async function runContainerCommand(
   };
 }
 
-async function consumeCompletionMarker(
-  container: Docker.Container,
-  marker: string,
-) {
+async function consumeCompletionMarker(container: Docker.Container, marker: string) {
   const result = await runContainerCommand(container, [
     "sh",
     "-c",
@@ -2479,8 +2154,7 @@ async function applyContainerActions(
     script,
     JSON.stringify(containerActionSteps(actions, display, browserProfile)),
   ]);
-  if (result.code !== 0)
-    throw new Error(result.stderr || "computer action failed");
+  if (result.code !== 0) throw new Error(result.stderr || "computer action failed");
 }
 
 async function observeContainer(container: Docker.Container, display = ":1") {
@@ -2497,8 +2171,7 @@ async function observeContainer(container: Docker.Container, display = ":1") {
     'printf "\\n"',
   ].join("; ");
   const result = await runContainerCommand(container, ["bash", "-lc", command]);
-  if (result.code !== 0)
-    throw new Error(result.stderr || "screen capture failed");
+  if (result.code !== 0) throw new Error(result.stderr || "screen capture failed");
   return parseObservation(result.stdout);
 }
 
