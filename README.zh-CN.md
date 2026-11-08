@@ -16,7 +16,7 @@ Argo 是一个开源 AI 智能体项目，让你拥有可长期协作的 AI 队�
 
 它是 Grok Bot、Meta Muse、OpenAI Dots、Instinct、OpenClaw、Hermes Agent、Claude Duet 和 Hark Pro 的开源、自托管替代方案。
 
-Argo 目前处于测试阶段。详情见 [argo.example](https://argo.example)。
+Argo 目前处于测试阶段。详情见 [argoai.top](https://argoai.top)。
 
 本文是 [英文 README](./README.md) 的简体中文译文，链接指向的其他文档目前仍为英文。
 

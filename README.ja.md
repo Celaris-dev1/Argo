@@ -17,7 +17,7 @@ Argo は、常駐型の AI チームメイトを持てるオープンソース�
 Grok Bot、Meta Muse、OpenAI Dots、Instinct、OpenClaw、Hermes Agent、Claude Duet の
 オープンソースかつセルフホスト可能な代替ツールです。
 
-Argo は現在ベータ版です。詳しくは [argo.example](https://argo.example) をご覧ください。
+Argo は現在ベータ版です。詳しくは [argoai.top](https://argoai.top) をご覧ください。
 
 このドキュメントは[英語版 README](./README.md) の日本語訳です。リンク先のドキュメントは現在英語のみです。
 

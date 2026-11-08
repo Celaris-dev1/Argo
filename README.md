@@ -17,7 +17,7 @@ and computer provider, or run the complete stack locally.
 It is an open source, self-hosted alternative to Grok Bot, Meta Muse, OpenAI Dots, Instinct,
 OpenClaw, Hermes Agent, and Claude Duet.
 
-Argo is in beta. Learn more at [argo.example](https://argo.example).
+Argo is in beta. Try the hosted version, or read guides on running a free, uncensored AI agent, at [argoai.top](https://argoai.top).
 
 ## Features
 
