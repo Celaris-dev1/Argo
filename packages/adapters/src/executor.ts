@@ -1061,8 +1061,9 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const callClientNonceForRun = callEndRun ? run.clientNonce : sourceClientNonce;
         const voiceCall = callEndRun || isCallClientNonce(sourceClientNonce);
         const graphicalToolsAllowed = graphical && acceptsImages && !heldForTakeover;
+        // A headless computer has no screen but still runs the page browser.
         const pageBrowserAllowed =
-          graphical && browser.describe().capabilities.page && !heldForTakeover;
+          computerKind !== "desktop" && browser.describe().capabilities.page && !heldForTakeover;
         // Small models get a core tool set (ARGO_SMALL_MODELS); everyone else keeps the bot's list.
         const runDisabledBuiltinTools = withSmallModelDisabledTools(
           bot.disabledBuiltinTools,
