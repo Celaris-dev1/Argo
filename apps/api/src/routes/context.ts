@@ -12,6 +12,7 @@ import {
   hiddenCatalogModel,
   kickModelCredentialRefresh,
   listAvailablePiCatalog,
+  LOCAL_PROVIDER_ID,
   McpOAuthBroker,
   modelCredentialAuthKindsForSpace,
   offeredCatalog,
@@ -146,6 +147,12 @@ export function createRouterContext(deps: RouterDeps) {
       actor,
       deps.billing?.modelCreditsEnabled ? deps.env.defaultProvider : undefined,
     );
+    // The operator's own model server serves every member without a connection of their own.
+    const operatorProvider =
+      deps.env.deploymentModelConfigured && deps.env.defaultProvider === LOCAL_PROVIDER_ID
+        ? LOCAL_PROVIDER_ID
+        : undefined;
+    if (operatorProvider) auth.byProvider[operatorProvider] ??= "api_key";
     const available = listAvailablePiCatalog(auth.byProvider, auth.byModel);
     const [live, providerLive] = await Promise.all([
       codexLiveCatalogsForSpace(deps.prisma, deps.secrets, actor, auth, codexCatalog, {
@@ -180,7 +187,9 @@ export function createRouterContext(deps: RouterDeps) {
     )
       selected = await savedCatalogSelections(deps.prisma, actor.userId);
     return offeredCatalog(merged, selected).map((entry) =>
-      entry.provider === auth.managedProvider
+      entry.provider === operatorProvider
+        ? { ...entry, managed: true }
+        : entry.provider === auth.managedProvider
         ? {
             ...entry,
             managed: true,

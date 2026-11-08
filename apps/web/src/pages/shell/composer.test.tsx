@@ -1330,3 +1330,18 @@ it("accepts file drops in transparent padding only during file drags", () => {
   dispatchDrag(window, "dragend", dataTransfer);
   expect(fieldset.classList.contains("pointer-events-none")).toBe(true);
 });
+
+it("names the chat's model and opens the model picker from it", () => {
+  const onOpenModels = vi.fn();
+  renderComposer(async () => true, { modelName: "o4-mini", onOpenModels });
+  const chip = container?.querySelector<HTMLButtonElement>(
+    '[data-testid="composer-model-button"]',
+  );
+  expect(chip?.textContent).toBe("o4-mini");
+  expect(chip?.getAttribute("aria-label")).toBe("Model: o4-mini");
+  act(() => chip?.click());
+  expect(onOpenModels).toHaveBeenCalledOnce();
+
+  rerenderComposer({ modelName: undefined });
+  expect(container?.querySelector('[data-testid="composer-model-button"]')).toBeNull();
+});

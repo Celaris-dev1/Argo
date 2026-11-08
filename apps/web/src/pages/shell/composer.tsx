@@ -18,7 +18,7 @@ import {
   updateComposerMentionBindings,
 } from "@argo/core";
 import { Button } from "@argo/ui-web";
-import { ArrowUp, Box, Paperclip, Plus, Settings, Square, X } from "lucide-react";
+import { ArrowUp, Box, ChevronDown, Paperclip, Plus, Settings, Square, X } from "lucide-react";
 import type { ClipboardEvent, DragEvent, RefObject } from "react";
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
@@ -63,6 +63,7 @@ export const Composer = memo(function Composer({
   imageConfirmation,
   onDraftEdited,
   onOpenModels,
+  modelName,
   onOpenConnections,
   runError,
   runErrorId,
@@ -97,6 +98,8 @@ export const Composer = memo(function Composer({
   imageConfirmation?: boolean;
   onDraftEdited?: () => void;
   onOpenModels: () => void;
+  /** The model this chat runs on; shown as a chip that opens the model picker. */
+  modelName?: string;
   onOpenConnections: () => void;
   runError: string | null;
   runErrorId: string | null;
@@ -882,6 +885,21 @@ export const Composer = memo(function Composer({
             expanded ? "row-start-2" : ""
           }`}
         >
+          {modelName ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={t`Model: ${modelName}`}
+              data-testid="composer-model-button"
+              disabled={disabled}
+              onClick={() => onOpenModels()}
+              className="h-8 max-w-40 gap-1 rounded-full px-3 text-[13px] text-muted-foreground"
+            >
+              <span className="truncate">{modelName}</span>
+              <ChevronDown size={14} aria-hidden="true" />
+            </Button>
+          ) : null}
           {onOpenCoding ? (
             <Button
               type="button"
