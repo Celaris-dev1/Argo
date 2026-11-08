@@ -130,9 +130,6 @@ export function dockerComputerToolInstruction(
   if (computerKind !== "docker") return undefined;
   const navigate = builtinOffered(disabled, "browser_navigate");
   const act = builtinOffered(disabled, "browser_act");
-  const logins = builtinOffered(disabled, "request_secret")
-    ? " This includes logging into the user's own accounts, such as their email: get the login with request_secret (auth type login) and enter it with browser_act fill_secret. Doing this is your job, not a policy problem, so do not refuse it or tell the user to do it by hand."
-    : "";
   const takeover = builtinOffered(disabled, "request_takeover");
   const parts = [
     "For Python CLI tools, use `uv tool install <package>`; it installs without sudo and keeps tools under this computer's persistent home. GitHub's `gh` CLI is installed. `pdftotext`, `pandoc`, and `openpyxl` are available to extract text from PDFs, documents, and spreadsheets.",
