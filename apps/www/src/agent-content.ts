@@ -65,11 +65,11 @@ ${getHomeCopy("en")
 
 ${home.cta.copy}
 
-- [Agent setup prompt](https://github.com/elie222/rakazo/blob/main/SETUP_PROMPT.md)
+- [Agent setup prompt](https://github.com/celaris-dev1/argo/blob/main/SETUP_PROMPT.md)
 - [Self-hosting guide](https://argo.example/self-hosted-ai-agent/)
-- [Full self-hosting reference](https://github.com/elie222/rakazo/blob/main/docs/self-host.md)
+- [Full self-hosting reference](https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md)
 - [OpenClaw comparison](https://argo.example/openclaw-alternative/)
-- [Source code](https://github.com/elie222/rakazo)
+- [Source code](https://github.com/celaris-dev1/argo)
 
 ## Site index
 
@@ -96,9 +96,9 @@ The project started from a simple premise: useful agents should be understandabl
 
 Argo targets the web, macOS, Windows, Linux, iOS, and Android. The source is available under the Apache-2.0 license and accepts public issues and contributions on GitHub. Inbox Zero Inc. maintains the project and offers support at hello@argo.example.
 
-- [Source code](https://github.com/elie222/rakazo)
+- [Source code](https://github.com/celaris-dev1/argo)
 - [Self-hosting guide](https://argo.example/self-hosted-ai-agent/)
-- [Full self-hosting reference](https://github.com/elie222/rakazo/blob/main/docs/self-host.md)
+- [Full self-hosting reference](https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md)
 - [Support](https://argo.example/support/)
 `;
 
@@ -106,7 +106,7 @@ export const SUPPORT_MARKDOWN = `# Argo support
 
 For help with the Argo mobile app or a hosted Argo account, email [hello@argo.example](mailto:hello@argo.example). Include the email address on the account, what you expected to happen, and any error message you saw. Never send passwords, API keys, access tokens, or other secrets.
 
-For self-hosted Argo, start with the [self-hosting guide](https://argo.example/self-hosted-ai-agent/). The [full reference](https://github.com/elie222/rakazo/blob/main/docs/self-host.md) is on GitHub. Open reproducible bugs and feature requests in the [public GitHub repository](https://github.com/elie222/rakazo/issues). Report vulnerabilities only to [security@argo.example](mailto:security@argo.example).
+For self-hosted Argo, start with the [self-hosting guide](https://argo.example/self-hosted-ai-agent/). The [full reference](https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md) is on GitHub. Open reproducible bugs and feature requests in the [public GitHub repository](https://github.com/celaris-dev1/argo/issues). Report vulnerabilities only to [security@argo.example](mailto:security@argo.example).
 
 Hosted users can permanently delete their account and associated personal Space data from the Account screen in the Argo app, or on the web at [app.argo.example](https://app.argo.example) under Settings → Account. Without access to the app, email [hello@argo.example](mailto:hello@argo.example) from the account's email address to ask us to delete it. Sign-in security records are kept for up to 90 days.
 `;
@@ -159,10 +159,10 @@ Argo Cloud at https://app.argo.example is in beta. Self-hosting is also availabl
 
 ## How an agent should use Argo
 
-1. Read the [setup prompt](https://github.com/elie222/rakazo/blob/main/SETUP_PROMPT.md) before changing the user's machine.
-2. Use the [self-hosting guide](https://argo.example/self-hosted-ai-agent/) for setup. The [GitHub guide](https://github.com/elie222/rakazo/blob/main/docs/self-host.md) is the full reference for backups, upgrades, and production layout.
+1. Read the [setup prompt](https://github.com/celaris-dev1/argo/blob/main/SETUP_PROMPT.md) before changing the user's machine.
+2. Use the [self-hosting guide](https://argo.example/self-hosted-ai-agent/) for setup. The [GitHub guide](https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md) is the full reference for backups, upgrades, and production layout.
 3. Confirm deployment choices and any host-level commands with the user, and keep secrets in local environment configuration rather than tracked files.
-4. Use the [public issue tracker](https://github.com/elie222/rakazo/issues) for reproducible bugs. Send vulnerabilities only to [security@argo.example](mailto:security@argo.example).
+4. Use the [public issue tracker](https://github.com/celaris-dev1/argo/issues) for reproducible bugs. Send vulnerabilities only to [security@argo.example](mailto:security@argo.example).
 
 ## Canonical resources
 
@@ -172,16 +172,16 @@ Argo Cloud at https://app.argo.example is in beta. Self-hosting is also availabl
 - [Alternatives](https://argo.example/alternatives/)
 - [Open source Grok Bot alternative](https://argo.example/grok-bot-alternative/)
 - [About](https://argo.example/about/)
-- [Source](https://github.com/elie222/rakazo)
+- [Source](https://github.com/celaris-dev1/argo)
 - [Self-hosting guide](https://argo.example/self-hosted-ai-agent/): requirements, Docker install, source setup, and desktop and mobile connections.
 - [Self-hosting Markdown](https://argo.example/self-hosted-ai-agent.md): the setup guide with language-tagged code examples.
-- [Full self-hosting reference](https://github.com/elie222/rakazo/blob/main/docs/self-host.md)
+- [Full self-hosting reference](https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md)
 - [OpenClaw comparison](https://argo.example/openclaw-alternative/)
 - [Docs](https://argo.example/docs/): getting started, using Argo, and self-hosting. Each page has a Markdown version.
 - [Integrations](https://argo.example/integrations/): every app a bot can connect to. [Markdown list](https://argo.example/integrations.md); each app page has a Markdown version with its actions.
 - [Submit a plugin](https://argo.example/plugins/submit/): list a plugin in the Argo marketplace. [Markdown with the API](https://argo.example/plugins/submit.md).
 - [Blog](https://argo.example/blog/)
-- [Releases](https://github.com/elie222/rakazo/releases)
+- [Releases](https://github.com/celaris-dev1/argo/releases)
 - [Support](https://argo.example/support/)
 - [Privacy](https://argo.example/privacy/)
 - [Terms](https://argo.example/terms/)

@@ -19,7 +19,7 @@ Requires Docker Engine 26+ (API 1.45+ for bot home volume subpaths), the Compose
 
 ```bash
 mkdir -p argo && cd argo &&
-curl -fsSLO https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/install-images.sh &&
+curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/install-images.sh &&
 bash install-images.sh
 ```
 
@@ -130,7 +130,7 @@ Compose bot homes mount only their own subdirectory of the application volume us
 
 ## Reporting a problem
 
-Attach a diagnostics report to a [self-host issue](https://github.com/elie222/rakazo/issues/new?template=self-host.yml):
+Attach a diagnostics report to a [self-host issue](https://github.com/celaris-dev1/argo/issues/new?template=self-host.yml):
 
 ```bash
 docker compose -f docker-compose.images.yml exec api node dist/cli/diagnostics.js

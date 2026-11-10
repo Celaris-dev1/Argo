@@ -44,7 +44,7 @@ export function welcomeEmail(
       </Text>
       <Text>
         Argo is open source. If you like it,{" "}
-        <Link href="https://github.com/elie222/rakazo" style={linkStyle}>
+        <Link href="https://github.com/celaris-dev1/argo" style={linkStyle}>
           a star on GitHub
         </Link>{" "}
         helps others find it.
@@ -52,7 +52,7 @@ export function welcomeEmail(
       <Text>
         Want to run it on your own servers?{" "}
         <Link
-          href="https://github.com/elie222/rakazo/blob/main/docs/self-host.md"
+          href="https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md"
           style={linkStyle}
         >
           Self-host Argo

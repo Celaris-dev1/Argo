@@ -119,7 +119,7 @@ a restart. The installer does not download the script on macOS. From the directo
 the stack's `.env`:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/restrict-computer-egress.sh
+curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/restrict-computer-egress.sh
 ```
 
 Save the following as `egress.yml` beside that script and start it with

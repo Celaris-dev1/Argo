@@ -124,7 +124,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "elie222",
+        "owner": "celaris-dev1",
         "repo": "argo"
       }
     ]

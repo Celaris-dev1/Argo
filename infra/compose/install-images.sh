@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-DOWNLOAD_BASE="${ARGO_DOWNLOAD_BASE:-https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose}"
+DOWNLOAD_BASE="${ARGO_DOWNLOAD_BASE:-https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose}"
 while [[ "$DOWNLOAD_BASE" == */ ]]; do
   DOWNLOAD_BASE="${DOWNLOAD_BASE%/}"
 done

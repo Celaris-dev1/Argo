@@ -5,7 +5,7 @@ Chat with your bots, answer their questions, watch their computers and take call
 ## Install
 
 - iPhone: [App Store](https://apps.apple.com/app/argo/id6801531099).
-- Android: [download the APK](https://github.com/elie222/rakazo/releases/download/android/rakazo.apk).
+- Android: [download the APK](https://github.com/celaris-dev1/argo/releases/download/android/argo.apk).
 
 You can also choose **Get the mobile app** from the account menu in the web or desktop app.
 

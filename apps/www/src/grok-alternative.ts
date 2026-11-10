@@ -70,7 +70,7 @@ export const GROK_SOURCES = [
 ] as const;
 
 export const INSTALL_COMMAND = `mkdir -p argo && cd argo &&
-curl -fsSLO https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/install-images.sh &&
+curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/install-images.sh &&
 bash install-images.sh`;
 
 export const SELF_HOST_LEAD =

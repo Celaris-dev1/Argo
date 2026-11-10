@@ -249,7 +249,7 @@ jobs:
           xcrun stapler validate "$app"
           spctl --assess --type execute --verbose=2 "$app"
           grep -Fqx "provider: github" "$app/Contents/Resources/app-update.yml"
-          grep -Fqx "owner: elie222" "$app/Contents/Resources/app-update.yml"
+          grep -Fqx "owner: celaris-dev1" "$app/Contents/Resources/app-update.yml"
           grep -Fqx "repo: argo" "$app/Contents/Resources/app-update.yml"
 
       - name: Verify packaged native dependencies
@@ -343,7 +343,7 @@ jobs:
           if ($executables.Count -lt 2) { throw "Windows installer or application was not created." }
           $config = "apps/desktop/out/win-unpacked/resources/app-update.yml"
           $feed = Get-Content -Raw $config
-          foreach ($expected in @("provider: github", "owner: elie222", "repo: argo")) {
+          foreach ($expected in @("provider: github", "owner: celaris-dev1", "repo: argo")) {
             if ($feed -notmatch "(?m)^$([regex]::Escape($expected))\r?$") {
               throw "Windows update config missing '$expected'."
             }
@@ -386,7 +386,7 @@ jobs:
           test -n "$config"
           test -f "$config"
           grep -Fqx "provider: github" "$config"
-          grep -Fqx "owner: elie222" "$config"
+          grep -Fqx "owner: celaris-dev1" "$config"
           grep -Fqx "repo: argo" "$config"
           test -f apps/desktop/out/latest-linux.yml
           grep -Fqx "version: $RELEASE_VERSION" apps/desktop/out/latest-linux.yml
