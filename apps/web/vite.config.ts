@@ -501,7 +501,7 @@ export default defineConfig(({ command, mode }) => {
   });
   return {
     build: {
-      sourcemap: true,
+      sourcemap: false,
       rolldownOptions: {
         output: {
           codeSplitting: {
