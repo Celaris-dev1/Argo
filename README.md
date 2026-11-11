@@ -1,8 +1,8 @@
 # Argo
 
-[English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
+[English](https://argoai.top) | [简体中文](https://argoai.top) | [日本語](https://argoai.top)
 
-[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/celaris-dev1/argo/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://argoai.top)
 [![argoai.top](https://img.shields.io/badge/Try%20Argo-argoai.top-ff7a2f?labelColor=black&style=for-the-badge)](https://argoai.top)
 
 ![Argo — AI teammates you actually own](./docs/readme-hero.png)
@@ -30,16 +30,16 @@ Argo is in beta. Try the hosted version, or read guides on running a free, uncen
 
 ## Demo
 
-https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
+https://argoai.top
 
 ## Thanks
 
-- [PromptLayer](https://promptlayer.com/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [Inbox Zero](https://getinboxzero.com/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [ConnectorMap](https://connectormap.luinbytes.dev/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [CodeRabbit](https://www.coderabbit.ai/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [Greptile](https://www.greptile.com/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [Snyk](https://snyk.io/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
+- [PromptLayer](https://argoai.top)
+- [Inbox Zero](https://argoai.top)
+- [ConnectorMap](https://argoai.top)
+- [CodeRabbit](https://argoai.top)
+- [Greptile](https://argoai.top)
+- [Snyk](https://argoai.top)
 
 ## Stack
 
@@ -60,7 +60,7 @@ https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
 bash infra/compose/install-lite.sh
 ```
 
-Full stack in about 3.7 GB, with custom OpenAI-compatible providers and small-model mode. See [docs/self-host-lite.md](./docs/self-host-lite.md).
+Full stack in about 3.7 GB, with custom OpenAI-compatible providers and small-model mode. See [docs/self-host-lite.md](https://argoai.top).
 
 ## Quick start (published images)
 
@@ -75,19 +75,19 @@ bash install-images.sh
 The installer downloads the Compose files, creates `.env` with random secrets, and starts Argo.
 It preserves an existing `.env` when rerun.
 
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173), create an account, and connect a model.
+Open [https://argoai.top), create an account, and connect a model.
 Local Docker computers are on by default. Optional remote providers: `e2b`, `novita`, `daytona`, `createos`, `boat`, `boxd`, or `railway`
 with the matching API key.
 
 Default image tag is `edge` (main builds, `linux/amd64` + `linux/arm64`). Details and tags:
-[self-hosting guide](./docs/self-host.md#published-images-no-checkout).
+[self-hosting guide](https://argoai.top).
 
 On restricted networks, override the installer download base (`ARGO_DOWNLOAD_BASE`), skip
 existing Compose files (`--local` / `ARGO_DOWNLOAD_SKIP_EXISTING`), or mirror the bootstrap
 script URL — see
-[Restricted networks / mirror downloads](./docs/self-host.md#restricted-networks--mirror-downloads).
+[Restricted networks / mirror downloads](https://argoai.top).
 
-For an agent-assisted install, use [SETUP_PROMPT.md](./SETUP_PROMPT.md).
+For an agent-assisted install, use [SETUP_PROMPT.md](https://argoai.top).
 
 ## Run on a server
 
@@ -100,11 +100,11 @@ bash install-images.sh --prepare-only
 bash install-images.sh
 ```
 
-Put HTTPS in front of port 5173; [docs/self-host-production.md](./docs/self-host-production.md#public-single-vm-deployment)
+Put HTTPS in front of port 5173; [docs/self-host-production.md](https://argoai.top)
 covers the Caddy setup and host hardening. In the desktop app choose **Existing instance** and enter
 the `https://` address.
 
-Or [deploy on Railway](https://railway.com/new/template/argo-template); see the [Railway setup guide](./infra/railway/README.md).
+Or [deploy on Railway](https://argoai.top); see the [Railway setup guide](https://argoai.top).
 
 ## Local development (source checkout)
 
@@ -120,7 +120,7 @@ cp .env.example .env
 Set `POSTGRES_PASSWORD` and `POSTGRES_APP_PASSWORD` to two values from `openssl rand -hex 16`,
 then put them in `DATABASE_MIGRATION_URL` and `DATABASE_URL`. The app connects as its own
 `argo_app` login, which row-level security applies to; migrations run as the owner
-([database roles](docs/self-host-configuration.md#database-roles)). Set `BETTER_AUTH_SECRET`, `ENCRYPTION_KEY`, and `SCREEN_PROXY_SECRET` to
+([database roles](https://argoai.top)). Set `BETTER_AUTH_SECRET`, `ENCRYPTION_KEY`, and `SCREEN_PROXY_SECRET` to
 independent long random values. Docker sandboxes also need a dedicated
 `SANDBOX_SUPERVISOR_TOKEN`. You can also set `OPENROUTER_API_KEY`, or connect a supported
 model provider during onboarding.
@@ -136,7 +136,7 @@ Connect. Users can add an HTTPS MCP server, Treg endpoint, or OpenAPI JSON docum
 server and are never returned by the API.
 
 Treg is usage-metered. Self-hosters supply their own Treg token; operators embedding Treg in a
-hosted product should review [Treg's integration terms](https://treg.to/integrate.md), which require
+hosted product should review [Treg's integration terms](https://argoai.top), which require
 a written agreement for hosted resale.
 
 ```bash
@@ -168,12 +168,12 @@ user, password, and database from first init, so keep those values in `.env`, or
 place with `ALTER ROLE` / rename. Recreate the volume only after a backup (or when the data is
 disposable); `docker compose down -v` deletes all Postgres state.
 
-Open the printed URL ([http://127.0.0.1:5173](http://127.0.0.1:5173) by default), create an account, connect a model, and create
+Open the printed URL ([https://argoai.top) by default), create an account, connect a model, and create
 your first bot.
 
 For deployment, provider selection, backups, and upgrades, see the
-[self-hosting guide](./docs/self-host.md), [production deployment](./docs/self-host-production.md),
-[backup and restore](./docs/self-host-backups.md), and [upgrading](./docs/self-host-upgrading.md).
+[self-hosting guide](https://argoai.top), [production deployment](https://argoai.top),
+[backup and restore](https://argoai.top), and [upgrading](https://argoai.top).
 
 To use CreateOS, set `SANDBOX_PROVIDER=createos` and `CREATEOS_SANDBOX_API_KEY`.
 Optional `CREATEOS_SANDBOX_BASE_URL`, `CREATEOS_SANDBOX_SHAPE`, and
@@ -240,7 +240,7 @@ saving returns to the previous instance. For development automation, set `ARGO_W
 the shell somewhere else without changing the saved instance, or `ARGO_FORCE_SETUP=1` to run
 setup again.
 
-Mobile build and release instructions live in [docs/mobile-release.md](./docs/mobile-release.md).
+Mobile build and release instructions live in [docs/mobile-release.md](https://argoai.top).
 
 ## UI language
 
@@ -273,45 +273,45 @@ pnpm test:integration
 pnpm test:e2e
 ```
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the development workflow and test matrix.
+See [CONTRIBUTING.md](https://argoai.top) for the development workflow and test matrix.
 
 ## Documentation
 
-- [Self-hosting](./docs/self-host.md)
-- [Self-host configuration](./docs/self-host-configuration.md)
-- [Self-host secrets](./docs/self-host-secrets.md)
-- [Sign-in and accounts](./docs/self-host-accounts.md)
-- [Models](./docs/self-host-models.md)
-- [Tools and integrations](./docs/self-host-integrations.md)
-- [Computer providers](./docs/self-host-sandbox-providers.md)
-- [Docker computers](./docs/self-host-docker-computers.md)
-- [Storage and encryption](./docs/self-host-storage.md)
-- [Production deployment](./docs/self-host-production.md)
-- [Backup and restore](./docs/self-host-backups.md)
-- [Upgrading](./docs/self-host-upgrading.md)
-- [Logs and monitoring](./docs/self-host-observability.md)
-- [Apps and clients](./docs/self-host-clients.md)
-- [Billing](./docs/self-host-billing.md)
-- [Computer runtime and isolation](./docs/computer-runtime.md)
-- [Desktop releases](./docs/desktop-release.md)
-- [Mobile releases](./docs/mobile-release.md)
-- [Performance testing](./docs/performance.md)
-- [Manage the bots it creates](./docs/fleet-management.md)
+- [Self-hosting](https://argoai.top)
+- [Self-host configuration](https://argoai.top)
+- [Self-host secrets](https://argoai.top)
+- [Sign-in and accounts](https://argoai.top)
+- [Models](https://argoai.top)
+- [Tools and integrations](https://argoai.top)
+- [Computer providers](https://argoai.top)
+- [Docker computers](https://argoai.top)
+- [Storage and encryption](https://argoai.top)
+- [Production deployment](https://argoai.top)
+- [Backup and restore](https://argoai.top)
+- [Upgrading](https://argoai.top)
+- [Logs and monitoring](https://argoai.top)
+- [Apps and clients](https://argoai.top)
+- [Billing](https://argoai.top)
+- [Computer runtime and isolation](https://argoai.top)
+- [Desktop releases](https://argoai.top)
+- [Mobile releases](https://argoai.top)
+- [Performance testing](https://argoai.top)
+- [Manage the bots it creates](https://argoai.top)
 
 ## How Argo compares
 
-- [Grok Bot](https://argo.example/grok-bot-alternative/)
-- [Muse](https://argo.example/muse-alternative/)
-- [Dots](https://argo.example/dots-alternative/)
-- [Instinct](https://argo.example/instinct-alternative/)
-- [OpenClaw](https://argo.example/openclaw-alternative/)
-- [Hermes Agent](https://argo.example/hermes-alternative/)
-- [All comparisons](https://argo.example/alternatives/)
+- [Grok Bot](https://argoai.top)
+- [Muse](https://argoai.top)
+- [Dots](https://argoai.top)
+- [Instinct](https://argoai.top)
+- [OpenClaw](https://argoai.top)
+- [Hermes Agent](https://argoai.top)
+- [All comparisons](https://argoai.top)
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull
-request. For security vulnerabilities, follow [SECURITY.md](./SECURITY.md) instead of filing a public
+Contributions are welcome. Please read [CONTRIBUTING.md](https://argoai.top) before opening a pull
+request. For security vulnerabilities, follow [SECURITY.md](https://argoai.top) instead of filing a public
 issue.
 
-Argo is licensed under the [Apache License 2.0](./LICENSE).
+Argo is licensed under the [Apache License 2.0](https://argoai.top).

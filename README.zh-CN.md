@@ -1,8 +1,8 @@
 # Argo
 
-[English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
+[English](https://argoai.top) | [简体中文](https://argoai.top) | [日本語](https://argoai.top)
 
-[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/celaris-dev1/argo/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://argoai.top)
 [![argoai.top](https://img.shields.io/badge/Try%20Argo-argoai.top-ff7a2f?labelColor=black&style=for-the-badge)](https://argoai.top)
 
 ![Argo：由你掌控的 AI 队友](./docs/readme-hero.png)
@@ -16,7 +16,7 @@ Android 应用。
 
 Argo 目前处于测试阶段。详情见 [argoai.top](https://argoai.top)。
 
-本文是 [英文 README](./README.md) 的简体中文译文，链接指向的其他文档目前仍为英文。
+本文是 [英文 README](https://argoai.top) 的简体中文译文，链接指向的其他文档目前仍为英文。
 
 ## 与其他产品的比较
 
@@ -24,16 +24,16 @@ Argo 启动后，你可以像使用 Grok Bot 一样，通过聊天设置和管�
 Muse、Dots、Instinct、Claude Duet 和 Hark Pro 是托管式助手；OpenClaw 和 Hermes Agent 则同样是可以自行运行的开源智能体。
 后两者的文档介绍了安装器、配置文件和网关。Hermes Desktop 无需命令行即可开始第一次聊天；消息网关则是独立进程。
 
-- [Grok Bot](https://argo.example/grok-bot-alternative/)
-- [Muse](https://argo.example/muse-alternative/)
-- [Dots](https://argo.example/dots-alternative/)
-- [Instinct](https://argo.example/instinct-alternative/)，可通过短信或电话交流的个人助手
-- [OpenClaw](https://argo.example/openclaw-alternative/)
-- [Hermes Agent](https://argo.example/hermes-alternative/)，Nous Research 的开源智能体
-- [Claude Duet](https://argo.example/claude-duet-alternative/)，Anthropic 的主动式个人智能体
-- [Hark Pro](https://argo.example/hark-alternative/)，hark.com 提供的个人智能体
-- [全部对比](https://argo.example/alternatives/)
-- [自托管指南](https://argo.example/self-hosted-ai-agent/)
+- [Grok Bot](https://argoai.top)
+- [Muse](https://argoai.top)
+- [Dots](https://argoai.top)
+- [Instinct](https://argoai.top)，可通过短信或电话交流的个人助手
+- [OpenClaw](https://argoai.top)
+- [Hermes Agent](https://argoai.top)，Nous Research 的开源智能体
+- [Claude Duet](https://argoai.top)，Anthropic 的主动式个人智能体
+- [Hark Pro](https://argoai.top)，hark.com 提供的个人智能体
+- [全部对比](https://argoai.top)
+- [自托管指南](https://argoai.top)
 
 ## 功能
 
@@ -48,7 +48,7 @@ Muse、Dots、Instinct、Claude Duet 和 Hark Pro 是托管式助手；OpenClaw 
 
 ## 演示
 
-https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
+https://argoai.top
 
 ## 技术栈
 
@@ -65,11 +65,11 @@ https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
 
 ## 部署到 Railway
 
-[![部署到 Railway](https://railway.com/button.svg)](https://railway.com/new/template/argo-template)
+[![部署到 Railway](https://railway.com/button.svg)](https://argoai.top)
 
 部署包含 PostgreSQL、持久化存储和 Railway 计算机的私有 Argo 实例。
 填写邮箱和 Railway API 令牌，登录后再连接模型。
-参见[安装、安全默认设置与备份](./infra/railway/README.md)。
+参见[安装、安全默认设置与备份](https://argoai.top)。
 
 ## 快速开始（已发布镜像）
 
@@ -84,18 +84,18 @@ bash install-images.sh
 安装脚本会下载 Compose 文件，生成包含随机密钥的 `.env`，并启动 Argo。
 再次运行时会保留已有的 `.env`。
 
-打开 [http://127.0.0.1:5173](http://127.0.0.1:5173)，创建账号并连接模型。
+打开 [https://argoai.top)，创建账号并连接模型。
 默认启用本地 Docker 计算机。也可以选择远程提供商 `e2b`、`daytona`、`createos`、`box` 或 `railway`，
 并配置相应的 API 密钥。
 
 默认镜像标签为 `edge`，由主分支构建，支持 `linux/amd64` 和 `linux/arm64`。
-镜像详情与标签见[自托管指南](./docs/self-host.md#published-images-no-checkout)。
+镜像详情与标签见[自托管指南](https://argoai.top)。
 
 在受限网络中，可以覆盖安装器的下载地址前缀（`ARGO_DOWNLOAD_BASE`），跳过已有的 Compose 文件
 （`--local` / `ARGO_DOWNLOAD_SKIP_EXISTING`），或使用引导脚本的镜像地址。
-参见[受限网络与镜像下载](./docs/self-host.md#restricted-networks--mirror-downloads)。
+参见[受限网络与镜像下载](https://argoai.top)。
 
-如需让智能体协助安装，请使用 [SETUP_PROMPT.md](./SETUP_PROMPT.md)。
+如需让智能体协助安装，请使用 [SETUP_PROMPT.md](https://argoai.top)。
 
 ## 在服务器上运行
 
@@ -108,7 +108,7 @@ bash install-images.sh --prepare-only
 bash install-images.sh
 ```
 
-为 5173 端口配置 HTTPS 入口。[docs/self-host-production.md](./docs/self-host-production.md#public-single-vm-deployment)
+为 5173 端口配置 HTTPS 入口。[docs/self-host-production.md](https://argoai.top)
 介绍了 Caddy 配置和主机加固方法。在桌面应用中选择 **Existing instance**（已有实例），填写 `https://` 地址。
 
 ## 本地开发（从源码运行）
@@ -123,7 +123,7 @@ cp .env.example .env
 ```
 
 将 `POSTGRES_PASSWORD` 和 `POSTGRES_APP_PASSWORD` 分别设置为由 `openssl rand -hex 16` 生成的两个值，再把它们填入 `DATABASE_MIGRATION_URL` 和 `DATABASE_URL`。
-应用以自己的 `argo_app` 登录身份连接数据库，并受行级安全策略约束；迁移则以所有者身份运行（参见 [数据库角色](docs/self-host-configuration.md#database-roles)）。
+应用以自己的 `argo_app` 登录身份连接数据库，并受行级安全策略约束；迁移则以所有者身份运行（参见 [数据库角色](https://argoai.top)）。
 为 `BETTER_AUTH_SECRET`、`ENCRYPTION_KEY` 和 `SCREEN_PROXY_SECRET` 分别设置独立的长随机值。
 Docker 沙箱还需要专用的 `SANDBOX_SUPERVISOR_TOKEN`。
 你也可以设置 `OPENROUTER_API_KEY`，或在首次设置时连接支持的模型提供商。
@@ -138,7 +138,7 @@ Docker 沙箱还需要专用的 `SANDBOX_SUPERVISOR_TOKEN`。
 Treg 端点或 OpenAPI JSON 文档。连接器凭据在服务器上加密存储，API 不会返回这些凭据。
 
 Treg 按用量计费。自托管用户需提供自己的 Treg 令牌；
-将 Treg 嵌入托管产品的运营方应查阅 [Treg 集成条款](https://treg.to/integrate.md)，
+将 Treg 嵌入托管产品的运营方应查阅 [Treg 集成条款](https://argoai.top)，
 其中要求托管转售须签订书面协议。
 
 ```bash
@@ -168,9 +168,9 @@ docker compose --env-file .env \
 因此应保留 `.env` 中相应的值，或使用 `ALTER ROLE`、重命名等方式在数据库中修改。
 只有在完成备份后，或确认数据可以丢弃时，才重建数据卷；`docker compose down -v` 会删除全部 Postgres 数据。
 
-打开终端打印的地址（默认是 [http://127.0.0.1:5173](http://127.0.0.1:5173)），创建账号、连接模型，并创建第一个机器人。
+打开终端打印的地址（默认是 [https://argoai.top)），创建账号、连接模型，并创建第一个机器人。
 
-部署、提供商选择、备份与升级说明见[自托管指南](./docs/self-host.md)。
+部署、提供商选择、备份与升级说明见[自托管指南](https://argoai.top)。
 
 使用 CreateOS 时，设置 `SANDBOX_PROVIDER=createos` 和 `CREATEOS_SANDBOX_API_KEY`。
 可选配置 `CREATEOS_SANDBOX_BASE_URL`、`CREATEOS_SANDBOX_SHAPE` 和 `CREATEOS_SANDBOX_ROOTFS`
@@ -226,7 +226,7 @@ chmod +x Argo-*.AppImage
 开发自动化中，可以设置 `ARGO_WEB_URL`，让桌面应用连接其他地址而不改变已保存的实例；
 也可以设置 `ARGO_FORCE_SETUP=1`，再次运行设置流程。
 
-移动端构建和发布说明见 [docs/mobile-release.md](./docs/mobile-release.md)。
+移动端构建和发布说明见 [docs/mobile-release.md](https://argoai.top)。
 
 ## 界面语言
 
@@ -258,21 +258,21 @@ pnpm test:integration
 pnpm test:e2e
 ```
 
-开发流程和测试矩阵见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+开发流程和测试矩阵见 [CONTRIBUTING.md](https://argoai.top)。
 
 ## 文档
 
-- [自托管](./docs/self-host.md)
-- [自托管密钥管理](./docs/self-host-secrets.md)
-- [计算机运行时与隔离](./docs/computer-runtime.md)
-- [桌面端发布](./docs/desktop-release.md)
-- [移动端发布](./docs/mobile-release.md)
-- [性能测试](./docs/performance.md)
-- [计算机集群管理](./docs/fleet-management.md)
+- [自托管](https://argoai.top)
+- [自托管密钥管理](https://argoai.top)
+- [计算机运行时与隔离](https://argoai.top)
+- [桌面端发布](https://argoai.top)
+- [移动端发布](https://argoai.top)
+- [性能测试](https://argoai.top)
+- [计算机集群管理](https://argoai.top)
 
 ## 参与贡献
 
-欢迎贡献。提交 PR 前，请阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)。
-发现安全漏洞时，请按照 [SECURITY.md](./SECURITY.md) 的说明报告，勿提交公开 Issue。
+欢迎贡献。提交 PR 前，请阅读 [CONTRIBUTING.md](https://argoai.top)。
+发现安全漏洞时，请按照 [SECURITY.md](https://argoai.top) 的说明报告，勿提交公开 Issue。
 
-Argo 采用 [Apache License 2.0](./LICENSE) 许可证。
+Argo 采用 [Apache License 2.0](https://argoai.top) 许可证。

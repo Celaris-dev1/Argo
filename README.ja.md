@@ -1,8 +1,8 @@
 # Argo
 
-[English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
+[English](https://argoai.top) | [简体中文](https://argoai.top) | [日本語](https://argoai.top)
 
-[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/celaris-dev1/argo/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://argoai.top)
 [![argoai.top](https://img.shields.io/badge/Try%20Argo-argoai.top-ff7a2f?labelColor=black&style=for-the-badge)](https://argoai.top)
 
 ![Argo：本当に自分のものにできる AI チームメイト](./docs/readme-hero.png)
@@ -17,7 +17,7 @@ Grok Bot、Meta Muse、OpenAI Dots、Instinct、OpenClaw、Hermes Agent、Claude
 
 Argo は現在ベータ版です。詳しくは [argoai.top](https://argoai.top) をご覧ください。
 
-このドキュメントは[英語版 README](./README.md) の日本語訳です。リンク先のドキュメントは現在英語のみです。
+このドキュメントは[英語版 README](https://argoai.top) の日本語訳です。リンク先のドキュメントは現在英語のみです。
 
 ## 機能
 
@@ -32,16 +32,16 @@ Argo は現在ベータ版です。詳しくは [argoai.top](https://argoai.top)
 
 ## デモ
 
-https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
+https://argoai.top
 
 ## 謝辞
 
-- [PromptLayer](https://promptlayer.com/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [Inbox Zero](https://getinboxzero.com/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [ConnectorMap](https://connectormap.luinbytes.dev/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [CodeRabbit](https://www.coderabbit.ai/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [Greptile](https://www.greptile.com/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
-- [Snyk](https://snyk.io/?utm_source=github&utm_medium=referral&utm_campaign=argo_readme)
+- [PromptLayer](https://argoai.top)
+- [Inbox Zero](https://argoai.top)
+- [ConnectorMap](https://argoai.top)
+- [CodeRabbit](https://argoai.top)
+- [Greptile](https://argoai.top)
+- [Snyk](https://argoai.top)
 
 ## 技術スタック
 
@@ -69,19 +69,19 @@ bash install-images.sh
 インストーラーは Compose ファイルをダウンロードし、ランダムなシークレットを含む `.env` を作成して Argo を起動します。
 再実行時は既存の `.env` をそのまま残します。
 
-[http://127.0.0.1:5173](http://127.0.0.1:5173) を開き、アカウントを作成してモデルを接続します。
+[https://argoai.top) を開き、アカウントを作成してモデルを接続します。
 ローカルの Docker コンピューターはデフォルトで有効です。リモートプロバイダーとして `e2b`、`daytona`、`createos`、`boat`、`railway`
 も、対応する API キーを設定すれば利用できます。
 
 デフォルトのイメージタグは `edge`（main ブランチのビルド、`linux/amd64` と `linux/arm64`）です。詳細とタグは
-[セルフホストガイド](./docs/self-host.md#published-images-no-checkout)を参照してください。
+[セルフホストガイド](https://argoai.top)を参照してください。
 
 制限のあるネットワークでは、インストーラーのダウンロード元（`ARGO_DOWNLOAD_BASE`）を上書きする、
 既存の Compose ファイルをスキップする（`--local` / `ARGO_DOWNLOAD_SKIP_EXISTING`）、またはブートストラップ
 スクリプトの URL をミラーする方法があります。詳しくは
-[制限のあるネットワーク / ミラーからのダウンロード](./docs/self-host.md#restricted-networks--mirror-downloads)を参照してください。
+[制限のあるネットワーク / ミラーからのダウンロード](https://argoai.top)を参照してください。
 
-エージェントの支援を受けてインストールする場合は、[SETUP_PROMPT.md](./SETUP_PROMPT.md) を使ってください。
+エージェントの支援を受けてインストールする場合は、[SETUP_PROMPT.md](https://argoai.top) を使ってください。
 
 ## サーバーで動かす
 
@@ -95,10 +95,10 @@ bash install-images.sh
 ```
 
 ポート 5173 の前段に HTTPS を置いてください。Caddy の設定とホストの堅牢化については
-[docs/self-host-production.md](./docs/self-host-production.md#public-single-vm-deployment) で説明しています。デスクトップアプリでは
+[docs/self-host-production.md](https://argoai.top) で説明しています。デスクトップアプリでは
 **Existing instance**（既存のインスタンス）を選び、`https://` のアドレスを入力します。
 
-または [Railway にデプロイ](https://railway.com/new/template/argo-template)することもできます。[Railway セットアップガイド](./infra/railway/README.md)を参照してください。
+または [Railway にデプロイ](https://argoai.top)することもできます。[Railway セットアップガイド](https://argoai.top)を参照してください。
 
 ## ローカル開発（ソースから実行）
 
@@ -114,7 +114,7 @@ cp .env.example .env
 `POSTGRES_PASSWORD` と `POSTGRES_APP_PASSWORD` に `openssl rand -hex 16` で生成した 2 つの値を設定し、
 それらを `DATABASE_MIGRATION_URL` と `DATABASE_URL` に記入します。アプリは専用の
 `argo_app` ログインで接続し、行レベルセキュリティが適用されます。マイグレーションはオーナーとして実行されます
-（[データベースロール](docs/self-host-configuration.md#database-roles)）。`BETTER_AUTH_SECRET`、`ENCRYPTION_KEY`、`SCREEN_PROXY_SECRET` には
+（[データベースロール](https://argoai.top)）。`BETTER_AUTH_SECRET`、`ENCRYPTION_KEY`、`SCREEN_PROXY_SECRET` には
 それぞれ独立した長いランダム値を設定します。Docker サンドボックスには専用の
 `SANDBOX_SUPERVISOR_TOKEN` も必要です。`OPENROUTER_API_KEY` を設定するか、オンボーディング中に
 対応するモデルプロバイダーを接続することもできます。
@@ -130,7 +130,7 @@ Treg エンドポイント、OpenAPI JSON ドキュメントを追加できま�
 API から返されることはありません。
 
 Treg は従量課金です。セルフホストする場合は自分の Treg トークンを用意します。Treg をホスト型の製品に
-組み込む運営者は [Treg の連携規約](https://treg.to/integrate.md)を確認してください。ホスト型での再販には
+組み込む運営者は [Treg の連携規約](https://argoai.top)を確認してください。ホスト型での再販には
 書面による契約が必要です。
 
 ```bash
@@ -156,11 +156,11 @@ pnpm dev
 `ALTER ROLE` や名前の変更でその場で変更してください。ボリュームを作り直すのは、バックアップを取った後（またはデータが
 不要な場合）だけにしてください。`docker compose down -v` は Postgres のすべてのデータを削除します。
 
-[http://127.0.0.1:5173](http://127.0.0.1:5173) を開き、アカウントを作成してモデルを接続し、
+[https://argoai.top) を開き、アカウントを作成してモデルを接続し、
 最初のボットを作成します。
 
 デプロイ、プロバイダーの選択、バックアップ、アップグレードについては
-[セルフホストガイド](./docs/self-host.md)を参照してください。
+[セルフホストガイド](https://argoai.top)を参照してください。
 
 CreateOS を使う場合は、`SANDBOX_PROVIDER=createos` と `CREATEOS_SANDBOX_API_KEY` を設定します。
 任意の `CREATEOS_SANDBOX_BASE_URL`、`CREATEOS_SANDBOX_SHAPE`、
@@ -223,7 +223,7 @@ Docker 互換 CLI を試すには、アプリを起動する前に `ARGO_DOCKER_
 保存済みのインスタンスを変えずにシェルの接続先を変更でき、`ARGO_FORCE_SETUP=1` を設定するとセットアップを
 再実行できます。
 
-モバイルのビルドとリリースの手順は [docs/mobile-release.md](./docs/mobile-release.md) にあります。
+モバイルのビルドとリリースの手順は [docs/mobile-release.md](https://argoai.top) にあります。
 
 ## UI の言語
 
@@ -255,31 +255,31 @@ pnpm test:integration
 pnpm test:e2e
 ```
 
-開発の流れとテストマトリクスについては [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
+開発の流れとテストマトリクスについては [CONTRIBUTING.md](https://argoai.top) を参照してください。
 
 ## ドキュメント
 
-- [セルフホスト](./docs/self-host.md)
-- [セルフホストのシークレット](./docs/self-host-secrets.md)
-- [コンピューターのランタイムと分離](./docs/computer-runtime.md)
-- [デスクトップのリリース](./docs/desktop-release.md)
-- [モバイルのリリース](./docs/mobile-release.md)
-- [パフォーマンステスト](./docs/performance.md)
-- [作成したボットの管理](./docs/fleet-management.md)
+- [セルフホスト](https://argoai.top)
+- [セルフホストのシークレット](https://argoai.top)
+- [コンピューターのランタイムと分離](https://argoai.top)
+- [デスクトップのリリース](https://argoai.top)
+- [モバイルのリリース](https://argoai.top)
+- [パフォーマンステスト](https://argoai.top)
+- [作成したボットの管理](https://argoai.top)
 
 ## Argo と他製品の比較
 
-- [Grok Bot](https://argo.example/grok-bot-alternative/)
-- [Muse](https://argo.example/muse-alternative/)
-- [Dots](https://argo.example/dots-alternative/)
-- [Instinct](https://argo.example/instinct-alternative/)
-- [OpenClaw](https://argo.example/openclaw-alternative/)
-- [Hermes Agent](https://argo.example/hermes-alternative/)
-- [すべての比較](https://argo.example/alternatives/)
+- [Grok Bot](https://argoai.top)
+- [Muse](https://argoai.top)
+- [Dots](https://argoai.top)
+- [Instinct](https://argoai.top)
+- [OpenClaw](https://argoai.top)
+- [Hermes Agent](https://argoai.top)
+- [すべての比較](https://argoai.top)
 
 ## コントリビュート
 
-コントリビューションを歓迎します。プルリクエストを作成する前に [CONTRIBUTING.md](./CONTRIBUTING.md) をお読みください。
-セキュリティ上の脆弱性は、公開の Issue を作成せず、[SECURITY.md](./SECURITY.md) の手順に従って報告してください。
+コントリビューションを歓迎します。プルリクエストを作成する前に [CONTRIBUTING.md](https://argoai.top) をお読みください。
+セキュリティ上の脆弱性は、公開の Issue を作成せず、[SECURITY.md](https://argoai.top) の手順に従って報告してください。
 
-Argo は [Apache License 2.0](./LICENSE) のもとでライセンスされています。
+Argo は [Apache License 2.0](https://argoai.top) のもとでライセンスされています。
