@@ -22,6 +22,7 @@ describe("Docker sandbox", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it("rejects a failed interactive screen instead of returning a viewer fallback", async () => {
@@ -248,6 +249,54 @@ describe("Docker sandbox", () => {
       providerRef: "computer",
       ...expected,
     });
+  });
+
+  it("asks the profile hook and sends its answer to the supervisor", async () => {
+    vi.stubEnv("SANDBOX_COMPUTER_PROFILE_URL", "http://operator.test/profile");
+    vi.stubEnv("SANDBOX_COMPUTER_PROFILE_TOKEN", "hook-token");
+    const calls: { url: string; init?: RequestInit }[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string | URL, init?: RequestInit) => {
+        const url = String(input);
+        calls.push({ url, init });
+        return url.startsWith("http://operator.test")
+          ? Response.json({ profile: "navigator" })
+          : Response.json({ id: "computer" });
+      }),
+    );
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+
+    await provider.provision({ botId: "bot", homePath: "/tmp/bot" }, context);
+
+    expect(calls[0]?.url).toBe("http://operator.test/profile?userId=user");
+    expect(calls[0]?.init?.headers).toEqual({ authorization: "Bearer hook-token" });
+    expect(JSON.parse(String(calls[1]?.init?.body))).toMatchObject({ profile: "navigator" });
+  });
+
+  it("sends no profile when no hook is configured", async () => {
+    const fetchMock = vi.fn(async (_url: string | URL, _init?: RequestInit) =>
+      Response.json({ id: "computer" }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+
+    await provider.provision({ botId: "bot", homePath: "/tmp/bot" }, context);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).not.toHaveProperty("profile");
+  });
+
+  it("does not start a computer when the profile hook keeps failing", async () => {
+    vi.stubEnv("SANDBOX_COMPUTER_PROFILE_URL", "http://operator.test/profile");
+    const fetchMock = vi.fn(async () => new Response("down", { status: 502 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+
+    await expect(
+      provider.provision({ botId: "bot", homePath: "/tmp/bot" }, context),
+    ).rejects.toThrow("computer profile lookup failed");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("translates a 429 computer limit reached error from the supervisor", async () => {

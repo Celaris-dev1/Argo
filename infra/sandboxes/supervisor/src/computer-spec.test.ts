@@ -46,6 +46,7 @@ import {
   resolveComputerEgressMode,
   resolveComputerImage,
   resolveComputerMounts,
+  resolveComputerProfiles,
   resolveScreenNetworkMode,
   resolveScreenPublishTarget,
   resolveSpaceComputerLimit,
@@ -2033,6 +2034,53 @@ describe("computer resource limits", () => {
 
   it("parses byte counts without a unit suffix", () => {
     expect(parseMemoryBytes("X", "1073741824")).toBe(1024 ** 3);
+  });
+});
+
+describe("computer profiles", () => {
+  it("has no profiles unless configured", () => {
+    expect(resolveComputerProfiles(undefined).size).toBe(0);
+    expect(resolveComputerProfiles("  ").size).toBe(0);
+  });
+
+  it("reads an image and optional limits per profile", () => {
+    const profiles = resolveComputerProfiles(
+      JSON.stringify({
+        navigator: { image: "argo/computer:navigator", memory: "1g", cpus: 1 },
+        desktop: { image: "argo/computer:slim" },
+      }),
+    );
+    expect(profiles.get("navigator")).toEqual({
+      image: "argo/computer:navigator",
+      memory: "1g",
+      cpus: "1",
+    });
+    expect(profiles.get("desktop")).toEqual({ image: "argo/computer:slim" });
+  });
+
+  it("gives a profile's computers its own limits", () => {
+    const profile = resolveComputerProfiles(
+      JSON.stringify({ navigator: { image: "argo/computer:navigator", memory: "1g", cpus: "1" } }),
+    ).get("navigator");
+    const options = containerCreateOptions({
+      name: "argo-bot-x",
+      image: profile?.image ?? "",
+      botId: "bot",
+      spaceId: "space",
+      homePath: "/data/homes/bot",
+      limits: profile,
+    });
+    expect(options.Image).toBe("argo/computer:navigator");
+    expect(options.HostConfig.Memory).toBe(1024 ** 3);
+    expect(options.HostConfig.NanoCpus).toBe(1e9);
+  });
+
+  it("rejects malformed configuration at startup", () => {
+    expect(() => resolveComputerProfiles("[]")).toThrow("must be a JSON object");
+    expect(() => resolveComputerProfiles("{")).toThrow("must be a JSON object");
+    expect(() => resolveComputerProfiles('{"Bad Name":{"image":"x"}}')).toThrow("invalid profile");
+    expect(() => resolveComputerProfiles('{"navigator":{}}')).toThrow("needs an image");
+    expect(() => resolveComputerProfiles('{"navigator":{"image":"x","memory":"lots"}}')).toThrow();
   });
 });
 

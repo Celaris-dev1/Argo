@@ -31,6 +31,14 @@ browsers otherwise start only when needed. `0`, the default, leaves each to the 
 `ARGO_MAX_BOTS_PER_USER` caps the live bots one person may have across their Spaces, counting bots
 other bots create; archiving one frees its slot.
 
+`SANDBOX_COMPUTER_PROFILES` lets one host run more than one kind of computer. It is a JSON object
+of named profiles, each with an `image` already on the host and optional `memory`, `cpus` and
+`pidsLimit`, for example `{"navigator":{"image":"argo/computer:navigator","memory":"1g"}}`. To
+choose a profile per person, set `SANDBOX_COMPUTER_PROFILE_URL` on the API and worker: before a
+computer starts they request it with `?userId=<id>` (and `SANDBOX_COMPUTER_PROFILE_TOKEN` as a
+bearer token when set) and expect `{"profile":"<name>"}`, or `{"profile":null}` for the default
+computer. A changed profile replaces the computer on its next start; its home is kept.
+
 The supervisor reaches Docker at `/var/run/docker.sock` (or `//./pipe/docker_engine` on Windows). Set
 `DOCKER_SOCKET` for rootless Docker, Colima or another path; `DOCKER_HOST` wins when both are set.
 

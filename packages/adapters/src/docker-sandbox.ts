@@ -101,6 +101,9 @@ function sandboxGoneError(computer: ComputerRef): Error {
 export class DockerSandboxProvider implements SandboxProvider {
   private readonly supervisorToken: string;
   private readonly headless = /^(1|true|yes|on)$/i.test(process.env.ARGO_COMPUTER_HEADLESS ?? "");
+  /** Optional hook that names the computer profile a person's computers use. */
+  private readonly profileUrl = process.env.SANDBOX_COMPUTER_PROFILE_URL?.trim() || undefined;
+  private readonly profileToken = process.env.SANDBOX_COMPUTER_PROFILE_TOKEN?.trim() || undefined;
 
   constructor(
     private readonly supervisorUrl: string,
@@ -143,10 +146,37 @@ export class DockerSandboxProvider implements SandboxProvider {
     };
   }
 
+  /**
+   * Asks the configured hook which profile this person's computers use. A failed lookup stops
+   * the start: guessing the default would replace a running computer with a different one.
+   */
+  private async computerProfile(context: AdapterContext): Promise<string | undefined> {
+    if (!this.profileUrl) return undefined;
+    const url = new URL(this.profileUrl);
+    url.searchParams.set("userId", context.userId);
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetch(url, {
+          headers: this.profileToken ? { authorization: `Bearer ${this.profileToken}` } : {},
+          signal: AbortSignal.any([context.signal, AbortSignal.timeout(5_000)]),
+        });
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const body = await readSandboxJson<{ profile?: unknown }>(res, context.signal, 4096);
+        return typeof body.profile === "string" && body.profile ? body.profile : undefined;
+      } catch (error) {
+        if (context.signal.aborted) throw error;
+        lastError = error;
+      }
+    }
+    throw new Error("computer profile lookup failed", { cause: lastError });
+  }
+
   async provision(
     request: { botId: string; homePath: string },
     context: AdapterContext,
   ): Promise<ComputerRef> {
+    const profile = await this.computerProfile(context);
     const res = await fetch(this.url("/computers"), {
       method: "POST",
       headers: { ...this.headers(context, request.botId), "content-type": "application/json" },
@@ -154,6 +184,7 @@ export class DockerSandboxProvider implements SandboxProvider {
         botId: request.botId,
         homePath: request.homePath,
         spaceId: context.spaceId,
+        ...(profile ? { profile } : {}),
       }),
       signal: context.signal,
     });

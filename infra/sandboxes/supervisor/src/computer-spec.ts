@@ -169,18 +169,25 @@ function envOrDefault(name: string, fallback: string): string {
   return raw === undefined || raw.trim() === "" ? fallback : raw;
 }
 
-export function computerResourceLimits() {
+/** Limits a profile may set for its computers; anything omitted keeps the deployment's value. */
+export interface ComputerLimitOverrides {
+  memory?: string;
+  cpus?: string;
+  pidsLimit?: string;
+}
+
+export function computerResourceLimits(overrides: ComputerLimitOverrides = {}) {
   const memoryBytes = parseMemoryBytes(
     "ARGO_COMPUTER_MEMORY",
-    envOrDefault("ARGO_COMPUTER_MEMORY", DEFAULT_COMPUTER_MEMORY),
+    overrides.memory ?? envOrDefault("ARGO_COMPUTER_MEMORY", DEFAULT_COMPUTER_MEMORY),
   );
   const nanoCpus = parseNanoCpus(
     "ARGO_COMPUTER_CPUS",
-    envOrDefault("ARGO_COMPUTER_CPUS", DEFAULT_COMPUTER_CPUS),
+    overrides.cpus ?? envOrDefault("ARGO_COMPUTER_CPUS", DEFAULT_COMPUTER_CPUS),
   );
   const pidsLimit = parsePidsLimit(
     "ARGO_COMPUTER_PIDS_LIMIT",
-    envOrDefault("ARGO_COMPUTER_PIDS_LIMIT", DEFAULT_COMPUTER_PIDS_LIMIT),
+    overrides.pidsLimit ?? envOrDefault("ARGO_COMPUTER_PIDS_LIMIT", DEFAULT_COMPUTER_PIDS_LIMIT),
   );
   return {
     // Memory and MemorySwap are set together: leaving MemorySwap unset lets the
@@ -190,6 +197,55 @@ export function computerResourceLimits() {
     NanoCpus: nanoCpus,
     PidsLimit: pidsLimit,
   };
+}
+
+export interface ComputerProfile extends ComputerLimitOverrides {
+  image: string;
+}
+
+const PROFILE_NAME = /^[a-z0-9][a-z0-9_-]{0,31}$/;
+
+/**
+ * Named computer variants a caller may ask for by name, as a JSON object such as
+ * {"navigator":{"image":"argo/computer:navigator","memory":"1g"}}. A computer created without
+ * a profile, or with a name not listed here, uses the deployment's image and limits.
+ */
+export function resolveComputerProfiles(
+  value = process.env.SANDBOX_COMPUTER_PROFILES,
+): Map<string, ComputerProfile> {
+  const profiles = new Map<string, ComputerProfile>();
+  if (value === undefined || value.trim() === "") return profiles;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    throw new Error("SANDBOX_COMPUTER_PROFILES must be a JSON object");
+  }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("SANDBOX_COMPUTER_PROFILES must be a JSON object");
+  }
+  for (const [name, raw] of Object.entries(parsed)) {
+    if (!PROFILE_NAME.test(name)) {
+      throw new Error(`SANDBOX_COMPUTER_PROFILES has an invalid profile name "${name}"`);
+    }
+    const entry = (raw ?? {}) as Record<string, unknown>;
+    if (typeof entry.image !== "string" || entry.image.trim() === "") {
+      throw new Error(`SANDBOX_COMPUTER_PROFILES profile "${name}" needs an image`);
+    }
+    const profile: ComputerProfile = { image: entry.image.trim() };
+    for (const key of ["memory", "cpus", "pidsLimit"] as const) {
+      const limit = entry[key];
+      if (limit === undefined) continue;
+      if (typeof limit !== "string" && typeof limit !== "number") {
+        throw new Error(`SANDBOX_COMPUTER_PROFILES profile "${name}" has an invalid ${key}`);
+      }
+      profile[key] = String(limit);
+    }
+    // Reject a malformed limit at startup instead of at the first computer that uses it.
+    computerResourceLimits(profile);
+    profiles.set(name, profile);
+  }
+  return profiles;
 }
 
 export function resolveScreenNetworkMode(value: string | undefined): ScreenNetworkMode {
@@ -554,6 +610,7 @@ export interface ComputerCreateInput {
   publishControlPort?: boolean;
   dns?: string[];
   mounts?: ComputerMount[];
+  limits?: ComputerLimitOverrides;
 }
 
 interface PointerInput {
@@ -619,7 +676,7 @@ export function containerCreateOptions(input: ComputerCreateInput) {
       ShmSize: 256 * 1024 * 1024,
       CapDrop: ["ALL"],
       SecurityOpt: ["no-new-privileges:true"],
-      ...computerResourceLimits(),
+      ...computerResourceLimits(input.limits),
       ReadonlyPaths: ["/usr/share/novnc"],
       AutoRemove: false,
       NetworkMode: input.networkMode ?? "bridge",

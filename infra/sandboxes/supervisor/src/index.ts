@@ -22,7 +22,7 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { z } from "zod";
 import { computerImageEnsurer } from "./computer-image.js";
-import type { ComputerEgressMode } from "./computer-spec.js";
+import type { ComputerEgressMode, ComputerProfile } from "./computer-spec.js";
 import {
   assertComputerMountSources,
   assertVolumeSubpathSupport,
@@ -50,6 +50,7 @@ import {
   resolveComputerDns,
   resolveComputerEgressMode,
   resolveComputerMounts,
+  resolveComputerProfiles,
   resolveScreenNetworkMode,
   resolveScreenPublishTarget,
   resolveSpaceComputerLimit,
@@ -115,6 +116,26 @@ const computerContext =
   process.env.ARGO_COMPUTER_CONTEXT ??
   path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../computer");
 const ensureComputerImage = computerImageEnsurer(docker, COMPUTER_IMAGE, computerContext);
+const computerProfiles = resolveComputerProfiles();
+
+/**
+ * The named profile, when this host can run it. A profile whose image is not on the host
+ * falls back to the deployment's computer so the bot still starts.
+ */
+async function usableProfile(name: string | undefined): Promise<ComputerProfile | undefined> {
+  const profile = name ? computerProfiles.get(name) : undefined;
+  if (!profile) return undefined;
+  try {
+    await docker.getImage(profile.image).inspect();
+    return profile;
+  } catch {
+    getLogger().warn("computer profile skipped: its image is not on this host", {
+      profile: name,
+      image: profile.image,
+    });
+    return undefined;
+  }
+}
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const dataDir = path.resolve(repositoryRoot, process.env.DATA_DIR ?? "./data");
 let supervisorInfo: Docker.ContainerInspectInfo | undefined;
@@ -222,6 +243,7 @@ app.post("/computers", async (c) => {
       botId: z.string().min(1),
       homePath: z.string().min(1),
       spaceId: z.string().min(1),
+      profile: z.string().max(32).optional(),
     })
     .parse(await c.req.json());
   try {
@@ -231,6 +253,8 @@ app.post("/computers", async (c) => {
     });
     return await withBotLifecycleLock(body.botId, async () => {
       await ensureComputerImage();
+      const profile = await usableProfile(body.profile);
+      const computerImage = profile?.image ?? COMPUTER_IMAGE;
       await ensureRestrictedEgressEnforced();
       const runtimeInfo = await inspectSupervisorContainer();
       // A containerized supervisor's host paths (data directory, Docker socket) are known only now.
@@ -256,7 +280,7 @@ app.post("/computers", async (c) => {
       const existing = await findBotContainer(body.botId, body.spaceId);
       if (existing) {
         const info = await existing.inspect();
-        const desired = await docker.getImage(COMPUTER_IMAGE).inspect();
+        const desired = await docker.getImage(computerImage).inspect();
         const controlPublishOk = controlPortPublicationMatches(
           info.HostConfig.PortBindings,
           controlViaLoopback,
@@ -313,7 +337,7 @@ app.post("/computers", async (c) => {
           }
           return c.json({
             id: existing.id,
-            image: COMPUTER_IMAGE,
+            image: computerImage,
             resumed: true,
             started,
           });
@@ -367,7 +391,8 @@ app.post("/computers", async (c) => {
           container = await docker.createContainer(
             containerCreateOptions({
               name,
-              image: COMPUTER_IMAGE,
+              image: computerImage,
+              limits: profile,
               botId: body.botId,
               spaceId: body.spaceId,
               ...storage,
@@ -389,7 +414,7 @@ app.post("/computers", async (c) => {
         }
         return c.json({
           id: container.id,
-          image: COMPUTER_IMAGE,
+          image: computerImage,
           resumed: false,
         });
       };
