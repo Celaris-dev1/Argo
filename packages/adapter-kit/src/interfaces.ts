@@ -98,6 +98,11 @@ export interface SandboxProvider {
   /** True when every running minute is billed, so the active-lifetime cap applies. */
   billsWhileRunning?(computer: Pick<ComputerRef, "kind">): boolean;
   describe(): AdapterDescriptor<SandboxCapabilities>;
+  /**
+   * Whether this person's computers have a screen, for a provider whose computers differ per
+   * person. Omitted when describe().capabilities.graphical holds for every computer.
+   */
+  graphicalFor?(context: AdapterContext): Promise<boolean>;
   /** Workspace directory operations for hosts without the standard Unix command tools. */
   workspaceDirectories?(
     computer: ComputerRef,

@@ -98,12 +98,18 @@ function sandboxGoneError(computer: ComputerRef): Error {
   });
 }
 
+const PROFILE_CACHE_MS = 30_000;
+
 export class DockerSandboxProvider implements SandboxProvider {
   private readonly supervisorToken: string;
   private readonly headless = /^(1|true|yes|on)$/i.test(process.env.ARGO_COMPUTER_HEADLESS ?? "");
   /** Optional hook that names the computer profile a person's computers use. */
   private readonly profileUrl = process.env.SANDBOX_COMPUTER_PROFILE_URL?.trim() || undefined;
   private readonly profileToken = process.env.SANDBOX_COMPUTER_PROFILE_TOKEN?.trim() || undefined;
+  private readonly profiles = new Map<
+    string,
+    { value: { profile?: string; graphical?: boolean }; until: number }
+  >();
 
   constructor(
     private readonly supervisorUrl: string,
@@ -147,11 +153,15 @@ export class DockerSandboxProvider implements SandboxProvider {
   }
 
   /**
-   * Asks the configured hook which profile this person's computers use. A failed lookup stops
-   * the start: guessing the default would replace a running computer with a different one.
+   * Asks the configured hook which profile this person's computers use and whether it has a
+   * screen. Answers are reused briefly so one run asks once.
    */
-  private async computerProfile(context: AdapterContext): Promise<string | undefined> {
-    if (!this.profileUrl) return undefined;
+  private async computerProfile(
+    context: AdapterContext,
+  ): Promise<{ profile?: string; graphical?: boolean }> {
+    if (!this.profileUrl) return {};
+    const cached = this.profiles.get(context.userId);
+    if (cached && cached.until > Date.now()) return cached.value;
     const url = new URL(this.profileUrl);
     url.searchParams.set("userId", context.userId);
     let lastError: unknown;
@@ -162,8 +172,18 @@ export class DockerSandboxProvider implements SandboxProvider {
           signal: AbortSignal.any([context.signal, AbortSignal.timeout(5_000)]),
         });
         if (!res.ok) throw new Error(`status ${res.status}`);
-        const body = await readSandboxJson<{ profile?: unknown }>(res, context.signal, 4096);
-        return typeof body.profile === "string" && body.profile ? body.profile : undefined;
+        const body = await readSandboxJson<{ profile?: unknown; graphical?: unknown }>(
+          res,
+          context.signal,
+          4096,
+        );
+        const value = {
+          ...(typeof body.profile === "string" && body.profile ? { profile: body.profile } : {}),
+          ...(typeof body.graphical === "boolean" ? { graphical: body.graphical } : {}),
+        };
+        if (this.profiles.size > 1000) this.profiles.clear();
+        this.profiles.set(context.userId, { value, until: Date.now() + PROFILE_CACHE_MS });
+        return value;
       } catch (error) {
         if (context.signal.aborted) throw error;
         lastError = error;
@@ -172,11 +192,18 @@ export class DockerSandboxProvider implements SandboxProvider {
     throw new Error("computer profile lookup failed", { cause: lastError });
   }
 
+  /** A profile may give one person a computer with a screen on a deployment without them. */
+  async graphicalFor(context: AdapterContext): Promise<boolean> {
+    return (await this.computerProfile(context)).graphical ?? !this.headless;
+  }
+
   async provision(
     request: { botId: string; homePath: string },
     context: AdapterContext,
   ): Promise<ComputerRef> {
-    const profile = await this.computerProfile(context);
+    // A failed lookup stops the start: guessing the default would replace a running computer
+    // with a different one.
+    const { profile } = await this.computerProfile(context);
     const res = await fetch(this.url("/computers"), {
       method: "POST",
       headers: { ...this.headers(context, request.botId), "content-type": "application/json" },

@@ -274,6 +274,24 @@ describe("Docker sandbox", () => {
     expect(JSON.parse(String(calls[1]?.init?.body))).toMatchObject({ profile: "navigator" });
   });
 
+  it("lets the profile hook give one person a screen on a screenless deployment", async () => {
+    vi.stubEnv("ARGO_COMPUTER_HEADLESS", "1");
+    vi.stubEnv("SANDBOX_COMPUTER_PROFILE_URL", "http://operator.test/profile");
+    const fetchMock = vi.fn(async (input: string | URL) =>
+      String(input).includes("userId=owner")
+        ? Response.json({ profile: "desktop", graphical: true })
+        : Response.json({ profile: null }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+
+    expect(provider.describe().capabilities.graphical).toBe(false);
+    expect(await provider.graphicalFor({ ...context, userId: "owner" })).toBe(true);
+    expect(await provider.graphicalFor({ ...context, userId: "owner" })).toBe(true);
+    expect(await provider.graphicalFor(context)).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("sends no profile when no hook is configured", async () => {
     const fetchMock = vi.fn(async (_url: string | URL, _init?: RequestInit) =>
       Response.json({ id: "computer" }),
