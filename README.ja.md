@@ -2,22 +2,20 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
 
-[![GitHub stars](https://img.shields.io/github/stars/elie222/rakazo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/elie222/rakazo/stargazers)
-[![Discord コミュニティに参加](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?labelColor=black&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/RWwKa2Sn7h)
-[![App Store で iPhone 版をダウンロード](https://img.shields.io/badge/App%20Store-Download%20for%20iPhone-black?labelColor=black&style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/argo/id6801531099)
-[![Android APK をダウンロード](https://img.shields.io/badge/Android-Download%20APK-black?labelColor=black&style=for-the-badge&logo=android&logoColor=white)](https://github.com/elie222/rakazo/releases/download/android/rakazo.apk)
+[![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/celaris-dev1/argo/stargazers)
+[![argoai.top](https://img.shields.io/badge/Try%20Argo-argoai.top-ff7a2f?labelColor=black&style=for-the-badge)](https://argoai.top)
 
 ![Argo：本当に自分のものにできる AI チームメイト](./docs/readme-hero.png)
 
 Argo は、常駐型の AI チームメイトを持てるオープンソースの AI エージェントです。自分のマシンで動かせる
 セルフホスト型の AI アシスタントでもあります。Web 版、Electron デスクトップアプリ、
-[iPhone](https://apps.apple.com/app/argo/id6801531099) 版と [Android](https://github.com/elie222/rakazo/releases/download/android/rakazo.apk) 版で利用できます。
+iPhone 版と Android 版で利用できます。
 モデルやコンピューターのプロバイダーは自分で選べるほか、スタック全体をローカルで動かすこともできます。
 
 Grok Bot、Meta Muse、OpenAI Dots、Instinct、OpenClaw、Hermes Agent、Claude Duet の
 オープンソースかつセルフホスト可能な代替ツールです。
 
-Argo は現在ベータ版です。詳しくは [argo.example](https://argo.example) をご覧ください。
+Argo は現在ベータ版です。詳しくは [argoai.top](https://argoai.top) をご覧ください。
 
 このドキュメントは[英語版 README](./README.md) の日本語訳です。リンク先のドキュメントは現在英語のみです。
 
@@ -64,7 +62,7 @@ Docker Engine、Compose プラグイン、curl、OpenSSL が必要です。リ�
 
 ```bash
 mkdir -p argo && cd argo &&
-curl -fsSLO https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/install-images.sh &&
+curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/install-images.sh &&
 bash install-images.sh
 ```
 
@@ -108,7 +106,7 @@ Node.js 22.x 系の 22.22.2 以降、Node.js 24.x、または Node.js 26 以降�
 pnpm 9、Docker が必要です。Node.js 23.x と 25.x はサポートしていません。
 
 ```bash
-git clone https://github.com/elie222/rakazo.git
+git clone https://github.com/celaris-dev1/argo.git
 cd argo
 cp .env.example .env
 ```
@@ -285,5 +283,3 @@ pnpm test:e2e
 セキュリティ上の脆弱性は、公開の Issue を作成せず、[SECURITY.md](./SECURITY.md) の手順に従って報告してください。
 
 Argo は [Apache License 2.0](./LICENSE) のもとでライセンスされています。
-
-質問やアイデアは [Argo Discord コミュニティ](https://discord.gg/RWwKa2Sn7h)でお気軽にどうぞ。
