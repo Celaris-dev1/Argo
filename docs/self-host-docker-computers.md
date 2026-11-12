@@ -31,6 +31,10 @@ browsers otherwise start only when needed. `0`, the default, leaves each to the 
 `ARGO_MAX_BOTS_PER_USER` caps the live bots one person may have across their Spaces, counting bots
 other bots create; archiving one frees its slot.
 
+`ARGO_FIRST_BOT_TASK` gives each person's first bot a task to start on as soon as it exists, sent
+as their opening message, instead of the bot asking what it is for. `ARGO_FIRST_BOT_SITE_TASK`
+replaces it for a person whose address is at their own domain; `{site}` stands for that domain.
+
 `SANDBOX_COMPUTER_PROFILES` lets one host run more than one kind of computer. It is a JSON object
 of named profiles, each with an `image` already on the host and optional `memory`, `cpus` and
 `pidsLimit`, for example `{"navigator":{"image":"argo/computer:navigator","memory":"1g"}}`. To

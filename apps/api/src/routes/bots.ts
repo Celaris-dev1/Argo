@@ -44,6 +44,7 @@ import { changedBotSettings } from "../bot-setting-analytics.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
 import type { RouterDeps } from "../router.js";
 import { loadMessagePage } from "../thread-message-pages.js";
+import { resolveThreadTarget, sendThreadMessage } from "../thread-target.js";
 import type { RouterContext } from "./context.js";
 import { computerContext, modelSetup, THREAD_MESSAGE_PAGE_SIZE } from "./shared.js";
 
@@ -234,6 +235,58 @@ export async function enqueueBotIntroRun(deps: RouterDeps, actor: Actor, bot: Bo
   if (run) await deps.jobs.enqueue(runContinueJob(run.id));
 }
 
+/** The web onboarding's idempotency key for a person's first bot. */
+const FIRST_BOT_SPAWN_KEY = "onboarding:first";
+/** Addresses at these domains say nothing about a person's own website. */
+const SHARED_EMAIL_DOMAIN =
+  /^(gmail|googlemail|yahoo|ymail|outlook|hotmail|live|msn|icloud|me|mac|aol|proton|protonmail|pm|gmx|mail|yandex|zoho|qq|163|126|duck|hey|fastmail|tutanota|tuta)\./;
+
+/**
+ * The task a deployment gives each person's first bot, so their first screen shows finished work
+ * instead of a question. ARGO_FIRST_BOT_TASK is the task; ARGO_FIRST_BOT_SITE_TASK, when set,
+ * replaces it for an address at the person's own domain, with {site} standing for that domain.
+ */
+export function firstBotTask(
+  email: string | null | undefined,
+  env: { task?: string; siteTask?: string } = {
+    task: process.env.ARGO_FIRST_BOT_TASK,
+    siteTask: process.env.ARGO_FIRST_BOT_SITE_TASK,
+  },
+): string | undefined {
+  const task = env.task?.trim() || undefined;
+  const siteTask = env.siteTask?.trim();
+  const domain = email?.split("@")[1]?.trim().toLowerCase();
+  if (siteTask?.includes("{site}") && domain && /^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) {
+    if (!SHARED_EMAIL_DOMAIN.test(domain)) return siteTask.replaceAll("{site}", domain);
+  }
+  return task;
+}
+
+/**
+ * Sends the deployment's first task as the person's opening message. Returns false when there
+ * is no task to send, so the caller falls back to the creation intro.
+ */
+async function startFirstBotTask(deps: RouterDeps, actor: Actor, bot: Bot): Promise<boolean> {
+  if (bot.spawnKey !== FIRST_BOT_SPAWN_KEY || !bot.threadId) return false;
+  if (deps.env.agentRuntime === "scripted") return false;
+  const user = await deps.prisma.user.findUnique({
+    where: { id: actor.userId },
+    select: { email: true },
+  });
+  const text = firstBotTask(user?.email);
+  if (!text) return false;
+  if ((await modelSetup(deps, actor)).needsModel) return false;
+  // An idempotent create returns the bot it already made; its thread has started by then.
+  const [messages, runs] = await Promise.all([
+    deps.prisma.message.count({ where: { threadId: bot.threadId } }),
+    deps.prisma.run.count({ where: { botId: bot.id } }),
+  ]);
+  if (messages > 0 || runs > 0) return true;
+  const target = await resolveThreadTarget(deps.prisma, actor, { botId: bot.id });
+  await sendThreadMessage(deps, actor, target, { text, clientNonce: `first-task:${bot.id}` });
+  return true;
+}
+
 export function botsRoutes(ctx: RouterContext) {
   const { deps, repos, botModelValidation, removeBot, agentImportServices, groupRepos, authed } =
     ctx;
@@ -255,9 +308,15 @@ export function botsRoutes(ctx: RouterContext) {
         } catch (error) {
           throw mapSpaceLifecycleError(error);
         }
-        await enqueueBotIntroRun(deps, context.actor, bot).catch((error) => {
-          getLogger().error("bot intro run enqueue", error);
+        const started = await startFirstBotTask(deps, context.actor, bot).catch((error) => {
+          getLogger().error("first bot task start", error);
+          return false;
         });
+        if (!started) {
+          await enqueueBotIntroRun(deps, context.actor, bot).catch((error) => {
+            getLogger().error("bot intro run enqueue", error);
+          });
+        }
         return bot;
       }),
       importPreview: authed.bots.importPreview.handler(async ({ context, input }) =>
