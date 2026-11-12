@@ -319,7 +319,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "browser_navigate",
     description:
-      'Open a URL in the page browser on this bot\'s computer and return the document title. Prefer this over pixel clicks for web pages. If the result includes fallback:"computer_act", use computer_act on the desktop browser instead.',
+      "Open a URL in the page browser on this bot's computer. The result is the page's snapshot, with element refs for browser_act, so you do not need browser_snapshot right after it. Prefer this over pixel clicks for web pages. If the result includes fallback:\"computer_act\", use computer_act on the desktop browser instead.",
     inputSchema: {
       type: "object",
       properties: {

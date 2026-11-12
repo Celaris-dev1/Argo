@@ -664,7 +664,14 @@ app.post("/computers/:id/browser", async (c) => {
       c.req.header("x-argo-space-id"),
     );
     if (await isHeadlessComputer(c.req.param("id"), container)) {
-      const result = await runHelper({ container, layout: HEADLESS_BROWSER_LAYOUT });
+      let result = await runHelper({ container, layout: HEADLESS_BROWSER_LAYOUT });
+      // A computer that just started may still be opening its browser; give it one more chance
+      // here instead of spending a whole bot turn on "not ready".
+      for (let attempt = 0; attempt < 3 && pageBrowserNotReady(result); attempt++) {
+        await new Promise((resolve) => setTimeout(resolve, 1_500));
+        signal.throwIfAborted();
+        result = await runHelper({ container, layout: HEADLESS_BROWSER_LAYOUT });
+      }
       if (result.code !== 0 || Buffer.byteLength(result.stdout) > 512 * 1024) {
         throw new Error(
           /command timed out/.test(result.stderr)

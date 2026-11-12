@@ -492,3 +492,36 @@ describe("screen setup reuse", () => {
     expect(commands()).toEqual(["helper", "setup", "helper"]);
   });
 });
+
+it("waits for a screenless computer's browser that is still starting", async () => {
+  vi.useFakeTimers({ toFake: ["setTimeout"] });
+  try {
+    const defaultExec = mock.exec.getMockImplementation()!;
+    let helperCalls = 0;
+    mock.exec.mockImplementation(async (options: { Cmd: string[] }) => {
+      // No Xvfb: the computer has no screen.
+      if (options.Cmd.join(" ").includes("command -v Xvfb"))
+        return { ...(await defaultExec(options)), inspect: async () => ({ ExitCode: 1 }) };
+      if (!options.Cmd.includes("/usr/local/bin/argo-page-browser") || helperCalls++ > 1)
+        return defaultExec(options);
+      return {
+        start: async () =>
+          Duplex.from({
+            readable: Readable.from([
+              Buffer.from(
+                JSON.stringify({ ok: false, error: "CDP not ready on port 9222: refused" }),
+              ),
+            ]),
+            writable: new Writable({ write: (_chunk, _encoding, callback) => callback() }),
+          }),
+        inspect: async () => ({ ExitCode: 0 }),
+      };
+    });
+    const pending = snapshot("computer-starting", "headless", "run:1");
+    await vi.runAllTimersAsync();
+    expect(await (await pending).json()).toMatchObject({ ok: true, title: "Fixture" });
+    expect(helperCalls).toBe(3);
+  } finally {
+    vi.useRealTimers();
+  }
+});

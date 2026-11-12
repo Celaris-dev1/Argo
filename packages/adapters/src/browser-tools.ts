@@ -81,7 +81,15 @@ export async function browserNavigateFromTool(
   }
   try {
     const result = await browser.navigate(computer, { url, signal: context.signal }, context);
-    return formatBrowserResult(result, options);
+    if (result.fallback || result.error) return formatBrowserResult(result, options);
+    // Return the page with the navigation: reading it is almost always the next step, and
+    // a separate snapshot call costs the bot a whole turn.
+    const page = await browser
+      .snapshot(computer, { signal: context.signal }, context)
+      .catch(() => undefined);
+    context.signal.throwIfAborted();
+    if (!page || page.fallback || page.error) return result;
+    return { ...page, url: page.url || result.url, title: page.title || result.title };
   } catch (error) {
     context.signal.throwIfAborted();
     return formatBrowserResult(
