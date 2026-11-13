@@ -158,6 +158,7 @@ import {
   ROUTINE_HISTORY_PAGE_SIZE,
   RoutineHistorySchema,
   RoutineRunCursorSchema,
+  RunActionsOutputSchema,
   RunsListOutputSchema,
 } from "./runs.js";
 import { SearchQueryOutputSchema } from "./search.js";
@@ -1280,6 +1281,8 @@ export const appContract = {
   },
   runs: {
     list: oc.input(z.object({ filter: z.enum(["active", "recent"]) })).output(RunsListOutputSchema),
+    /** What the bot did during one of the caller's runs, oldest first. */
+    actions: oc.input(z.object({ runId: Id })).output(RunActionsOutputSchema),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {

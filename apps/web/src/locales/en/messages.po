@@ -1023,6 +1023,7 @@ msgid "Block rule"
 msgstr "Block rule"
 
 #: src/lib/ticket-status.ts
+#: src/pages/ActivityList.tsx
 msgid "Blocked"
 msgstr "Blocked"
 
@@ -1970,6 +1971,10 @@ msgstr "Could not install plugin"
 #: src/pages/KnowledgeSection.tsx
 msgid "Could not load"
 msgstr "Could not load"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not load actions"
+msgstr "Could not load actions"
 
 #: src/pages/ActivityList.tsx
 msgid "Could not load activity"
@@ -3485,6 +3490,10 @@ msgid "Load web images automatically"
 msgstr "Load web images automatically"
 
 #: src/pages/ActivityList.tsx
+msgid "Loading"
+msgstr "Loading"
+
+#: src/pages/ActivityList.tsx
 msgid "Loading activity…"
 msgstr "Loading activity…"
 
@@ -4129,6 +4138,10 @@ msgstr "No submissions"
 #: src/pages/Board.tsx
 msgid "No tickets yet"
 msgstr "No tickets yet"
+
+#: src/pages/ActivityList.tsx
+msgid "No tools used."
+msgstr "No tools used."
 
 #: src/pages/RoutineEditor.tsx
 msgid "No trigger"
@@ -6400,6 +6413,10 @@ msgstr "What do you most want Argo to help with?"
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
 msgstr "What do you want me on first?"
+
+#: src/pages/ActivityList.tsx
+msgid "What it did"
+msgstr "What it did"
 
 #: src/pages/shell/create-bot-dialog.tsx
 msgid "What kind of bot?"

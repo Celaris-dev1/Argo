@@ -1023,6 +1023,7 @@ msgid "Block rule"
 msgstr "Regra de bloqueio"
 
 #: src/lib/ticket-status.ts
+#: src/pages/ActivityList.tsx
 msgid "Blocked"
 msgstr ""
 
@@ -1970,6 +1971,10 @@ msgstr ""
 #: src/pages/KnowledgeSection.tsx
 msgid "Could not load"
 msgstr "Não foi possível carregar"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not load actions"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Could not load activity"
@@ -3485,6 +3490,10 @@ msgid "Load web images automatically"
 msgstr "Carregar imagens da web automaticamente"
 
 #: src/pages/ActivityList.tsx
+msgid "Loading"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
 msgid "Loading activity…"
 msgstr "Carregando minha atividade"
 
@@ -4128,6 +4137,10 @@ msgstr ""
 
 #: src/pages/Board.tsx
 msgid "No tickets yet"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
+msgid "No tools used."
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -6399,6 +6412,10 @@ msgstr ""
 
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
+msgid "What it did"
 msgstr ""
 
 #: src/pages/shell/create-bot-dialog.tsx

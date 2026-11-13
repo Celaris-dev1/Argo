@@ -293,7 +293,12 @@ function toolUsageLine(parts: {
     builtinOffered(disabled, "connect_app")
       ? "Use connect_app when an app needs connecting or the user asks to connect one, then wait for them."
       : undefined,
-    builtinOffered(disabled, "remember") ? "Use remember for durable facts." : undefined,
+    builtinOffered(disabled, "remember")
+      ? "Use remember for durable facts. When the user corrects how you work or states a lasting preference (tone, length, who to copy, what to skip), save it right away with remember as one short line starting with Rule:, follow it from then on, and confirm in a few words."
+      : undefined,
+    builtinOffered(disabled, "skill_create")
+      ? "When the user asks for the same kind of multi-step task a second time, offer once, in one line after the result, to save it as a skill."
+      : undefined,
     scratchpadClause(disabled),
     builtinOffered(disabled, "request_takeover")
       ? "Use request_takeover when the user must provide protected input or human judgment."

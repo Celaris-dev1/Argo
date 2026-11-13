@@ -1,4 +1,4 @@
-import type { Actor, RunActivityRow } from "@argo/contracts";
+import type { Actor, RunAction, RunActivityRow } from "@argo/contracts";
 import { MessageBlock } from "@argo/contracts";
 import {
   ACTIVE_RUN_STATUSES,
@@ -8,6 +8,7 @@ import {
   truncatePlainText,
 } from "@argo/core";
 import type { PrismaClient } from "@argo/db";
+import { IsolationError, runAsSystem } from "@argo/db";
 
 const RECENT_LIMIT = 20;
 const TERMINAL_STATUSES = ["completed", "failed", "cancelled"] as const;
@@ -108,5 +109,36 @@ export async function listSpaceRuns(
       ? row.completedAt
       : row.updatedAt
     ).toISOString(),
+  }));
+}
+
+const RUN_ACTIONS_LIMIT = 200;
+
+/**
+ * What the bot did during one of the caller's own runs, read from the audit log the tool gate
+ * writes. Labels are the humanized tool names recorded there; no arguments or content.
+ */
+export async function listRunActions(
+  prisma: PrismaClient,
+  actor: Actor,
+  runId: string,
+): Promise<RunAction[]> {
+  const run = await prisma.run.findFirst({
+    where: { id: runId, spaceId: actor.spaceId, userId: actor.userId },
+    select: { id: true },
+  });
+  if (!run) throw new IsolationError();
+  const rows = await runAsSystem("read a run's own action receipts", () =>
+    prisma.auditEvent.findMany({
+      where: { runId: run.id, spaceId: actor.spaceId, action: "tool.call" },
+      select: { createdAt: true, targetLabel: true, targetId: true, outcome: true },
+      orderBy: { createdAt: "asc" },
+      take: RUN_ACTIONS_LIMIT,
+    }),
+  );
+  return rows.map((row) => ({
+    at: row.createdAt.toISOString(),
+    label: row.targetLabel || row.targetId || "Action",
+    outcome: row.outcome === "denied" || row.outcome === "failure" ? row.outcome : "success",
   }));
 }

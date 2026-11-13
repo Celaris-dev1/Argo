@@ -1024,6 +1024,7 @@ msgid "Block rule"
 msgstr "禁止規則"
 
 #: src/lib/ticket-status.ts
+#: src/pages/ActivityList.tsx
 msgid "Blocked"
 msgstr "受阻"
 
@@ -1971,6 +1972,10 @@ msgstr ""
 #: src/pages/KnowledgeSection.tsx
 msgid "Could not load"
 msgstr "無法載入"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not load actions"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Could not load activity"
@@ -3486,6 +3491,10 @@ msgid "Load web images automatically"
 msgstr "自動載入網路圖片"
 
 #: src/pages/ActivityList.tsx
+msgid "Loading"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
 msgid "Loading activity…"
 msgstr "正在載入動態…"
 
@@ -4130,6 +4139,10 @@ msgstr ""
 #: src/pages/Board.tsx
 msgid "No tickets yet"
 msgstr "尚無工作項目"
+
+#: src/pages/ActivityList.tsx
+msgid "No tools used."
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "No trigger"
@@ -6401,6 +6414,10 @@ msgstr "你最希望 Argo 幫你做什麼？"
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
 msgstr "你想讓我先做什麼？"
+
+#: src/pages/ActivityList.tsx
+msgid "What it did"
+msgstr ""
 
 #: src/pages/shell/create-bot-dialog.tsx
 msgid "What kind of bot?"

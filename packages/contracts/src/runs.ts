@@ -116,3 +116,12 @@ export const RunsListOutputSchema = z.object({
   runs: z.array(RunActivityRowSchema),
 });
 export type RunsListOutput = z.infer<typeof RunsListOutputSchema>;
+
+/** One thing a bot did during a run, as recorded by the tool gate. */
+export const RunActionSchema = z.object({
+  at: z.string(),
+  label: z.string(),
+  outcome: z.enum(["success", "failure", "denied"]),
+});
+export type RunAction = z.infer<typeof RunActionSchema>;
+export const RunActionsOutputSchema = z.object({ actions: z.array(RunActionSchema) });
