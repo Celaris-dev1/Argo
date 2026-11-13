@@ -34,6 +34,10 @@ other bots create; archiving one frees its slot.
 `ARGO_FIRST_BOT_TASK` gives each person's first bot a task to start on as soon as it exists, sent
 as their opening message, instead of the bot asking what it is for. `ARGO_FIRST_BOT_SITE_TASK`
 replaces it for a person whose address is at their own domain; `{site}` stands for that domain.
+`ARGO_FIRST_BOT_APPS` (comma-separated app slugs, such as `gmail,googlecalendar`) offers connect
+cards for those apps under that first message. `ARGO_APP_CONNECTED_TASK` is sent as the person's
+message the moment they connect an app, so the bot puts it to work straight away; `{app}` stands for
+the app's name. Unset, the bot waits for the person.
 
 `SANDBOX_COMPUTER_PROFILES` lets one host run more than one kind of computer. It is a JSON object
 of named profiles, each with an `image` already on the host and optional `memory`, `cpus` and

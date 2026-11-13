@@ -42,6 +42,7 @@ import { agentImportSetupState, createImportedBot, previewAgentImport } from "..
 import { deleteAgentSecret, listAgentSecrets, putAgentSecret } from "../agent-secrets.js";
 import { changedBotSettings } from "../bot-setting-analytics.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
+import { offerFirstApps } from "../onboarding.js";
 import type { RouterDeps } from "../router.js";
 import { loadMessagePage } from "../thread-message-pages.js";
 import { resolveThreadTarget, sendThreadMessage } from "../thread-target.js";
@@ -284,6 +285,11 @@ async function startFirstBotTask(deps: RouterDeps, actor: Actor, bot: Bot): Prom
   if (messages > 0 || runs > 0) return true;
   const target = await resolveThreadTarget(deps.prisma, actor, { botId: bot.id });
   await sendThreadMessage(deps, actor, target, { text, clientNonce: `first-task:${bot.id}` });
+  await offerFirstApps(
+    { prisma: deps.prisma, events: deps.events, connectors: deps.connectors },
+    actor,
+    bot.id,
+  ).catch((error) => getLogger().error("first bot apps offer", error));
   return true;
 }
 

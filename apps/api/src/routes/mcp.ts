@@ -52,6 +52,7 @@ import {
   mcpServerDto,
 } from "../mcp-servers.js";
 import {
+  appConnectedTask,
   chooseFocus,
   dismissFocus,
   markAppConnected,
@@ -59,6 +60,7 @@ import {
   startOnboarding,
 } from "../onboarding.js";
 import { installPlugin, lockPluginInstalls, setPluginParts } from "../plugin-installs.js";
+import { resolveThreadTarget, sendThreadMessage } from "../thread-target.js";
 import {
   approvedPluginEntries,
   listPluginSubmissions,
@@ -983,7 +985,7 @@ export function mcpRoutes(ctx: RouterContext) {
         return { ok: true as const };
       }),
       appConnected: authed.onboarding.appConnected.handler(async ({ context, input }) => {
-        await markAppConnected(
+        const connected = await markAppConnected(
           onboardingDeps,
           context.actor,
           input.botId,
@@ -992,6 +994,24 @@ export function mcpRoutes(ctx: RouterContext) {
           input.threadId,
           input.messageId,
         );
+        // Put the new app to work straight away instead of waiting for the person to ask.
+        const text = connected && appConnectedTask(connected.name);
+        if (connected && text) {
+          const target = await resolveThreadTarget(deps.prisma, context.actor, {
+            botId: input.botId,
+          });
+          if (target.threadId === connected.threadId) {
+            await sendThreadMessage(deps, context.actor, target, {
+              text,
+              clientNonce: `app-connected:${connected.threadId}:${input.provider}`,
+            }).catch((error) =>
+              getLogger().warn("onboarding.app_connected_task_failed", {
+                "bot.id": input.botId,
+                "error.message": error instanceof Error ? error.message : String(error),
+              }),
+            );
+          }
+        }
         return { ok: true as const };
       }),
     },

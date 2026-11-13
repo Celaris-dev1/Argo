@@ -258,27 +258,7 @@ export async function chooseFocus(
     false,
   );
 
-  const providers = deps.connectors.managedProviders();
-  const catalog = (
-    await Promise.all(
-      providers.map((provider) =>
-        provider
-          .catalog({
-            operationId: "onboarding.choose",
-            traceId: "onboarding.choose",
-            spaceId: actor.spaceId,
-            userId: actor.userId,
-            botId: bot.id,
-            signal: AbortSignal.timeout(15_000),
-          })
-          .catch(() => []),
-      ),
-    )
-  ).flat();
-  const cards: MessageBlock[] = option.apps.flatMap((slug) => {
-    const entry = matchAppCatalog(catalog, slug);
-    return entry ? [appConnectCard(entry)] : [];
-  });
+  const cards = await appCards(deps, actor, bot.id, option.apps, "onboarding.choose");
   if (!cards.length) {
     await post(deps, target, [{ kind: "text", text: "What would you like to work on first?" }]);
     return;
@@ -302,6 +282,68 @@ export async function chooseFocus(
   ]);
 }
 
+/** Connect cards for the apps the catalog has. */
+async function appCards(
+  deps: OnboardingDeps,
+  actor: Actor,
+  botId: string,
+  apps: readonly string[],
+  operationId: string,
+): Promise<MessageBlock[]> {
+  const catalog = (
+    await Promise.all(
+      deps.connectors.managedProviders().map((provider) =>
+        provider
+          .catalog({
+            operationId,
+            traceId: operationId,
+            spaceId: actor.spaceId,
+            userId: actor.userId,
+            botId,
+            signal: AbortSignal.timeout(15_000),
+          })
+          .catch(() => []),
+      ),
+    )
+  ).flat();
+  return apps.flatMap((slug) => {
+    const entry = matchAppCatalog(catalog, slug);
+    return entry ? [appConnectCard(entry)] : [];
+  });
+}
+
+/**
+ * Offers the deployment's apps under a new person's first bot, so it can go through them
+ * as soon as each one is connected. Does nothing when no listed app is available.
+ */
+export async function offerFirstApps(
+  deps: OnboardingDeps,
+  actor: Actor,
+  botId: string,
+  apps = firstBotApps(),
+): Promise<void> {
+  if (!apps.length) return;
+  const { bot, thread } = await requireBotThread(deps, actor, botId);
+  const cards = (await appCards(deps, actor, bot.id, apps, "onboarding.firstApps")).filter(
+    (card) => card.kind === "app_connect" && card.status !== "connected",
+  );
+  if (!cards.length) return;
+  const target = { spaceId: actor.spaceId, botId: bot.id, threadId: thread.id };
+  await post(deps, target, [
+    { kind: "text", text: "Connect these and I’ll go through them for you." },
+    ...cards,
+  ]);
+}
+
+/** The apps a deployment offers new people, from `ARGO_FIRST_BOT_APPS` (comma separated). */
+export function firstBotApps(value = process.env.ARGO_FIRST_BOT_APPS): string[] {
+  return (value ?? "")
+    .split(",")
+    .map((app) => app.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
 export async function markAppConnected(
   deps: OnboardingDeps,
   actor: Actor,
@@ -310,7 +352,7 @@ export async function markAppConnected(
   connectorId = "composio",
   threadId?: string,
   messageId?: string,
-): Promise<void> {
+): Promise<{ name: string; threadId: string } | undefined> {
   const { bot, thread: ownThread } = await requireBotThread(deps, actor, botId);
   let thread = ownThread;
   if (threadId && threadId !== ownThread.id) {
@@ -323,7 +365,7 @@ export async function markAppConnected(
     thread = { ...ownThread, id: target.threadId };
   }
   const providerAdapter = deps.connectors.managed(connectorId);
-  if (!providerAdapter) return;
+  if (!providerAdapter) return undefined;
   const catalog = await providerAdapter.catalog(
     {
       operationId: "onboarding.appConnected",
@@ -339,7 +381,7 @@ export async function markAppConnected(
     catalog.filter((item) => item.connectorId === connectorId),
     provider,
   );
-  if (!entry?.connected) return;
+  if (!entry?.connected) return undefined;
   const target = { spaceId: actor.spaceId, botId: bot.id, threadId: thread.id };
   const updates = await deps.prisma.$transaction(async (tx) => {
     // Two authorizations may finish together on an onboarding message with multiple cards.
@@ -386,6 +428,20 @@ export async function markAppConnected(
     return events;
   });
   for (const event of updates) await deps.events.notify(thread.id, event.seq);
+  // Only a card that just turned connected counts, so a repeat call never starts a second job.
+  return updates.length ? { name: entry.name, threadId: thread.id } : undefined;
+}
+
+/**
+ * The deployment's task for a bot right after its person connects an app, with `{app}` replaced
+ * by the app's name. Unset means the bot waits for the person, as before.
+ */
+export function appConnectedTask(
+  app: string,
+  template = process.env.ARGO_APP_CONNECTED_TASK,
+): string | undefined {
+  const task = template?.trim();
+  return task ? task.replaceAll("{app}", app) : undefined;
 }
 
 function capitalize(value: string): string {
