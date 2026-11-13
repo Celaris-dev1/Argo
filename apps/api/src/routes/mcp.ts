@@ -56,11 +56,12 @@ import {
   chooseFocus,
   dismissFocus,
   markAppConnected,
+  onlyFirstTaskRunning,
   promptFocus,
   startOnboarding,
 } from "../onboarding.js";
 import { installPlugin, lockPluginInstalls, setPluginParts } from "../plugin-installs.js";
-import { resolveThreadTarget, sendThreadMessage } from "../thread-target.js";
+import { resolveThreadTarget, sendThreadMessage, stopThreadRuns } from "../thread-target.js";
 import {
   approvedPluginEntries,
   listPluginSubmissions,
@@ -1001,6 +1002,9 @@ export function mcpRoutes(ctx: RouterContext) {
             botId: input.botId,
           });
           if (target.threadId === connected.threadId) {
+            // The opening demo matters less than the person's own data, so stop it first.
+            if (await onlyFirstTaskRunning(deps.prisma, input.botId, target.threadId))
+              await stopThreadRuns(deps, context.actor, target);
             await sendThreadMessage(deps, context.actor, target, {
               text,
               clientNonce: `app-connected:${connected.threadId}:${input.provider}`,

@@ -1,6 +1,7 @@
 import type { ConnectorRegistry } from "@argo/adapters";
 import type { Actor, MessageBlock } from "@argo/contracts";
 import {
+  ACTIVE_RUN_STATUSES,
   appConnectCard,
   connectedAppBlocks,
   matchAppCatalog,
@@ -442,6 +443,27 @@ export function appConnectedTask(
 ): string | undefined {
   const task = template?.trim();
   return task ? task.replaceAll("{app}", app) : undefined;
+}
+
+/**
+ * Whether the bot is still working on its opening demo and nothing else, so a newly connected
+ * app can take over instead of queueing behind it.
+ */
+export async function onlyFirstTaskRunning(
+  prisma: Pick<PrismaClient, "message" | "run">,
+  botId: string,
+  threadId: string,
+): Promise<boolean> {
+  const first = await prisma.message.findUnique({
+    where: { threadId_clientNonce: { threadId, clientNonce: `first-task:${botId}` } },
+    select: { runId: true },
+  });
+  if (!first?.runId) return false;
+  const active = await prisma.run.findMany({
+    where: { threadId, status: { in: [...ACTIVE_RUN_STATUSES] } },
+    select: { id: true },
+  });
+  return active.length === 1 && active[0]?.id === first.runId;
 }
 
 function capitalize(value: string): string {

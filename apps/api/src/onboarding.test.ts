@@ -7,6 +7,7 @@ import {
   firstBotApps,
   markAppConnected,
   offerFirstApps,
+  onlyFirstTaskRunning,
   promptFocus,
 } from "./onboarding.js";
 
@@ -312,5 +313,23 @@ describe("app connected task", () => {
       { id: "card", blocks: [{ ...card, status: "connected" }] },
     ]) as never;
     expect(await markAppConnected(deps, actor, "bot", "gmail", "composio")).toBeUndefined();
+  });
+});
+
+describe("onlyFirstTaskRunning", () => {
+  const prisma = (runId: string | null, active: string[]) =>
+    ({
+      message: { findUnique: vi.fn(async () => (runId === null ? null : { runId })) },
+      run: { findMany: vi.fn(async () => active.map((id) => ({ id }))) },
+    }) as never;
+
+  it("is true only while the opening demo is the sole active run", async () => {
+    expect(await onlyFirstTaskRunning(prisma("demo", ["demo"]), "bot", "thread")).toBe(true);
+    expect(await onlyFirstTaskRunning(prisma("demo", []), "bot", "thread")).toBe(false);
+    expect(await onlyFirstTaskRunning(prisma("demo", ["demo", "mine"]), "bot", "thread")).toBe(
+      false,
+    );
+    expect(await onlyFirstTaskRunning(prisma("demo", ["mine"]), "bot", "thread")).toBe(false);
+    expect(await onlyFirstTaskRunning(prisma(null, ["mine"]), "bot", "thread")).toBe(false);
   });
 });
