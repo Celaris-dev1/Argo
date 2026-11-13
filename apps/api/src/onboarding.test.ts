@@ -2,11 +2,13 @@ import type * as db from "@argo/db";
 import { appendEventInTransaction } from "@argo/db";
 import { describe, expect, it, vi } from "vitest";
 import {
+  answerMorningBrief,
   appConnectedTask,
   chooseFocus,
   firstBotApps,
   markAppConnected,
   offerFirstApps,
+  offerMorningBrief,
   onlyFirstTaskRunning,
   promptFocus,
 } from "./onboarding.js";
@@ -331,5 +333,78 @@ describe("onlyFirstTaskRunning", () => {
     );
     expect(await onlyFirstTaskRunning(prisma("demo", ["mine"]), "bot", "thread")).toBe(false);
     expect(await onlyFirstTaskRunning(prisma(null, ["mine"]), "bot", "thread")).toBe(false);
+  });
+});
+
+describe("morning brief", () => {
+  const card = {
+    kind: "choice",
+    question: "q",
+    options: [
+      { id: "morning-brief", letter: "A", label: "Every morning" },
+      { id: "morning-brief-skip", letter: "B", label: "Not now" },
+    ],
+  };
+  function setup(opts: { offered?: boolean; routines?: number; timezone?: string | null }) {
+    const { deps, actor, tx } = fixture([]);
+    const prisma = deps.prisma as unknown as Record<string, unknown>;
+    const created: unknown[] = [];
+    prisma.message = {
+      findMany: vi.fn(async () => (opts.offered ? [{ blocks: [card] }] : [])),
+    };
+    prisma.routine = { count: vi.fn(async () => opts.routines ?? 0) };
+    Object.assign(tx, {
+      user: { findUnique: vi.fn(async () => ({ timezone: opts.timezone ?? null })) },
+      routine: {
+        create: vi.fn(async ({ data }: { data: unknown }) => {
+          created.push(data);
+          return { id: "routine", ...(data as object) };
+        }),
+      },
+    });
+    tx.message.findMany = vi.fn(async () => [{ id: "card", blocks: [card] }]) as never;
+    return { deps, actor, tx, created };
+  }
+
+  it("offers once, and not when the bot already has one", async () => {
+    let s = setup({});
+    await offerMorningBrief(s.deps, s.actor, "bot");
+    expect(posted.flatMap((m) => m.blocks)).toContainEqual(
+      expect.objectContaining({ kind: "choice" }),
+    );
+    s = setup({ offered: true });
+    await offerMorningBrief(s.deps, s.actor, "bot");
+    expect(posted).toHaveLength(0);
+    s = setup({ routines: 1 });
+    await offerMorningBrief(s.deps, s.actor, "bot");
+    expect(posted).toHaveLength(0);
+  });
+
+  it("schedules 7:00 in the person's timezone on yes, nothing on not now", async () => {
+    let s = setup({ timezone: "Africa/Lagos" });
+    const made = await answerMorningBrief(s.deps, s.actor, "bot", "morning-brief");
+    expect(s.created).toEqual([
+      expect.objectContaining({
+        crons: ["0 7 * * *"],
+        timezone: "Africa/Lagos",
+        active: true,
+        botId: "bot",
+      }),
+    ]);
+    expect(made?.routine.id).toBe("routine");
+    expect(s.tx.message.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { blocks: [expect.objectContaining({ answerId: "morning-brief" })] },
+      }),
+    );
+    s = setup({});
+    expect(await answerMorningBrief(s.deps, s.actor, "bot", "morning-brief-skip")).toBeUndefined();
+    expect(s.created).toHaveLength(0);
+  });
+
+  it("keeps the focus flow from claiming the morning card", async () => {
+    const s = setup({});
+    await chooseFocus(s.deps, s.actor, "bot", "day");
+    expect(s.tx.message.update).not.toHaveBeenCalled();
   });
 });

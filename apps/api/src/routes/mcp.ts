@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import { ORPCError } from "@orpc/server";
 import { runContinueJob } from "@argo/adapter-kit";
 import {
   createPluginMarketplace,
@@ -26,6 +25,7 @@ import {
   spaceAvailability,
 } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 import { isAdmin } from "../admins.js";
 import {
   assertNameFreeWhereAvailable,
@@ -34,12 +34,12 @@ import {
   serverSecretSpace,
 } from "../availability.js";
 import { searchIntegrationCatalog } from "../integration-catalog.js";
-import { grantMcpServerToExistingBots } from "../mcp-grant.js";
 import {
   queueMcpConnectedRun,
   resolveMcpApprovalCards,
   revertConnectedMcpApprovals,
 } from "../mcp-approval.js";
+import { grantMcpServerToExistingBots } from "../mcp-grant.js";
 import { buildMcpUpdateMaterial, legacyMcpArgs } from "../mcp-material.js";
 import {
   assertMcpOAuthTemplates,
@@ -52,27 +52,31 @@ import {
   mcpServerDto,
 } from "../mcp-servers.js";
 import {
+  answerMorningBrief,
   appConnectedTask,
   chooseFocus,
   dismissFocus,
+  isMorningBriefOption,
   markAppConnected,
+  offerMorningBrief,
   onlyFirstTaskRunning,
   promptFocus,
   startOnboarding,
 } from "../onboarding.js";
 import { installPlugin, lockPluginInstalls, setPluginParts } from "../plugin-installs.js";
-import { resolveThreadTarget, sendThreadMessage, stopThreadRuns } from "../thread-target.js";
 import {
   approvedPluginEntries,
   listPluginSubmissions,
   reviewPluginSubmission,
 } from "../plugin-submissions.js";
+import { resolveThreadTarget, sendThreadMessage, stopThreadRuns } from "../thread-target.js";
 import type { RouterContext } from "./context.js";
 import { computerContext, isUniqueViolation } from "./shared.js";
 
 export function mcpRoutes(ctx: RouterContext) {
   const {
     deps,
+    announceRoutine,
     onboardingDeps,
     mcpOAuth,
     mcpAwaitsOAuth,
@@ -978,7 +982,15 @@ export function mcpRoutes(ctx: RouterContext) {
         return { ok: true as const };
       }),
       choose: authed.onboarding.choose.handler(async ({ context, input }) => {
-        await chooseFocus(onboardingDeps, context.actor, input.botId, input.optionId);
+        if (isMorningBriefOption(input.optionId)) {
+          const made = await answerMorningBrief(
+            onboardingDeps,
+            context.actor,
+            input.botId,
+            input.optionId,
+          );
+          if (made) await announceRoutine(context.actor, made.bot, made.routine);
+        } else await chooseFocus(onboardingDeps, context.actor, input.botId, input.optionId);
         return { ok: true as const };
       }),
       dismissFocus: authed.onboarding.dismissFocus.handler(async ({ context, input }) => {
@@ -1010,6 +1022,12 @@ export function mcpRoutes(ctx: RouterContext) {
               clientNonce: `app-connected:${connected.threadId}:${input.provider}`,
             }).catch((error) =>
               getLogger().warn("onboarding.app_connected_task_failed", {
+                "bot.id": input.botId,
+                "error.message": error instanceof Error ? error.message : String(error),
+              }),
+            );
+            await offerMorningBrief(onboardingDeps, context.actor, input.botId).catch((error) =>
+              getLogger().warn("onboarding.morning_brief_offer_failed", {
                 "bot.id": input.botId,
                 "error.message": error instanceof Error ? error.message : String(error),
               }),
