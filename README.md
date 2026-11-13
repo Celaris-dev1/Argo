@@ -4,6 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/celaris-dev1/argo/stargazers)
 [![argoai.top](https://img.shields.io/badge/Try%20Argo-argoai.top-ff7a2f?labelColor=black&style=for-the-badge)](https://argoai.top)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?labelColor=black&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/BTva8yKHA)
 
 ![Argo — AI teammates you actually own](./docs/readme-hero.png)
 
