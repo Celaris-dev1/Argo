@@ -9,6 +9,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const rpcMock = vi.hoisted(() => ({
   approvalRules: { list: vi.fn(), set: vi.fn(), remove: vi.fn(), preview: vi.fn() },
   autoReview: { get: vi.fn(), set: vi.fn() },
+  connections: { list: vi.fn(async () => [] as unknown[]) },
 }));
 vi.mock("../lib/rpc", () => ({
   rpc: rpcMock,
@@ -165,6 +166,77 @@ it("sets the mode, and lists Auto only when an approval model is there", async (
   } finally {
     container.remove();
     vi.unstubAllGlobals();
+  }
+});
+
+it("sets a connected app to Allow or Block, and leaves apps with a rule to the rule list", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  rpcMock.approvalRules.list.mockResolvedValue([
+    {
+      id: "r",
+      effect: "deny",
+      matchKind: "connector",
+      matchValue: "slack",
+      createdAt: "2026-10-25T00:00:00.000Z",
+    },
+  ]);
+  rpcMock.connections.list.mockResolvedValue([
+    {
+      id: "c1",
+      connectorId: "composio",
+      provider: "gmail",
+      displayName: "Gmail",
+      status: "connected",
+      capabilities: [],
+      createdAt: "2026-10-25T00:00:00.000Z",
+    },
+    {
+      id: "c2",
+      connectorId: "composio",
+      provider: "slack",
+      displayName: "Slack",
+      status: "connected",
+      capabilities: [],
+      createdAt: "2026-10-25T00:00:00.000Z",
+    },
+    {
+      id: "c3",
+      connectorId: "composio",
+      provider: "notion",
+      displayName: "Notion",
+      status: "revoked",
+      capabilities: [],
+      createdAt: "2026-10-25T00:00:00.000Z",
+    },
+  ]);
+  rpcMock.approvalRules.set.mockResolvedValue({
+    id: "r2",
+    effect: "deny",
+    matchKind: "connector",
+    matchValue: "gmail",
+    createdAt: "2026-10-25T00:00:00.000Z",
+  });
+  rpcMock.autoReview.get.mockResolvedValue(settings);
+  const { container, root } = await render();
+  const apps = '[data-testid="approval-apps"]';
+  try {
+    await vi.waitFor(() => expect(container.querySelector(apps)?.textContent).toContain("Gmail"));
+    expect(container.querySelector(apps)?.textContent).not.toContain("Slack");
+    expect(container.querySelector(apps)?.textContent).not.toContain("Notion");
+    expect(button(container, "Ask", apps)?.getAttribute("aria-pressed")).toBe("true");
+    await act(async () => button(container, "Block", apps)?.click());
+    expect(rpcMock.approvalRules.set).toHaveBeenLastCalledWith({
+      scope: "account",
+      effect: "deny",
+      matchKind: "connector",
+      matchValue: "gmail",
+    });
+    await vi.waitFor(() => expect(container.querySelector(apps)).toBeNull());
+    await act(async () => root.unmount());
+  } finally {
+    container.remove();
+    vi.unstubAllGlobals();
+    rpcMock.connections.list.mockResolvedValue([]);
   }
 });
 
