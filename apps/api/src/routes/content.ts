@@ -16,6 +16,7 @@ import {
   listSpaceArtifacts,
 } from "../artifacts.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
+import { shareRun, shareUrl, unshareRun } from "../run-shares.js";
 import { listRunActions, listSpaceRuns } from "../runs.js";
 import { querySpaceSearch } from "../search.js";
 import { loadAllMessages } from "../thread-message-pages.js";
@@ -269,6 +270,14 @@ export function contentRoutes(ctx: RouterContext) {
       actions: authed.runs.actions.handler(async ({ context, input }) => ({
         actions: await listRunActions(deps.prisma, context.actor, input.runId),
       })),
+      share: authed.runs.share.handler(async ({ context, input }) => {
+        const { id } = await shareRun(deps.prisma, context.actor, input.runId);
+        return { url: shareUrl(deps.env.webOrigin, id) };
+      }),
+      unshare: authed.runs.unshare.handler(async ({ context, input }) => {
+        await unshareRun(deps.prisma, context.actor, input.runId);
+        return { ok: true as const };
+      }),
     },
   };
 }

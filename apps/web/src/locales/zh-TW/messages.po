@@ -2040,6 +2040,10 @@ msgstr "無法載入此對話。"
 msgid "Could not load this file."
 msgstr "無法載入此檔案。"
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "無法載入語音設定"
@@ -2215,6 +2219,10 @@ msgstr "無法傳送重設郵件"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "無法傳送"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3070,6 +3078,10 @@ msgstr "每有一位朋友開始試用，你就能獲得一個月免費。"
 msgid "Get the mobile app"
 msgstr "下載手機應用程式"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr ""
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr "正在準備"
@@ -3449,6 +3461,10 @@ msgstr "Linear 工單"
 msgid "Link"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "連結私訊"
@@ -3491,6 +3507,7 @@ msgid "Load web images automatically"
 msgstr "自動載入網路圖片"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
 
@@ -5350,6 +5367,10 @@ msgstr "形狀"
 msgid "Shape {0}"
 msgstr "形狀 {0}"
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5619,6 +5640,10 @@ msgstr "停止"
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
 msgstr "停止電腦"
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
+msgstr ""
 
 #: src/pages/shell/message-view.tsx
 msgid "Stop speaking"
@@ -5911,6 +5936,10 @@ msgstr "此檔案不是有效的 UTF-8 文字。"
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "此匯入已使用過。請重新選擇檔案。"
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr ""
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"

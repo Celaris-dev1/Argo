@@ -2039,6 +2039,10 @@ msgstr "이 채팅을 불러오지 못했습니다."
 msgid "Could not load this file."
 msgstr "파일을 불러오지 못했습니다."
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "음성 설정을 불러오지 못했습니다."
@@ -2214,6 +2218,10 @@ msgstr "재설정 이메일을 보낼 수 없습니다"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "메시지를 보내지 못했습니다."
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3069,6 +3077,10 @@ msgstr "친구가 체험을 시작할 때마다 한 달 무료 혜택을 받으�
 msgid "Get the mobile app"
 msgstr "모바일 앱 다운로드"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr ""
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr ""
@@ -3448,6 +3460,10 @@ msgstr "Linear 이슈"
 msgid "Link"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "DM 연결"
@@ -3490,6 +3506,7 @@ msgid "Load web images automatically"
 msgstr "웹 이미지 자동으로 불러오기"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
 
@@ -5349,6 +5366,10 @@ msgstr "모양"
 msgid "Shape {0}"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5617,6 +5638,10 @@ msgstr "중지"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
 msgstr ""
 
 #: src/pages/shell/message-view.tsx
@@ -5910,6 +5935,10 @@ msgstr ""
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "이미 사용된 가져오기입니다. 파일을 다시 선택하세요."
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr ""
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"

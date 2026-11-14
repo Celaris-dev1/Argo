@@ -2039,6 +2039,10 @@ msgstr "Could not load this chat."
 msgid "Could not load this file."
 msgstr "Could not load this file."
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr "Could not load this page."
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "Could not load voice settings"
@@ -2214,6 +2218,10 @@ msgstr "Could not send reset email"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "Could not send that"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr "Could not share"
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3069,6 +3077,10 @@ msgstr "Get a free month for each friend who starts a trial."
 msgid "Get the mobile app"
 msgstr "Get the mobile app"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr "Get your own bot"
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr "Getting ready"
@@ -3448,6 +3460,10 @@ msgstr "Linear issue"
 msgid "Link"
 msgstr "Link"
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr "Link copied"
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "Link DMs"
@@ -3490,6 +3506,7 @@ msgid "Load web images automatically"
 msgstr "Load web images automatically"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr "Loading"
 
@@ -5349,6 +5366,10 @@ msgstr "Shape"
 msgid "Shape {0}"
 msgstr "Shape {0}"
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr "Share"
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5618,6 +5639,10 @@ msgstr "Stop"
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
 msgstr "Stop computer"
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
+msgstr "Stop sharing"
 
 #: src/pages/shell/message-view.tsx
 msgid "Stop speaking"
@@ -5910,6 +5935,10 @@ msgstr "This file is not valid UTF-8 text."
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "This import was already used. Choose the files again."
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr "This link is no longer shared."
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"

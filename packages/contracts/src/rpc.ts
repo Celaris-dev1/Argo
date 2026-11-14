@@ -159,6 +159,7 @@ import {
   RoutineHistorySchema,
   RoutineRunCursorSchema,
   RunActionsOutputSchema,
+  RunShareLinkSchema,
   RunsListOutputSchema,
 } from "./runs.js";
 import { SearchQueryOutputSchema } from "./search.js";
@@ -1283,6 +1284,9 @@ export const appContract = {
     list: oc.input(z.object({ filter: z.enum(["active", "recent"]) })).output(RunsListOutputSchema),
     /** What the bot did during one of the caller's runs, oldest first. */
     actions: oc.input(z.object({ runId: Id })).output(RunActionsOutputSchema),
+    /** Publishes a read-only snapshot of one of the caller's finished runs; repeat calls return the same link. */
+    share: oc.input(z.object({ runId: Id })).output(RunShareLinkSchema),
+    unshare: oc.input(z.object({ runId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {

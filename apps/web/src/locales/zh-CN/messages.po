@@ -2039,6 +2039,10 @@ msgstr "无法加载此对话。"
 msgid "Could not load this file."
 msgstr "无法加载此文件。"
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "无法加载语音设置"
@@ -2214,6 +2218,10 @@ msgstr "无法发送重置邮件"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "无法发送"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3069,6 +3077,10 @@ msgstr "每有一位朋友开始试用，你就能获得一个月免费。"
 msgid "Get the mobile app"
 msgstr "获取移动应用"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr ""
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr "正在准备"
@@ -3448,6 +3460,10 @@ msgstr "Linear 工单"
 msgid "Link"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "关联私信"
@@ -3490,6 +3506,7 @@ msgid "Load web images automatically"
 msgstr "自动加载网络图片"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
 
@@ -5349,6 +5366,10 @@ msgstr "形状"
 msgid "Shape {0}"
 msgstr "形状 {0}"
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5618,6 +5639,10 @@ msgstr "停止"
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
 msgstr "停止电脑"
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
+msgstr ""
 
 #: src/pages/shell/message-view.tsx
 msgid "Stop speaking"
@@ -5910,6 +5935,10 @@ msgstr "这个文件不是有效的 UTF-8 文本。"
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "此导入已使用过。请重新选择文件。"
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr ""
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"

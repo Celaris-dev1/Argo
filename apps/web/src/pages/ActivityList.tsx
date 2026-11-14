@@ -24,6 +24,7 @@ import {
 } from "../lib/activity-list-filters";
 import { useSpaceQueries } from "../lib/query";
 import { formatRelativeTime } from "../lib/relative-time";
+import { useSpaceRpc } from "../lib/space-rpc";
 
 export function statusTone(status: RunActivityRow["status"], updatedAt?: string): string {
   if (status === "failed") return "text-destructive";
@@ -388,6 +389,74 @@ function ActivityRow({ run, onOpen }: { run: RunActivityRow; onOpen: () => void 
             {showActions ? <RunActions runId={run.runId} /> : null}
           </CollapsibleContent>
         </Collapsible>
+      ) : null}
+      {run.status === "completed" ? <ShareRun runId={run.runId} /> : null}
+    </div>
+  );
+}
+
+function ShareRun({ runId }: { runId: string }) {
+  const { t } = useLingui();
+  const rpc = useSpaceRpc();
+  const [url, setUrl] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "busy" | "copied" | "error">("idle");
+  async function share() {
+    setState("busy");
+    try {
+      const link = (await rpc.runs.share({ runId })).url;
+      setUrl(link);
+      await navigator.clipboard?.writeText(link).catch(() => undefined);
+      setState("copied");
+    } catch {
+      setState("error");
+    }
+  }
+  async function stop() {
+    setState("busy");
+    try {
+      await rpc.runs.unshare({ runId });
+      setUrl(null);
+      setState("idle");
+    } catch {
+      setState("error");
+    }
+  }
+  return (
+    <div className="ms-[30px] mb-1 flex flex-wrap items-baseline gap-3 text-[12px]">
+      {url ? (
+        <>
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="truncate text-foreground underline"
+          >
+            {state === "copied" ? t`Link copied` : url}
+          </a>
+          <button
+            type="button"
+            onClick={() => void stop()}
+            disabled={state === "busy"}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Trans>Stop sharing</Trans>
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          onClick={() => void share()}
+          disabled={state === "busy"}
+          className="text-muted-foreground hover:text-foreground"
+          data-testid="activity-share"
+        >
+          <Trans>Share</Trans>
+        </button>
+      )}
+      {state === "error" ? (
+        <span className="text-destructive" role="alert">
+          {t`Could not share`}
+        </span>
       ) : null}
     </div>
   );

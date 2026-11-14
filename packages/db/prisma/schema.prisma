@@ -7,6 +7,24 @@ datasource db {
   provider = "postgresql"
 }
 
+/// A public, read-only snapshot of one finished run that its owner chose to share.
+model RunShare {
+  id        String   @id
+  runId     String   @unique
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  botName   String
+  prompt    String
+  result    String
+  steps     Json     @default("[]")
+  createdAt DateTime @default(now())
+
+  @@index([spaceId, userId])
+  @@map("run_shares")
+}
+
 /// Acceptance of the operator's Terms of Use (TERMS_OF_USE_URL) at a version.
 model TermsAcceptance {
   userId     String
@@ -35,6 +53,7 @@ model AiDataConsent {
 model User {
   aiDataConsents AiDataConsent[]
   termsAcceptances TermsAcceptance[]
+  runShares        RunShare[]
   id                          String                       @id
   name                        String
   email                       String
@@ -945,6 +964,7 @@ model Run {
   // Partial index runs_bot_outcome_pending_idx (unreturned bot-message outcomes) is created in SQL.
   @@index([routineId])
   @@map("runs")
+  share                RunShare?
 }
 
 model SteeringMessage {

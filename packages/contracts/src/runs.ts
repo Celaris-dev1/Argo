@@ -125,3 +125,14 @@ export const RunActionSchema = z.object({
 });
 export type RunAction = z.infer<typeof RunActionSchema>;
 export const RunActionsOutputSchema = z.object({ actions: z.array(RunActionSchema) });
+
+/** The public, read-only snapshot behind a shared run link. */
+export const RunShareSchema = z.object({
+  botName: z.string(),
+  prompt: z.string(),
+  result: z.string(),
+  steps: z.array(RunActionSchema.omit({ at: true })),
+  createdAt: z.string(),
+});
+export type RunShare = z.infer<typeof RunShareSchema>;
+export const RunShareLinkSchema = z.object({ url: z.string() });

@@ -2039,6 +2039,10 @@ msgstr "Dieser Chat konnte nicht geladen werden."
 msgid "Could not load this file."
 msgstr "Datei konnte nicht geladen werden."
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "Stimmeinstellungen konnten nicht geladen werden"
@@ -2214,6 +2218,10 @@ msgstr "E-Mail zum Zurücksetzen konnte nicht gesendet werden"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "Senden fehlgeschlagen"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3069,6 +3077,10 @@ msgstr "Erhalte einen Gratismonat für jeden Freund, der eine Testphase startet.
 msgid "Get the mobile app"
 msgstr "Mobile App herunterladen"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr ""
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr ""
@@ -3448,6 +3460,10 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "DMs verknüpfen"
@@ -3490,6 +3506,7 @@ msgid "Load web images automatically"
 msgstr "Webbilder automatisch laden"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
 
@@ -5349,6 +5366,10 @@ msgstr "Form"
 msgid "Shape {0}"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5617,6 +5638,10 @@ msgstr "Stoppen"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
 msgstr ""
 
 #: src/pages/shell/message-view.tsx
@@ -5910,6 +5935,10 @@ msgstr ""
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "Dieser Import wurde bereits verwendet. Wähle die Dateien erneut aus."
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr ""
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"

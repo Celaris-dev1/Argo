@@ -177,6 +177,7 @@ import { pluginSubmissionRoutes } from "./plugin-submissions.js";
 import { sendReferralEmails, startReferralEmails } from "./referral-email.js";
 import { mountApiRequestBodyLimits } from "./request-body-limit.js";
 import { createRouter } from "./router.js";
+import { readPublicShare } from "./run-shares.js";
 import { mountScreenTarget } from "./screen-proxy.js";
 import { createAuthResponseAudit } from "./security-audit.js";
 import { createSpeechSummarizer } from "./speech-summary.js";
@@ -881,6 +882,13 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     }),
   );
   app.route("/", marketingEmailRoutes(prisma, env.authSecret));
+  // A shared run is public by design: its owner published this snapshot and nothing more.
+  app.get("/api/v1/shares/:id", async (c) => {
+    const share = await readPublicShare(prisma, c.req.param("id"));
+    if (!share) return c.json({ error: "not found" }, 404);
+    c.header("cache-control", "public, max-age=60");
+    return c.json(share);
+  });
   mountApiRequestBodyLimits(app, env.maxUploadSizeBytes);
   mountScreenTarget(app, prisma, env.screenProxySecret);
   mountDiagramScript(app);
