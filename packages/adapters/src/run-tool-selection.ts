@@ -1,8 +1,4 @@
-import {
-  disabledBuiltinToolSet,
-  FLEET_TOOL_NAMES,
-  FLEET_WRITE_TOOL_NAMES,
-} from "@argo/contracts";
+import { disabledBuiltinToolSet, FLEET_TOOL_NAMES, FLEET_WRITE_TOOL_NAMES } from "@argo/contracts";
 import { isBackgroundRunTrigger, isOwnerStartedRun } from "@argo/core";
 import { builtinAgentTools } from "./builtin-tools.js";
 import { selectCloudAgentTools } from "./cloud-agent-tools-select.js";
@@ -129,7 +125,7 @@ export function selectBuiltinToolsForRun(options: {
         !options.groupId &&
         !options.voiceCall &&
         !options.messagingChannelRun &&
-        !isBackgroundRunTrigger(options.trigger)) ||
+        callableTrigger(options.trigger)) ||
         tool.name !== "call_user") &&
       (options.historyRetrievalEnabled ||
         !["search_history", "read_history"].includes(tool.name)) &&
@@ -165,4 +161,9 @@ export function filterPageBrowserTools<T extends { name: string }>(
 /** The fleet tools this run was offered, the same decision as tool selection. */
 export function offeredFleetTools(tools: readonly { name: string }[]): string[] {
   return tools.map((tool) => tool.name).filter((name) => FLEET_TOOL_NAMES_SET.has(name));
+}
+
+/** A person's own turn, or a routine they set up; other background work never rings anyone. */
+export function callableTrigger(trigger: string | undefined): boolean {
+  return !isBackgroundRunTrigger(trigger) || trigger === "routine" || trigger === "schedule";
 }

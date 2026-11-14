@@ -4220,6 +4220,7 @@ describe("call_user availability", () => {
     expect(offered({ messagingChannelRun: true })).toBe(false);
     expect(offered({ trigger: "tickets" })).toBe(false);
     expect(offered({ voiceCall: true })).toBe(false);
+    expect(offered({ trigger: "routine" })).toBe(true);
   });
 });
 

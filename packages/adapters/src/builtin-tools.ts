@@ -1300,7 +1300,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "call_user",
     description:
-      "Ring the user's devices for a voice call. Use when the user asked you to call them, or when you have reminded them about the same thing three times and they have not replied. Your opening is spoken the moment they answer, then the conversation continues on the call. If they miss or decline it, the chat shows a missed call. Never call for routine updates a message can carry.",
+      "Ring the user's devices for a voice call. Use when the user asked you to call them, or when you have reminded them about the same thing three times and they have not replied. From a routine or watch, call only when the user asked to be called about what you found. Your opening is spoken the moment they answer, then the conversation continues on the call. If they miss or decline it, the chat shows a missed call. Never call for routine updates a message can carry.",
     inputSchema: {
       type: "object",
       properties: {
