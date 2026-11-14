@@ -18,7 +18,22 @@ OpenClaw, Hermes Agent, and Claude Duet.
 
 Argo is in beta. Try the hosted version, or read guides on running a free, uncensored AI agent, at [argoai.top](https://argoai.top).
 
+Run it yourself with Docker:
+
+```bash
+mkdir -p argo && cd argo && curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/install-images.sh && bash install-images.sh
+```
+
+If Argo is useful to you, a star helps other people find it.
+
+## Demo
+
+https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
+
 ## Features
+
+- A morning brief, Telegram chat, and receipts showing every action a bot took
+- Shareable result links, per-app Allow / Ask / Block approvals, and bots that remember your corrections
 
 - Persistent bots with their own conversations, memory, routines, and history
 - Voice mode: speak replies, dictate, and call a bot. Bring your own ElevenLabs, OpenAI, Cartesia, or Fish Audio key, or use a Mac server's installed voices
@@ -28,10 +43,6 @@ Argo is in beta. Try the hosted version, or read guides on running a free, uncen
 - Bring-your-own model credentials through Pi
 - App integrations through Composio or Pipedream Connect, plus user-installed Treg, remote MCP, and OpenAPI tool sources
 - Docker, E2B, Daytona, CreateOS, Boat, and trusted local-computer support
-
-## Demo
-
-https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
 
 ## Thanks
 

@@ -46,9 +46,17 @@ export function SharedRunPage() {
           </article>
         </>
       )}
-      <footer className="border-t border-border pt-6">
+      <footer className="flex flex-wrap gap-2 border-t border-border pt-6">
         <Button render={<Link to="/sign-up" />}>
           <Trans>Get your own bot</Trans>
+        </Button>
+        <Button
+          variant="ghost"
+          render={
+            <a href="https://github.com/celaris-dev1/argo" target="_blank" rel="noreferrer" />
+          }
+        >
+          <Trans>Star on GitHub</Trans>
         </Button>
       </footer>
     </main>
