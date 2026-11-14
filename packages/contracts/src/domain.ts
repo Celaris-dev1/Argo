@@ -390,6 +390,8 @@ export const CreateBotInput = z.object({
   computerMode: ComputerModeSchema.default("team"),
   /** Idempotency key within a space (unique with spaceId). */
   spawnKey: z.string().trim().min(1).max(120).optional(),
+  /** For the first bot only: the job the person typed before signing up, sent as their opening message. */
+  firstTask: z.string().trim().min(1).max(500).optional(),
 });
 export type CreateBotInput = z.infer<typeof CreateBotInput>;
 

@@ -267,14 +267,19 @@ export function firstBotTask(
  * Sends the deployment's first task as the person's opening message. Returns false when there
  * is no task to send, so the caller falls back to the creation intro.
  */
-async function startFirstBotTask(deps: RouterDeps, actor: Actor, bot: Bot): Promise<boolean> {
+async function startFirstBotTask(
+  deps: RouterDeps,
+  actor: Actor,
+  bot: Bot,
+  typedTask?: string,
+): Promise<boolean> {
   if (bot.spawnKey !== FIRST_BOT_SPAWN_KEY || !bot.threadId) return false;
   if (deps.env.agentRuntime === "scripted") return false;
   const user = await deps.prisma.user.findUnique({
     where: { id: actor.userId },
     select: { email: true },
   });
-  const text = firstBotTask(user?.email);
+  const text = typedTask?.trim() || firstBotTask(user?.email);
   if (!text) return false;
   if ((await modelSetup(deps, actor)).needsModel) return false;
   // An idempotent create returns the bot it already made; its thread has started by then.
@@ -314,10 +319,12 @@ export function botsRoutes(ctx: RouterContext) {
         } catch (error) {
           throw mapSpaceLifecycleError(error);
         }
-        const started = await startFirstBotTask(deps, context.actor, bot).catch((error) => {
-          getLogger().error("first bot task start", error);
-          return false;
-        });
+        const started = await startFirstBotTask(deps, context.actor, bot, input.firstTask).catch(
+          (error) => {
+            getLogger().error("first bot task start", error);
+            return false;
+          },
+        );
         if (!started) {
           await enqueueBotIntroRun(deps, context.actor, bot).catch((error) => {
             getLogger().error("bot intro run enqueue", error);
