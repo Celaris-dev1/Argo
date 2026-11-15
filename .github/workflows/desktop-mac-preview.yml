@@ -4,6 +4,11 @@ name: desktop-mac-preview
 # macOS asks testers to confirm the first launch, and the app does not auto-update.
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Pre-release tag such as argo-v1.2.3; empty keeps the DMG as an artifact only
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -11,6 +16,8 @@ permissions:
 jobs:
   build:
     runs-on: macos-26
+    permissions:
+      contents: write
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -42,3 +49,14 @@ jobs:
           path: apps/desktop/out/*.dmg
           if-no-files-found: error
           retention-days: 30
+      - name: Publish as a pre-release
+        if: inputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^argo-v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Tag must look like argo-v1.2.3" >&2; exit 1; }
+          gh release create "$TAG" apps/desktop/out/*.dmg --target "$GITHUB_SHA" --prerelease \
+            --title "Argo ${TAG#argo-}" \
+            --notes "Unsigned macOS preview. On first launch, open System Settings > Privacy & Security and choose Open Anyway."
