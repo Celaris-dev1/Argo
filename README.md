@@ -34,7 +34,6 @@ https://github.com/user-attachments/assets/dccdeddb-2134-4a56-8eed-b2e591736b1c
 
 - A morning brief, Telegram chat, and receipts showing every action a bot took
 - Shareable result links, per-app Allow / Ask / Block approvals, and bots that remember your corrections
-
 - Persistent bots with their own conversations, memory, routines, and history
 - Voice mode: speak replies, dictate, and call a bot. Bring your own ElevenLabs, OpenAI, Cartesia, or Fish Audio key, or use a Mac server's installed voices
 - Shared Team Computers and isolated Private computers
