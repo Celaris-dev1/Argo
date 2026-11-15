@@ -27,6 +27,11 @@ servers. Anonymous access is rate limited per IP address; set `KEENABLE_API_KEY`
 worker to send a key and lift those limits. Errors, per-bot disabled tools and the way back to
 the default work as described for Parallel.
 
+To try several backends in order, list them: `WEB_PROVIDER=keyless,keenable`. Search moves to
+the next backend when one fails or finds nothing (useful when a keyless engine rate-limits a
+server's address), and page fetches move on when one fails. Each listed backend's data-sharing
+notes above still apply.
+
 ## Self-hosted memory
 
 Supermemory and Honcho can run on your own network. In **Settings → Memory**, choose **Local**

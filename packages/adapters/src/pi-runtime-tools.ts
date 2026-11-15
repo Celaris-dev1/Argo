@@ -1,5 +1,3 @@
-import type { Agent, AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
-import type { Api, Model, Models } from "@earendil-works/pi-ai";
 import type {
   AdapterContext,
   AgentRunRequest,
@@ -11,6 +9,8 @@ import type {
 } from "@argo/adapter-kit";
 import { DEFAULT_CONTEXT_STRATEGY } from "@argo/adapter-kit";
 import { FLEET_TOOL_NAMES } from "@argo/contracts";
+import type { Agent, AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
+import type { Api, Model, Models } from "@earendil-works/pi-ai";
 import { isToolPauseResult } from "./approval-effect.js";
 import {
   connectionIdArgument,
@@ -157,6 +157,7 @@ export function describeToolActivity(toolName: string, args: unknown): string {
   if (toolName === "save_shared_memory") return `Saving shared memory: ${detail(record.path)}`;
   if (toolName === "web_search") return `Searching the web: ${detail(record.query)}`;
   if (toolName === "web_fetch") return `Reading page: ${detail(redactActivityUrl(record.url))}`;
+  if (toolName === "deep_research") return `Researching: ${detail(record.question)}`;
   if (toolName === "skill_read")
     return record.file
       ? `Reading ${detail(record.file)} from ${detail(record.name)}`

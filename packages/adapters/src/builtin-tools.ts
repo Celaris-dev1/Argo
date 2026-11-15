@@ -798,6 +798,54 @@ export const builtinAgentTools: ConnectorTool[] = [
     readOnly: true,
   },
   {
+    name: "deep_research",
+    description:
+      "Research a question in depth on the public web and return a cited report. Plans sub-questions, searches, reads many pages, chases gaps, checks claims, and writes the answer with numbered sources. Takes minutes, so use it only when the user asks for research, a deep dive, or a thorough comparison; use web_search for a quick fact. Does not need a computer. Present the returned report to the user as written.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        question: { type: "string", description: "The research request in the user's words." },
+        depth: {
+          type: "string",
+          enum: ["low", "high", "ultra"],
+          description:
+            "low (default): about 8 questions, 40 sources, a few minutes. high: about 3x, two rounds, claims need two sources. ultra: about 5x, three rounds, plus a sceptic pass for counter-evidence.",
+        },
+        questions: { type: "number", description: "Override: sub-questions to plan." },
+        sources: { type: "number", description: "Override: pages to read." },
+        rounds: { type: "number", description: "Override: search-and-read rounds (1-4)." },
+        verification: {
+          type: "string",
+          enum: ["none", "two-sources", "skeptic"],
+          description: "Override: how claims are checked.",
+        },
+        minutes: { type: "number", description: "Override: time budget in minutes." },
+        words: { type: "number", description: "Override: target report length in words." },
+        format: {
+          type: "string",
+          enum: ["report", "brief", "table"],
+          description: "Shape of the answer (default report).",
+        },
+        recencyDays: {
+          type: "number",
+          description: "Only use pages from roughly the last N days.",
+        },
+        includeDomains: {
+          type: "array",
+          items: { type: "string" },
+          description: 'Only read these sites, for example ["gov.uk"].',
+        },
+        excludeDomains: {
+          type: "array",
+          items: { type: "string" },
+          description: "Never read these sites.",
+        },
+      },
+      required: ["question"],
+    },
+    readOnly: true,
+  },
+  {
     name: "cloud_agent_launch",
     description:
       "Launch a remote cloud coding agent on a connected repository. Returns immediately with a tracking id and status; the agent link appears when launched. Opens a PR when openPr is true. Not the bot computer.",

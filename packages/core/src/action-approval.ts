@@ -61,6 +61,7 @@ const UNATTENDED_SAFE_BUILTIN_TOOLS = new Set([
   "browser_snapshot",
   "cloud_agent_status",
   "computer_observe",
+  "deep_research",
   "list_files",
   "list_fleet",
   "list_secrets",
