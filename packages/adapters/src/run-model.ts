@@ -528,13 +528,18 @@ export async function resolveRunModel(
       where: { id: "default" },
     }),
   ]);
+  const deploymentProvider = deps.deploymentModelConfigured
+    ? resolveDeploymentModel().provider
+    : undefined;
   const selected = selectConfiguredModel({
     override,
     overrideCredential,
     main,
-    hostedProvider: (await modelCreditBillingEnabled(deps))
-      ? resolveDeploymentModel().provider
-      : undefined,
+    // The operator's own model server needs no member connection, like a funded provider.
+    hostedProvider:
+      (await modelCreditBillingEnabled(deps)) || deploymentProvider === LOCAL_PROVIDER_ID
+        ? (deploymentProvider ?? resolveDeploymentModel().provider)
+        : undefined,
     defaults: {
       settings,
       deployment: deps.deploymentModelConfigured ? resolveDeploymentModel() : null,

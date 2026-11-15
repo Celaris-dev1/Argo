@@ -1,6 +1,7 @@
-import { getEnvApiKey } from "@earendil-works/pi-ai/compat";
 import type { ModelUsageLookup } from "@argo/adapter-kit";
+import { getEnvApiKey } from "@earendil-works/pi-ai/compat";
 import { OpenRouterUsageLookup } from "./openrouter-usage.js";
+import { LOCAL_PROVIDER_ID } from "./pi-local-provider.js";
 
 export const DEFAULT_OPENROUTER_MODEL_ID = "openai/gpt-6-luna";
 
@@ -50,11 +51,20 @@ export function resolveDeploymentModel(env: NodeJS.ProcessEnv = process.env) {
     env.PI_DEFAULT_CREDENTIALS?.trim() === "host" &&
     // Bedrock also resolves EC2 instance roles through IMDS at request time.
     (provider === "amazon-bedrock" || getEnvApiKey(provider) === HOST_CREDENTIALS);
+  // The operator's own model server (ARGO_LOCAL_MODELS) carries its own key, if any, so it is
+  // ready as the default once it serves the named model.
+  const localDefault =
+    provider === LOCAL_PROVIDER_ID &&
+    Boolean(explicitModel) &&
+    (env.ARGO_LOCAL_MODELS ?? "")
+      .split(",")
+      .map((id) => id.trim())
+      .includes(explicitModel!);
   return {
     provider,
     model: explicitModel || models[provider] || models.openrouter!,
     key,
-    configured: Boolean(key) || hostCredentials,
+    configured: Boolean(key) || hostCredentials || localDefault,
     hostCredentials,
   };
 }

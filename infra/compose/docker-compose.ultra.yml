@@ -40,14 +40,14 @@ services:
       - jit=off
 
   computer:
-    image: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-headless}
+    image: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-scout}
     pull_policy: never
 
   supervisor:
     mem_limit: 128m
     environment:
       NODE_OPTIONS: --max-old-space-size=96
-      ARGO_COMPUTER_IMAGE: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-headless}
+      ARGO_COMPUTER_IMAGE: ${ARGO_COMPUTER_IMAGE:-argo/computer}:${ARGO_COMPUTER_IMAGE_TAG:-scout}
       ARGO_COMPUTER_MEMORY: ${ARGO_COMPUTER_MEMORY:-512m}
       ARGO_COMPUTER_CPUS: ${ARGO_COMPUTER_CPUS:-0.8}
       ARGO_COMPUTER_PIDS_LIMIT: ${ARGO_COMPUTER_PIDS_LIMIT:-256}

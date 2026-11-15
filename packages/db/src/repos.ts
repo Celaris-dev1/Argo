@@ -1,11 +1,4 @@
-import type {
-  Actor,
-  Bot,
-  BotAvatarSet,
-  BotSection,
-  MessageBlock,
-  SpaceBot,
-} from "@argo/contracts";
+import type { Actor, Bot, BotAvatarSet, BotSection, MessageBlock, SpaceBot } from "@argo/contracts";
 import {
   canonicalPiProviderId,
   DEFAULT_NEW_BOT_AVATAR_SET,
@@ -25,7 +18,7 @@ import {
 import { chooseBotAvatar } from "./bot-avatar-choice.js";
 import type { Prisma, PrismaClient } from "./client.js";
 import type { ComputerMode } from "./computers.js";
-import { ensureComputerRecord, parseComputerMode } from "./computers.js";
+import { assertBotQuota, ensureComputerRecord, parseComputerMode } from "./computers.js";
 import { createThreadMessageInTransaction } from "./messages.js";
 import { withNewestThreadMessages } from "./preview-messages.js";
 import { BotSectionNameConflictError, IsolationError } from "./scope.js";
@@ -579,6 +572,7 @@ export function createRepos(
             spaceId: actor.spaceId,
             userId: actor.userId,
           });
+          await assertBotQuota(tx, actor.userId);
           const positions = await tx.bot.aggregate({
             where: { spaceId: actor.spaceId, userId: actor.userId },
             _max: { position: true },

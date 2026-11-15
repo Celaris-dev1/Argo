@@ -1,5 +1,8 @@
 export const APPEARANCE_PREFERENCES = ["system", "light", "dark"] as const;
 
+/** Used until the person picks an appearance. */
+export const DEFAULT_APPEARANCE_PREFERENCE = "dark" satisfies (typeof APPEARANCE_PREFERENCES)[number];
+
 export type AppearancePreference = (typeof APPEARANCE_PREFERENCES)[number];
 
 export type ResolvedAppearance = "light" | "dark";
@@ -297,7 +300,7 @@ export function isAppearancePreference(
 export function normalizeAppearancePreference(
   raw: string | null | undefined,
 ): AppearancePreference {
-  return isAppearancePreference(raw) ? raw : "system";
+  return isAppearancePreference(raw) ? raw : DEFAULT_APPEARANCE_PREFERENCE;
 }
 
 export type ResolveAppearancePreferenceOptions = {

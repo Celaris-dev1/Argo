@@ -1,10 +1,10 @@
-import { ORPCError } from "@orpc/server";
 import type { UsageOperationKind } from "@argo/adapter-kit";
 import { resolveBotWorkspacePath } from "@argo/adapters";
 import type { ExportManifest } from "@argo/contracts";
 import { attachmentMaxBytes, resolveBotAvatarSet } from "@argo/contracts";
 import { AttachmentValidationError } from "@argo/core";
 import { IsolationError, parseComputerMode } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import {
   ArtifactListCursorError,
   createOwnedArtifact,
@@ -16,7 +16,8 @@ import {
   listSpaceArtifacts,
 } from "../artifacts.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
-import { listSpaceRuns } from "../runs.js";
+import { shareRun, shareUrl, unshareRun } from "../run-shares.js";
+import { listRunActions, listSpaceRuns } from "../runs.js";
 import { querySpaceSearch } from "../search.js";
 import { loadAllMessages } from "../thread-message-pages.js";
 import type { RouterContext } from "./context.js";
@@ -266,6 +267,17 @@ export function contentRoutes(ctx: RouterContext) {
       list: authed.runs.list.handler(async ({ context, input }) => ({
         runs: await listSpaceRuns(deps.prisma, context.actor, input.filter),
       })),
+      actions: authed.runs.actions.handler(async ({ context, input }) => ({
+        actions: await listRunActions(deps.prisma, context.actor, input.runId),
+      })),
+      share: authed.runs.share.handler(async ({ context, input }) => {
+        const { id } = await shareRun(deps.prisma, context.actor, input.runId);
+        return { url: shareUrl(deps.env.webOrigin, id) };
+      }),
+      unshare: authed.runs.unshare.handler(async ({ context, input }) => {
+        await unshareRun(deps.prisma, context.actor, input.runId);
+        return { ok: true as const };
+      }),
     },
   };
 }

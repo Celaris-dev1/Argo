@@ -12,6 +12,7 @@ import { applyUiDirection } from "./lib/apply-ui-direction";
 import { clientUpdates } from "./lib/client-update";
 import { webLogoAvatarActivity } from "./lib/logo-avatar-activity";
 import { reportCaughtReactError } from "./lib/monitoring";
+import { capturePendingTask } from "./lib/pending-task";
 import { markAfterPaint, markOnce } from "./lib/performance";
 import { installPreloadRecovery } from "./lib/preload-recovery";
 import { queryClient } from "./lib/query";
@@ -56,6 +57,7 @@ function AppearanceSync() {
   return null;
 }
 
+capturePendingTask();
 createRoot(document.getElementById("root")!, { onCaughtError: reportCaughtReactError }).render(
   <StrictMode>
     <PerformanceProbe />

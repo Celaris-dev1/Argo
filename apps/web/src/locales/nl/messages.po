@@ -665,6 +665,10 @@ msgstr "Alle tijd"
 msgid "Allow"
 msgstr "Toestaan"
 
+#: src/lib/dictation.ts
+msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
+msgstr ""
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Allow cross-space bot communication"
 msgstr "Communicatie tussen bots in verschillende ruimtes toestaan"
@@ -676,10 +680,6 @@ msgstr ""
 #: src/components/AskCard.tsx
 msgid "Allow once"
 msgstr "Een keer toestaan"
-
-#: src/lib/dictation.ts
-msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
-msgstr ""
 
 #: src/components/ApprovalRulePreview.tsx
 msgid "Allow rule"
@@ -860,6 +860,19 @@ msgstr "gearchiveerd"
 msgid "Archived"
 msgstr "Gearchiveerd"
 
+#: src/pages/shell/avatar-studio-popover.tsx
+msgid "Argo"
+msgstr "Argo"
+
+#: src/components/ModelCredits.tsx
+#: src/pages/Onboarding.tsx
+msgid "Argo credits"
+msgstr ""
+
+#: src/pages/memory-providers/HonchoSettingsForm.tsx
+msgid "argo-shared and IDs starting with bot- are reserved for Argo."
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "Argumenten"
@@ -970,6 +983,7 @@ msgstr "Avatarstudio"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/create-bot-dialog.tsx
 msgid "Back"
 msgstr "Terug"
 
@@ -1009,6 +1023,7 @@ msgid "Block rule"
 msgstr "Blokkeerregel"
 
 #: src/lib/ticket-status.ts
+#: src/pages/ActivityList.tsx
 msgid "Blocked"
 msgstr "Geblokkeerd"
 
@@ -1428,6 +1443,15 @@ msgctxt "email sign-in"
 msgid "Code"
 msgstr "Code"
 
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Collapse {0}"
@@ -1679,6 +1703,7 @@ msgstr "Contextlimiet"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/integrations/IntegrationSetup.tsx
 #: src/components/SignupSurvey.tsx
+#: src/components/TermsGate.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/shell/agent-import.tsx
@@ -1948,6 +1973,10 @@ msgid "Could not load"
 msgstr "Laden mislukt"
 
 #: src/pages/ActivityList.tsx
+msgid "Could not load actions"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
 msgid "Could not load activity"
 msgstr "Activiteit laden mislukt"
 
@@ -2010,6 +2039,10 @@ msgstr "Deze chat laden mislukt."
 msgid "Could not load this file."
 msgstr "Dit bestand laden mislukt."
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "Steminstellingen laden mislukt"
@@ -2024,6 +2057,10 @@ msgstr "Uitloggen mislukt. Probeer het opnieuw."
 #: src/pages/Paywall.tsx
 msgid "Could not open billing"
 msgstr "Facturatie openen mislukt"
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
 
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not play a test clip"
@@ -2181,6 +2218,10 @@ msgstr "Herstellingsmail versturen mislukt"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "Versturen mislukt"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3036,6 +3077,10 @@ msgstr "Krijg een gratis maand voor elke vriend die een proefperiode start."
 msgid "Get the mobile app"
 msgstr "De mobiele app downloaden"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr ""
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr "Aan het voorbereiden"
@@ -3175,6 +3220,10 @@ msgstr "Hoe te controleren"
 #: src/components/SignupSurvey.tsx
 msgid "How will you use Argo?"
 msgstr ""
+
+#: src/components/TermsGate.tsx
+msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
+msgstr "Ik ben 18 jaar of ouder en ga akkoord met de <0>Gebruiksvoorwaarden</0>."
 
 #: src/pages/shell/computer-release-actions.tsx
 msgid "I’m done"
@@ -3411,6 +3460,10 @@ msgstr "Linear-issue"
 msgid "Link"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "DM’s koppelen"
@@ -3451,6 +3504,11 @@ msgstr "Oudere runs laden"
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Load web images automatically"
 msgstr "Webafbeeldingen automatisch laden"
+
+#: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
+msgid "Loading"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Loading activity…"
@@ -3790,6 +3848,10 @@ msgstr "Model-id"
 msgid "Model options"
 msgstr "Modelopties"
 
+#: src/pages/shell/composer.tsx
+msgid "Model: {modelName}"
+msgstr ""
+
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/settings-nav.ts
 #: src/pages/SpaceSettingOverrides.tsx
@@ -4094,6 +4156,10 @@ msgstr ""
 msgid "No tickets yet"
 msgstr "Nog geen tickets"
 
+#: src/pages/ActivityList.tsx
+msgid "No tools used."
+msgstr ""
+
 #: src/pages/RoutineEditor.tsx
 msgid "No trigger"
 msgstr "Geen trigger"
@@ -4186,12 +4252,6 @@ msgstr "OAuth verlopen"
 msgid "Offline"
 msgstr ""
 
-#: src/pages/model-settings/connection-controls.tsx
-#: src/pages/Onboarding.tsx
-msgid "Ollama API key"
-msgstr ""
-
-#: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 msgid "Ollama Cloud"
 msgstr ""
@@ -4557,19 +4617,6 @@ msgstr "Pull request"
 msgid "Queued"
 msgstr "In wachtrij"
 
-#: src/pages/shell/avatar-studio-popover.tsx
-msgid "Argo"
-msgstr "Argo"
-
-#: src/components/ModelCredits.tsx
-#: src/pages/Onboarding.tsx
-msgid "Argo credits"
-msgstr ""
-
-#: src/pages/memory-providers/HonchoSettingsForm.tsx
-msgid "argo-shared and IDs starting with bot- are reserved for Argo."
-msgstr ""
-
 #: src/pages/shell/message-hover-actions.tsx
 msgid "React"
 msgstr "Reageren"
@@ -4871,6 +4918,11 @@ msgstr "Vraag een nieuwe code aan"
 msgid "Requests"
 msgstr ""
 
+#: src/pages/model-settings/connection-controls.tsx
+#: src/pages/Onboarding.tsx
+msgid "Required API key"
+msgstr ""
+
 #: src/pages/shell/message-cards.tsx
 msgid "Research & writing"
 msgstr "Onderzoek & schrijven"
@@ -4958,15 +5010,15 @@ msgstr "Nu opnieuw proberen"
 msgid "Retry screen"
 msgstr "Scherm opnieuw proberen"
 
-#. placeholder {0}: call.botName
-#: src/components/call/CallCard.tsx
-msgid "Return to call with {0}"
-msgstr "Terug naar het gesprek met {0}"
-
 #: src/pages/McpOAuthCallback.tsx
 #: src/pages/SlackInstallCallback.tsx
 msgid "Return to Argo"
 msgstr "Terug naar Argo"
+
+#. placeholder {0}: call.botName
+#: src/components/call/CallCard.tsx
+msgid "Return to call with {0}"
+msgstr "Terug naar het gesprek met {0}"
 
 #: src/lib/model-connection-preflight.ts
 msgid "Review provider settings and test again."
@@ -5314,6 +5366,10 @@ msgstr "Vorm"
 msgid "Shape {0}"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5540,6 +5596,10 @@ msgstr "Spraakmodel"
 msgid "SSO is temporarily unavailable. Try again."
 msgstr "SSO is tijdelijk niet beschikbaar. Probeer het opnieuw."
 
+#: src/pages/SharedRun.tsx
+msgid "Star on GitHub"
+msgstr ""
+
 #: src/pages/shell/computer-overlay.tsx
 msgid "Start"
 msgstr ""
@@ -5582,6 +5642,10 @@ msgstr "Stoppen"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
 msgstr ""
 
 #: src/pages/shell/message-view.tsx
@@ -5701,6 +5765,10 @@ msgstr "Teams-bericht"
 #: src/pages/RoutineEditor.tsx
 msgid "Teams not enabled"
 msgstr "Teams is niet ingeschakeld"
+
+#: src/components/TermsGate.tsx
+msgid "Terms of Use"
+msgstr "Gebruiksvoorwaarden"
 
 #: src/components/teach/SkillDraftCard.tsx
 msgid "Test"
@@ -5871,6 +5939,10 @@ msgstr "Dit bestand is geen geldige UTF-8-tekst."
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "Deze import is al gebruikt. Kies de bestanden opnieuw."
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr ""
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"
@@ -6194,6 +6266,10 @@ msgstr "Gebruik {oauthEnvReference} voor het toegangstoken."
 msgid "Use a found model"
 msgstr "Een gevonden model gebruiken"
 
+#: src/components/ModelCredits.tsx
+msgid "Use Argo credits"
+msgstr ""
+
 #: src/lib/model-connection-preflight.ts
 msgid "Use Connect to verify the key."
 msgstr "Gebruik Verbinden om de sleutel te verifiëren."
@@ -6221,10 +6297,6 @@ msgstr ""
 #: src/components/teach/TeachRecordingChrome.tsx
 msgid "Use Protected input for passwords."
 msgstr "Gebruik Beveiligde invoer voor wachtwoorden."
-
-#: src/components/ModelCredits.tsx
-msgid "Use Argo credits"
-msgstr ""
 
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "Use space default"
@@ -6374,6 +6446,14 @@ msgstr ""
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
 msgstr "Waarmee wil je dat ik begin?"
+
+#: src/pages/ActivityList.tsx
+msgid "What it did"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "What kind of bot?"
+msgstr ""
 
 #: src/components/teach/TeachComputerOverlay.tsx
 msgid "What result will you demonstrate?"
@@ -6530,21 +6610,3 @@ msgstr "Je spraakaanbieder heeft geen tegoed meer."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Je spraakaanbieder heeft de sleutel geweigerd."
-
-#: src/pages/shell/composer.tsx
-#: src/pages/shell/computer-overlay.tsx
-msgid "Coding"
-msgstr ""
-
-#: src/pages/shell/composer.tsx
-msgid "Coding mode"
-msgstr ""
-
-#: src/pages/Shell.tsx
-msgid "Could not open coding mode"
-msgstr ""
-
-#: src/pages/Onboarding.tsx
-#: src/pages/model-settings/connection-controls.tsx
-msgid "Required API key"
-msgstr ""

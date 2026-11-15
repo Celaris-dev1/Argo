@@ -1003,7 +1003,10 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           .filter(Boolean)
           .join("\n\n");
         const graphical =
-          computerKind !== "desktop" && deps.sandbox.describe().capabilities.graphical;
+          computerKind !== "desktop" &&
+          // A run that never uses its computer must not fail on the per-person lookup.
+          ((await deps.sandbox.graphicalFor?.(context).catch(() => undefined)) ??
+            deps.sandbox.describe().capabilities.graphical);
         // Gate on the pair written to the run row above; re-deriving it would drop the
         // deployment fallback and gate a vision-capable default as text-only.
         const modelSeesImages = modelAcceptsImageInput(
@@ -1061,8 +1064,9 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const callClientNonceForRun = callEndRun ? run.clientNonce : sourceClientNonce;
         const voiceCall = callEndRun || isCallClientNonce(sourceClientNonce);
         const graphicalToolsAllowed = graphical && acceptsImages && !heldForTakeover;
+        // A headless computer has no screen but still runs the page browser.
         const pageBrowserAllowed =
-          graphical && browser.describe().capabilities.page && !heldForTakeover;
+          computerKind !== "desktop" && browser.describe().capabilities.page && !heldForTakeover;
         // Small models get a core tool set (ARGO_SMALL_MODELS); everyone else keeps the bot's list.
         const runDisabledBuiltinTools = withSmallModelDisabledTools(
           bot.disabledBuiltinTools,

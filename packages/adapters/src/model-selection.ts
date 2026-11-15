@@ -9,6 +9,7 @@ import {
 import type { PrismaClient } from "@argo/db";
 import { chooseModelCredential, findModelCredential, findModelCredentialById } from "@argo/db";
 import { resolveDeploymentModel } from "./deployment-model.js";
+import { LOCAL_PROVIDER_ID } from "./pi-local-provider.js";
 import { modelCredentialDto } from "./model-connect.js";
 import type { ModelCredentialAuthKind } from "./pi-catalog-availability.js";
 import {
@@ -554,9 +555,13 @@ export async function validateBotModelChange(
   const { provider, model } = input;
   const changing = provider !== input.current?.provider || model !== input.current?.model;
   if (changing && provider && model) {
+    const deployment = resolveDeploymentModel();
+    const operatorServed =
+      provider === LOCAL_PROVIDER_ID && deployment.configured && deployment.provider === provider;
     const hosted =
-      deps.hostedProvider === provider &&
-      (await hasHostedModelCredits(deps.prisma, scope, provider));
+      operatorServed ||
+      (deps.hostedProvider === provider &&
+        (await hasHostedModelCredits(deps.prisma, scope, provider)));
     const credential = hosted
       ? null
       : await findConnectedModelCredential(deps.prisma, deps.secretStore, scope, provider, model);

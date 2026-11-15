@@ -129,6 +129,7 @@ export interface RouterDeps {
     deploymentModelHostCredentials?: boolean;
     webOrigin: string;
     privacyPolicyUrl?: string;
+    termsOfUse?: { url: string; version: string };
     screenProxySecret: string;
     sandboxProvider: string;
     gitSha?: string;

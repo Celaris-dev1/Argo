@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { AiDataUse, AiRecipient } from "@argo/contracts";
-import { localBaseUrl } from "./pi-local-provider.js";
+import { localBaseUrl, localModelsName } from "./pi-local-provider.js";
 import { listPiCatalog } from "./pi-models.js";
 import { voiceCatalogEntry } from "./voice-factory.js";
 
@@ -28,7 +28,9 @@ export function aiRecipient(input: {
 }): Omit<AiRecipient, "allowed"> | null {
   if (input.provider === "scripted") return null;
   const endpoint = input.baseUrl ?? (input.provider === "local" ? localBaseUrl() : undefined);
-  const origin = endpoint ? new URL(endpoint).origin : undefined;
+  // A named deployment endpoint is disclosed by the name its operator gave it.
+  const named = input.provider === "local" && !input.baseUrl && localModelsName();
+  const origin = endpoint && !named ? new URL(endpoint).origin : undefined;
   const name = recipientName(input.provider, input.use);
   // Bind custom connections to the full endpoint without exposing private URL components.
   const key = createHash("sha256")

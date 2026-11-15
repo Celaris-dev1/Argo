@@ -260,6 +260,9 @@ function SpaceShell() {
     inGroup || routeChat?.groupId
       ? undefined
       : (bots.find((b) => b.id === (botId ?? routeChat?.botId)) ?? bots[0]);
+  const meQuery = useQuery(queries.me.queryOptions());
+  // What the composer names as running: the bot's own model, else the space default.
+  const activeModelId = active?.modelId ?? meQuery.data?.defaultModel ?? undefined;
   const userBubble = useMemo(
     () => (active ? chatUserBubbleColors(active.color, active.id) : undefined),
     [active?.color, active?.id],
@@ -998,6 +1001,7 @@ function SpaceShell() {
               sendError={sendError}
               imageConfirmation={composer.imageConfirmation}
               onDraftEdited={composer.clearImageConfirmation}
+              modelName={inGroup ? undefined : activeModelId}
               onOpenModels={() => {
                 // A group's failed run belongs to one member; change that bot's model.
                 const failedBotId =

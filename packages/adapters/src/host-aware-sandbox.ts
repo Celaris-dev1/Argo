@@ -101,6 +101,13 @@ export class HostAwareSandbox implements SandboxProvider {
     return this.isolated.describe();
   }
 
+  async graphicalFor(context: AdapterContext) {
+    return (
+      (await this.isolated.graphicalFor?.(context)) ??
+      this.isolated.describe().capabilities.graphical
+    );
+  }
+
   private route(computer: Pick<ComputerRef, "kind">) {
     return computer.kind === "desktop" ? this.host : this.isolated;
   }

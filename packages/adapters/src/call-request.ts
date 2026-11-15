@@ -11,11 +11,7 @@ import {
   phoneCallSettings,
 } from "@argo/core";
 import type { Prisma, PrismaClient, ThreadEvents } from "@argo/db";
-import {
-  appendEventInTransaction,
-  createThreadMessageInTransaction,
-  runAsSystem,
-} from "@argo/db";
+import { appendEventInTransaction, createThreadMessageInTransaction, runAsSystem } from "@argo/db";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { isUniqueViolation, publishMessage, runLeaseFor } from "./run-messages.js";
 
@@ -160,8 +156,12 @@ export async function requestUserCall(
   },
   run: { id: string; spaceId: string; userId: string; threadId: string; botId: string },
   input: { reason: string; opening: string },
+  options: { unattended?: boolean } = {},
 ) {
   if (!deps.phoneCallsEnabled) return { error: "Calls are disabled." };
+  if (options.unattended && (await inQuietHours(deps.prisma, run.userId))) {
+    return { error: "It is the user's quiet hours (22:00-07:00). Send a message instead." };
+  }
   const request = newCallRequest({ ...input, phoneCallRingSeconds: deps.phoneCallRingSeconds });
   if ("error" in request) return request;
   // The call cooldown is per person across all their Spaces; every other read and
@@ -349,4 +349,28 @@ export async function endCallFromTool(
       ? "The call is already closed and now carries your title. The user is reading, not listening: finish any remaining work as a normal chat reply with full formatting."
       : "Call ended and your farewell was spoken. The user is now reading, not listening: finish any remaining work as a normal chat reply with full formatting.",
   };
+}
+
+/** Unattended runs never ring between 22:00 and 07:00 in the user's timezone (UTC when unset). */
+export async function inQuietHours(
+  prisma: PrismaClient,
+  userId: string,
+  now: Date = new Date(),
+): Promise<boolean> {
+  const user = await runAsSystem("read the user's timezone for quiet hours", () =>
+    prisma.user.findUnique({ where: { id: userId }, select: { timezone: true } }),
+  );
+  return isQuietHour(now, user?.timezone ?? "UTC");
+}
+
+export function isQuietHour(now: Date, timeZone: string): boolean {
+  let hour: number;
+  try {
+    hour = Number(
+      new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", hourCycle: "h23" }).format(now),
+    );
+  } catch {
+    hour = now.getUTCHours();
+  }
+  return hour >= 22 || hour < 7;
 }

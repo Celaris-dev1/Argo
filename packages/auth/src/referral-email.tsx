@@ -25,7 +25,7 @@ export function referralEmail(
       <Text>Have any questions? Just reply to this email.</Text>
       <Text>
         If you're enjoying Argo,{" "}
-        <Link href="https://github.com/elie222/rakazo" style={linkStyle}>
+        <Link href="https://github.com/celaris-dev1/argo" style={linkStyle}>
           give us a star on GitHub
         </Link>
         .

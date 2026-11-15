@@ -16,6 +16,7 @@ import {
   showNarrationStatus,
 } from "./run-progress.js";
 import type { ToolHandlers } from "./run-tool-gate.js";
+import { callableTrigger } from "./run-tool-selection.js";
 import {
   clampUserProgressMessage,
   isProgressMessageTruncated,
@@ -31,15 +32,17 @@ export const messagingTools: ToolHandlers = {
       ctx.source.messagingChannelRun ||
       thread.groupId ||
       ctx.source.voiceCall ||
-      isBackgroundRunTrigger(run.trigger)
+      !callableTrigger(run.trigger)
     ) {
       return call.finish({ error: "Calls require a one-to-one chat." });
     }
     return call.finish(
-      await requestUserCall(deps, run, {
-        reason: String(args.reason ?? ""),
-        opening: String(args.opening ?? ""),
-      }),
+      await requestUserCall(
+        deps,
+        run,
+        { reason: String(args.reason ?? ""), opening: String(args.opening ?? "") },
+        { unattended: isBackgroundRunTrigger(run.trigger) },
+      ),
     );
   },
   async end_call(ctx, call) {

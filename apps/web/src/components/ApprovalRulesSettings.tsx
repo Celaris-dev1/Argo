@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   ActionApprovalRule,
   ActionAutoReviewSettings,
@@ -8,6 +7,7 @@ import type {
 import { humanizeToolName } from "@argo/core";
 import { writeSaved } from "@argo/core/query";
 import { Button, ToggleGroup, ToggleGroupItem } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSpaceQueries } from "../lib/query";
@@ -28,6 +28,7 @@ export function ApprovalRulesSettings({ scope }: { scope: SettingsScope }) {
   const input = { scope };
   const rulesQuery = useQuery(queries.approvalRules.list.queryOptions({ input }));
   const autoReviewQuery = useQuery(queries.autoReview.get.queryOptions({ input }));
+  const connectionsQuery = useQuery(queries.connections.list.queryOptions());
   const rules = rulesQuery.data ?? [];
   const autoReview = autoReviewQuery.data ?? null;
   const loading = rulesQuery.isPending || autoReviewQuery.isPending;
@@ -86,6 +87,31 @@ export function ApprovalRulesSettings({ scope }: { scope: SettingsScope }) {
       });
       // Saving replaces the rule's other effect on the same match.
       await setRules((current) => [...current.filter((other) => other.id !== rule.id), saved]);
+    }, t`Could not save rule`);
+
+  // Connected apps without their own rule yet, so each can be set to Allow or Block in one tap.
+  const ruledApps = new Set(
+    rules
+      .filter((rule) => rule.matchKind === "connector")
+      .map((rule) => rule.matchValue.toLowerCase()),
+  );
+  const unruledApps = [
+    ...new Set(
+      (connectionsQuery.data ?? [])
+        .filter((connection) => connection.status === "connected")
+        .map((connection) => connection.provider.toLowerCase()),
+    ),
+  ].filter((provider) => !ruledApps.has(provider));
+
+  const setAppEffect = (provider: string, effect: "always_allow" | "deny") =>
+    save(async () => {
+      const saved = await rpc.approvalRules.set({
+        scope,
+        effect,
+        matchKind: "connector",
+        matchValue: provider,
+      });
+      await setRules((current) => [...current, saved]);
     }, t`Could not save rule`);
 
   const removeRule = (rule: ActionApprovalRule) =>
@@ -199,6 +225,39 @@ export function ApprovalRulesSettings({ scope }: { scope: SettingsScope }) {
                 />
               ) : null}
             </div>
+          ))}
+        </SettingsGroup>
+      ) : null}
+      {unruledApps.length > 0 ? (
+        <SettingsGroup data-testid="approval-apps">
+          {unruledApps.map((provider) => (
+            <SettingsRow
+              key={provider}
+              label={humanizeToolName(provider)}
+              control={
+                <ToggleGroup
+                  aria-label={humanizeToolName(provider)}
+                  value={["ask"]}
+                  onValueChange={([next]) => {
+                    if (next === "always_allow" || next === "deny")
+                      void setAppEffect(provider, next);
+                  }}
+                  disabled={saving}
+                  spacing={1}
+                  className={segmented}
+                >
+                  <ToggleGroupItem value="always_allow" className={segment}>
+                    <Trans>Allow</Trans>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="ask" className={segment}>
+                    <Trans>Ask</Trans>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="deny" className={segment}>
+                    <Trans>Block</Trans>
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              }
+            />
           ))}
         </SettingsGroup>
       ) : null}

@@ -1,6 +1,7 @@
 import type { ConnectorRegistry } from "@argo/adapters";
 import type { Actor, MessageBlock } from "@argo/contracts";
 import {
+  ACTIVE_RUN_STATUSES,
   appConnectCard,
   connectedAppBlocks,
   matchAppCatalog,
@@ -13,6 +14,7 @@ import {
   IsolationError,
 } from "@argo/db";
 import { requireBotThread } from "./bot-thread.js";
+import { nextRoutineDate } from "./routines.js";
 import { resolveThreadTarget } from "./thread-target.js";
 
 /**
@@ -113,7 +115,121 @@ function messageHasChoiceOrAsk(blocks: MessageBlock[]): boolean {
 }
 
 function messageHasPendingChoice(blocks: MessageBlock[]): boolean {
-  return blocks.some((block) => block.kind === "choice" && !block.answerId);
+  return blocks.some(
+    (block) => block.kind === "choice" && !block.answerId && !isMorningBriefChoice(block),
+  );
+}
+
+const MORNING_BRIEF_YES = "morning-brief";
+const MORNING_BRIEF_NO = "morning-brief-skip";
+const MORNING_BRIEF_NAME = "Morning brief";
+const MORNING_BRIEF_CRON = "0 7 * * *";
+const MORNING_BRIEF_PROMPT =
+  "Morning brief. Go through my connected apps (email, calendar, files) and give me a short list of what needs me today: meetings, deadlines and the emails that matter. Draft replies to the two most important emails and save them as drafts. End with one thing you could take off my plate today. Do not send, post or change anything without asking me first.";
+
+function isMorningBriefChoice(block: MessageBlock): boolean {
+  return block.kind === "choice" && (block.options ?? []).some((o) => o.id === MORNING_BRIEF_YES);
+}
+
+export function isMorningBriefOption(optionId: string): boolean {
+  return optionId === MORNING_BRIEF_YES || optionId === MORNING_BRIEF_NO;
+}
+
+/** Offers, once per bot, to repeat the app brief every morning. */
+export async function offerMorningBrief(
+  deps: OnboardingDeps,
+  actor: Actor,
+  botId: string,
+): Promise<void> {
+  const { bot, thread } = await requireBotThread(deps, actor, botId);
+  const [offered, existing] = await Promise.all([
+    deps.prisma.message.findMany({
+      where: { threadId: thread.id, role: "bot" },
+      select: { blocks: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
+    deps.prisma.routine.count({ where: { botId: bot.id, name: MORNING_BRIEF_NAME } }),
+  ]);
+  if (existing > 0) return;
+  if (offered.some((m) => (m.blocks as MessageBlock[]).some(isMorningBriefChoice))) return;
+  await post(deps, { spaceId: actor.spaceId, botId: bot.id, threadId: thread.id }, [
+    {
+      kind: "choice",
+      question: "Get a brief like this every morning at 7?",
+      options: [
+        { id: MORNING_BRIEF_YES, letter: "A", label: "Every morning" },
+        { id: MORNING_BRIEF_NO, letter: "B", label: "Not now" },
+      ],
+    },
+  ]);
+}
+
+/**
+ * Records the answer and, on yes, schedules the brief at 7:00 in the person's own timezone.
+ * Returns the new routine so the caller can schedule its first wakeup.
+ */
+export async function answerMorningBrief(
+  deps: OnboardingDeps,
+  actor: Actor,
+  botId: string,
+  optionId: string,
+) {
+  const { bot, thread } = await requireBotThread(deps, actor, botId);
+  const target = { spaceId: actor.spaceId, botId: bot.id, threadId: thread.id };
+  let routine: Awaited<ReturnType<PrismaClient["routine"]["create"]>> | undefined;
+  const claimed = await deps.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    await tx.$executeRaw`SELECT id FROM threads WHERE id = ${thread.id} FOR UPDATE`;
+    const recent = await tx.message.findMany({
+      where: { threadId: thread.id, role: "bot" },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    const pending = recent.find((message) =>
+      (message.blocks as MessageBlock[]).some(
+        (block) => isMorningBriefChoice(block) && block.kind === "choice" && !block.answerId,
+      ),
+    );
+    if (!pending) return null;
+    const blocks = (pending.blocks as MessageBlock[]).map((block) =>
+      isMorningBriefChoice(block) ? { ...block, answerId: optionId } : block,
+    );
+    await tx.message.update({ where: { id: pending.id }, data: { blocks } });
+    if (optionId === MORNING_BRIEF_YES) {
+      const user = await tx.user.findUnique({
+        where: { id: actor.userId },
+        select: { timezone: true },
+      });
+      const timezone = user?.timezone || "UTC";
+      routine = await tx.routine.create({
+        data: {
+          spaceId: actor.spaceId,
+          botId: bot.id,
+          userId: actor.userId,
+          name: MORNING_BRIEF_NAME,
+          prompt: MORNING_BRIEF_PROMPT,
+          crons: [MORNING_BRIEF_CRON],
+          timezone,
+          notify: true,
+          active: true,
+          nextRunAt: nextRoutineDate([MORNING_BRIEF_CRON], timezone),
+        },
+      });
+    }
+    const event = await appendEventInTransaction(tx, {
+      spaceId: target.spaceId,
+      threadId: target.threadId,
+      botId: target.botId,
+      type: "thread.message.updated",
+      payload: { messageId: pending.id, role: "bot", blocks },
+    });
+    return event;
+  });
+  if (!claimed) return undefined;
+  await deps.events.notify(target.threadId, claimed.seq);
+  if (routine)
+    await post(deps, target, [{ kind: "text", text: "Done. Your first one arrives at 7." }], false);
+  return routine && { routine, bot: { id: bot.id, thread: { id: thread.id } } };
 }
 
 export async function promptFocus(
@@ -258,27 +374,7 @@ export async function chooseFocus(
     false,
   );
 
-  const providers = deps.connectors.managedProviders();
-  const catalog = (
-    await Promise.all(
-      providers.map((provider) =>
-        provider
-          .catalog({
-            operationId: "onboarding.choose",
-            traceId: "onboarding.choose",
-            spaceId: actor.spaceId,
-            userId: actor.userId,
-            botId: bot.id,
-            signal: AbortSignal.timeout(15_000),
-          })
-          .catch(() => []),
-      ),
-    )
-  ).flat();
-  const cards: MessageBlock[] = option.apps.flatMap((slug) => {
-    const entry = matchAppCatalog(catalog, slug);
-    return entry ? [appConnectCard(entry)] : [];
-  });
+  const cards = await appCards(deps, actor, bot.id, option.apps, "onboarding.choose");
   if (!cards.length) {
     await post(deps, target, [{ kind: "text", text: "What would you like to work on first?" }]);
     return;
@@ -302,6 +398,68 @@ export async function chooseFocus(
   ]);
 }
 
+/** Connect cards for the apps the catalog has. */
+async function appCards(
+  deps: OnboardingDeps,
+  actor: Actor,
+  botId: string,
+  apps: readonly string[],
+  operationId: string,
+): Promise<MessageBlock[]> {
+  const catalog = (
+    await Promise.all(
+      deps.connectors.managedProviders().map((provider) =>
+        provider
+          .catalog({
+            operationId,
+            traceId: operationId,
+            spaceId: actor.spaceId,
+            userId: actor.userId,
+            botId,
+            signal: AbortSignal.timeout(15_000),
+          })
+          .catch(() => []),
+      ),
+    )
+  ).flat();
+  return apps.flatMap((slug) => {
+    const entry = matchAppCatalog(catalog, slug);
+    return entry ? [appConnectCard(entry)] : [];
+  });
+}
+
+/**
+ * Offers the deployment's apps under a new person's first bot, so it can go through them
+ * as soon as each one is connected. Does nothing when no listed app is available.
+ */
+export async function offerFirstApps(
+  deps: OnboardingDeps,
+  actor: Actor,
+  botId: string,
+  apps = firstBotApps(),
+): Promise<void> {
+  if (!apps.length) return;
+  const { bot, thread } = await requireBotThread(deps, actor, botId);
+  const cards = (await appCards(deps, actor, bot.id, apps, "onboarding.firstApps")).filter(
+    (card) => card.kind === "app_connect" && card.status !== "connected",
+  );
+  if (!cards.length) return;
+  const target = { spaceId: actor.spaceId, botId: bot.id, threadId: thread.id };
+  await post(deps, target, [
+    { kind: "text", text: "Connect these and I’ll go through them for you." },
+    ...cards,
+  ]);
+}
+
+/** The apps a deployment offers new people, from `ARGO_FIRST_BOT_APPS` (comma separated). */
+export function firstBotApps(value = process.env.ARGO_FIRST_BOT_APPS): string[] {
+  return (value ?? "")
+    .split(",")
+    .map((app) => app.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
 export async function markAppConnected(
   deps: OnboardingDeps,
   actor: Actor,
@@ -310,7 +468,7 @@ export async function markAppConnected(
   connectorId = "composio",
   threadId?: string,
   messageId?: string,
-): Promise<void> {
+): Promise<{ name: string; threadId: string } | undefined> {
   const { bot, thread: ownThread } = await requireBotThread(deps, actor, botId);
   let thread = ownThread;
   if (threadId && threadId !== ownThread.id) {
@@ -323,7 +481,7 @@ export async function markAppConnected(
     thread = { ...ownThread, id: target.threadId };
   }
   const providerAdapter = deps.connectors.managed(connectorId);
-  if (!providerAdapter) return;
+  if (!providerAdapter) return undefined;
   const catalog = await providerAdapter.catalog(
     {
       operationId: "onboarding.appConnected",
@@ -339,7 +497,7 @@ export async function markAppConnected(
     catalog.filter((item) => item.connectorId === connectorId),
     provider,
   );
-  if (!entry?.connected) return;
+  if (!entry?.connected) return undefined;
   const target = { spaceId: actor.spaceId, botId: bot.id, threadId: thread.id };
   const updates = await deps.prisma.$transaction(async (tx) => {
     // Two authorizations may finish together on an onboarding message with multiple cards.
@@ -386,6 +544,41 @@ export async function markAppConnected(
     return events;
   });
   for (const event of updates) await deps.events.notify(thread.id, event.seq);
+  // Only a card that just turned connected counts, so a repeat call never starts a second job.
+  return updates.length ? { name: entry.name, threadId: thread.id } : undefined;
+}
+
+/**
+ * The deployment's task for a bot right after its person connects an app, with `{app}` replaced
+ * by the app's name. Unset means the bot waits for the person, as before.
+ */
+export function appConnectedTask(
+  app: string,
+  template = process.env.ARGO_APP_CONNECTED_TASK,
+): string | undefined {
+  const task = template?.trim();
+  return task ? task.replaceAll("{app}", app) : undefined;
+}
+
+/**
+ * Whether the bot is still working on its opening demo and nothing else, so a newly connected
+ * app can take over instead of queueing behind it.
+ */
+export async function onlyFirstTaskRunning(
+  prisma: Pick<PrismaClient, "message" | "run">,
+  botId: string,
+  threadId: string,
+): Promise<boolean> {
+  const first = await prisma.message.findUnique({
+    where: { threadId_clientNonce: { threadId, clientNonce: `first-task:${botId}` } },
+    select: { runId: true },
+  });
+  if (!first?.runId) return false;
+  const active = await prisma.run.findMany({
+    where: { threadId, status: { in: [...ACTIVE_RUN_STATUSES] } },
+    select: { id: true },
+  });
+  return active.length === 1 && active[0]?.id === first.runId;
 }
 
 function capitalize(value: string): string {

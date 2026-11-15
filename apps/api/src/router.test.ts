@@ -1,9 +1,6 @@
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import type { InferRouterInitialContext } from "@orpc/server";
-import { createRouterClient } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
 import type { ManagedConnectorProvider } from "@argo/adapter-kit";
 import { ConnectorAuthUnavailableError, SecretStoreUnavailableError } from "@argo/adapter-kit";
 import type { McpOAuthSummary } from "@argo/adapters";
@@ -31,11 +28,15 @@ import {
   MCP_OAUTH_CLIENT_REQUIRED,
   MODEL_KEY_FORMAT_ERROR,
   REPLY_QUOTE_MAX_LENGTH,
+  TERMS_REQUIRED,
 } from "@argo/contracts";
 import { openScreenCapability } from "@argo/core/node/screen-capability";
 import type { PrismaClient } from "@argo/db";
 import { AnswerTooLongError, runProviderTransaction } from "@argo/db";
 import { createLogger, createTestSink, installLogger } from "@argo/logging";
+import type { InferRouterInitialContext } from "@orpc/server";
+import { createRouterClient } from "@orpc/server";
+import { RPCHandler } from "@orpc/server/fetch";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mainRole, withModelRoles } from "../../../packages/adapters/src/testing/model-roles.js";
 import type { RouterDeps } from "./router.js";
@@ -9315,4 +9316,70 @@ describe("quarantined computer stop", () => {
       }
     },
   );
+});
+
+describe("terms of use", () => {
+  const terms = { url: "https://operator.example.test/terms", version: "2" };
+
+  function termsClient(accepted: boolean, termsOfUse: typeof terms | null = terms) {
+    const upsert = vi.fn().mockResolvedValue({});
+    const prisma = {
+      user: {
+        findUniqueOrThrow: vi.fn().mockResolvedValue({
+          email: "user@argo.test",
+          name: "Test User",
+          signupSurvey: null,
+        }),
+      },
+      termsAcceptance: {
+        findUnique: vi.fn().mockResolvedValue(accepted ? { userId: "user-1" } : null),
+        upsert,
+      },
+      userModelPreference: { findFirst: vi.fn().mockResolvedValue(null) },
+      deploymentSettings: { findUnique: vi.fn().mockResolvedValue(null) },
+    } as unknown as PrismaClient;
+    const deps = {
+      prisma,
+      env: {
+        defaultProvider: "fake",
+        defaultModel: "fake-model",
+        webOrigin: "http://127.0.0.1:5173",
+        screenProxySecret: "fake-test-secret",
+        sandboxProvider: "fake",
+        termsOfUse: termsOfUse ?? undefined,
+      },
+      dataDir: "/tmp/argo-router-test",
+    } as unknown as RouterDeps;
+    const actor = {
+      spaceId: "workspace-1",
+      userId: "user-1",
+      email: "user@argo.test",
+      isDeploymentOwner: false,
+    } satisfies Actor;
+    return { client: createRouterClient(createRouter(deps), { context: { actor } }), upsert };
+  }
+
+  it("lists the operator's terms on me until the account accepts them", async () => {
+    await expect(termsClient(false).client.me()).resolves.toMatchObject({ pendingTerms: terms });
+    await expect(termsClient(true).client.me()).resolves.toMatchObject({ pendingTerms: null });
+    await expect(termsClient(false, null).client.me()).resolves.toMatchObject({
+      pendingTerms: null,
+    });
+  });
+
+  it("refuses AI requests before acceptance", async () => {
+    await expect(
+      termsClient(false).client.threads.send({ botId: "bot-1", text: "hello" }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN", message: TERMS_REQUIRED });
+  });
+
+  it("records acceptance only for the version currently served", async () => {
+    const { client, upsert } = termsClient(false);
+    await expect(client.terms.accept({ version: "1" })).rejects.toMatchObject({ code: "CONFLICT" });
+    expect(upsert).not.toHaveBeenCalled();
+    await expect(client.terms.accept({ version: "2" })).resolves.toEqual({ ok: true });
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ create: { userId: "user-1", version: "2" } }),
+    );
+  });
 });

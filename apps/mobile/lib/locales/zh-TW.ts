@@ -1,4 +1,8 @@
 export const ZH_TW_MESSAGES: Record<string, string> = {
+  "Terms of Use": "使用條款",
+  "I'm 18 or older and agree to the Terms of Use.": "我已年滿 18 歲，並同意使用條款。",
+  Read: "閱讀",
+  Agree: "同意",
   "How other bots see it": "其他機器人如何瞭解它",
   "Share to": "分享到",
   "{count} files": "{count} 個檔案",

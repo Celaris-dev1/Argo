@@ -28,6 +28,24 @@ Two caps bound how many computers exist. `SANDBOX_MAX_COMPUTERS_PER_USER` caps t
 user's bots may have, and `SANDBOX_MAX_COMPUTERS_PER_SPACE` caps concurrent computer containers per
 Space. `SANDBOX_TEAM_SCREEN_LIMIT` caps active bot desktops on one Team Computer; desktops and
 browsers otherwise start only when needed. `0`, the default, leaves each to the machine.
+`ARGO_MAX_BOTS_PER_USER` caps the live bots one person may have across their Spaces, counting bots
+other bots create; archiving one frees its slot.
+
+`ARGO_FIRST_BOT_TASK` gives each person's first bot a task to start on as soon as it exists, sent
+as their opening message, instead of the bot asking what it is for. `ARGO_FIRST_BOT_SITE_TASK`
+replaces it for a person whose address is at their own domain; `{site}` stands for that domain.
+`ARGO_FIRST_BOT_APPS` (comma-separated app slugs, such as `gmail,googlecalendar`) offers connect
+cards for those apps under that first message. `ARGO_APP_CONNECTED_TASK` is sent as the person's
+message the moment they connect an app, so the bot puts it to work straight away; `{app}` stands for
+the app's name. Unset, the bot waits for the person.
+
+`SANDBOX_COMPUTER_PROFILES` lets one host run more than one kind of computer. It is a JSON object
+of named profiles, each with an `image` already on the host and optional `memory`, `cpus` and
+`pidsLimit`, for example `{"navigator":{"image":"argo/computer:navigator","memory":"1g"}}`. To
+choose a profile per person, set `SANDBOX_COMPUTER_PROFILE_URL` on the API and worker: before a
+computer starts they request it with `?userId=<id>` (and `SANDBOX_COMPUTER_PROFILE_TOKEN` as a
+bearer token when set) and expect `{"profile":"<name>"}`, or `{"profile":null}` for the default
+computer. A changed profile replaces the computer on its next start; its home is kept.
 
 The supervisor reaches Docker at `/var/run/docker.sock` (or `//./pipe/docker_engine` on Windows). Set
 `DOCKER_SOCKET` for rootless Docker, Colima or another path; `DOCKER_HOST` wins when both are set.
@@ -117,7 +135,7 @@ a restart. The installer does not download the script on macOS. From the directo
 the stack's `.env`:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/restrict-computer-egress.sh
+curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/restrict-computer-egress.sh
 ```
 
 Save the following as `egress.yml` beside that script and start it with

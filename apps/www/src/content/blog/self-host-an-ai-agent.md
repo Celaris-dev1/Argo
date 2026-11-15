@@ -8,11 +8,11 @@ category: "guides"
 tldr: "The published-image installer is a short script: Docker, Compose, curl, and OpenSSL, then an account and a model. Pull time depends on your connection. A public hostname, TLS, and a secrets review are a longer job than the first local chat."
 sources:
   - label: "Argo self-hosting guide"
-    href: "https://github.com/elie222/rakazo/blob/main/docs/self-host.md"
+    href: "https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md"
   - label: "Self-hosted AI agent"
     href: "https://argo.example/self-hosted-ai-agent/"
   - label: "Self-host secrets checklist"
-    href: "https://github.com/elie222/rakazo/blob/main/docs/self-host-secrets.md"
+    href: "https://github.com/celaris-dev1/argo/blob/main/docs/self-host-secrets.md"
 related:
   - href: "/self-hosted-ai-agent/"
     title: "Self-hosted AI agent"
@@ -65,7 +65,7 @@ comparison:
 
 The title is the shape of the local install, not a stopwatch result. Argo's published images start from one script. Docker then downloads the images, and that download is the part that varies. When the app is up, you create an account, connect a model, and the first chat is the product. A hostname on the public internet, TLS, and a review of secrets are a separate piece of work.
 
-This page follows the [self-hosting guide](https://github.com/elie222/rakazo/blob/main/docs/self-host.md) and the [self-hosted AI agent page](/self-hosted-ai-agent/). Those stay the reference if a command changes.
+This page follows the [self-hosting guide](https://github.com/celaris-dev1/argo/blob/main/docs/self-host.md) and the [self-hosted AI agent page](/self-hosted-ai-agent/). Those stay the reference if a command changes.
 
 ## What you are running
 
@@ -92,7 +92,7 @@ From an empty directory on the machine that should run Argo:
 
 ```bash
 mkdir -p argo && cd argo &&
-curl -fsSLO https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose/install-images.sh &&
+curl -fsSLO https://raw.githubusercontent.com/celaris-dev1/argo/main/infra/compose/install-images.sh &&
 bash install-images.sh
 ```
 
@@ -162,7 +162,7 @@ A minimal Caddy site is a reverse proxy to `127.0.0.1:5173`. Replace the example
 
 In the mobile app, tap **Use a custom server** on the sign-in screen and enter the same HTTPS origin as `WEB_ORIGIN`.
 
-This server path is why a public install is not the same job as the local script. You are choosing a hostname, a TLS terminator, who may sign up, and where secrets live. The [secrets checklist](https://github.com/elie222/rakazo/blob/main/docs/self-host-secrets.md) names the values and how to recover them. The [restricted-network guide](https://github.com/elie222/rakazo/blob/main/docs/self-host-restricted-network.md) covers mirrors when the installer or the image pull is blocked.
+This server path is why a public install is not the same job as the local script. You are choosing a hostname, a TLS terminator, who may sign up, and where secrets live. The [secrets checklist](https://github.com/celaris-dev1/argo/blob/main/docs/self-host-secrets.md) names the values and how to recover them. The [restricted-network guide](https://github.com/celaris-dev1/argo/blob/main/docs/self-host-restricted-network.md) covers mirrors when the installer or the image pull is blocked.
 
 ## Install from source only if you are developing
 

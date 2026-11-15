@@ -1,9 +1,7 @@
 #!/bin/sh
 set -eu
-# Lightpanda replaces Chromium when the image has it. The page browser speaks CDP either way.
-if [ -x /usr/local/bin/lightpanda ] && [ -x /usr/local/bin/argo-lightpanda ]; then
-  exec /usr/local/bin/argo-lightpanda "$@"
-fi
+# The desktop shows the browser the bot drives, so it is always Chromium (or Brave) here.
+# Lightpanda has no window; only the headless images use it, through their own argo-browser link.
 ARGO_HOME="${HOME:-/home/argo}"
 # start.sh exports the session bus for the whole desktop; the supervisor may
 # launch this script with a minimal environment, so recover the bus address.

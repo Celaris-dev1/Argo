@@ -24,7 +24,7 @@ sources:
   - label: "xAI pricing"
     href: "https://x.ai/pricing"
   - label: "Argo source"
-    href: "https://github.com/elie222/rakazo"
+    href: "https://github.com/celaris-dev1/argo"
 related:
   - href: "/claude-duet-alternative/"
     title: "Open source Claude Duet alternative"

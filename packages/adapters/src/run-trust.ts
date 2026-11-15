@@ -1,8 +1,13 @@
 import type { MessageBlock } from "@argo/contracts";
 import type { ActionApprovalRule } from "@argo/core";
-import { connectorKindFromToolName, inboundRoutinePrompts, siteAlwaysAllowed } from "@argo/core";
+import {
+  connectorKindFromToolName,
+  DEFAULT_AUTO_REVIEW_PREFERENCE,
+  inboundRoutinePrompts,
+  siteAlwaysAllowed,
+} from "@argo/core";
 import { sitesInText, urlSite } from "@argo/core/egress";
-import { listApprovalRules, storedBatchActions } from "@argo/db";
+import { findAutoReviewPreference, listApprovalRules, storedBatchActions } from "@argo/db";
 import { SITE_SENDING_TOOLS } from "./approval-ask.js";
 import { boundDirectApprovalDetails, catalogApprovalDetails } from "./approval-effect.js";
 import type { ExecutorDeps } from "./executor-deps.js";
@@ -92,12 +97,11 @@ export function createRunTrustLoaders(
     | Promise<{ enabled: boolean; skipApprovals: boolean }>
     | undefined;
   const loadAutoReviewPreference = () => {
-    // Approvals are off. A missing or saved "ask"/"auto" row used to pause
-    // the run on every external action.
-    autoReviewPreferencePromise ??= Promise.resolve({
-      enabled: false,
-      skipApprovals: true,
-    });
+    // Never ask unless the owner chose Ask or Auto for this space or account.
+    autoReviewPreferencePromise ??= findAutoReviewPreference(deps.prisma, {
+      userId: run.userId,
+      spaceId: run.spaceId,
+    }).then((saved) => saved ?? DEFAULT_AUTO_REVIEW_PREFERENCE);
     return autoReviewPreferencePromise;
   };
   // The owner's own words for this run: the message they sent, or the instructions of the

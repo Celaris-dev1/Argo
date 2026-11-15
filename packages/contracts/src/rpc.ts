@@ -158,6 +158,8 @@ import {
   ROUTINE_HISTORY_PAGE_SIZE,
   RoutineHistorySchema,
   RoutineRunCursorSchema,
+  RunActionsOutputSchema,
+  RunShareLinkSchema,
   RunsListOutputSchema,
 } from "./runs.js";
 import { SearchQueryOutputSchema } from "./search.js";
@@ -255,6 +257,12 @@ export const appContract = {
       )
       .output(AiConsentStatusSchema),
     revoke: oc.input(z.object({ key: z.string().nullable() })).output(AiConsentStatusSchema),
+  },
+  terms: {
+    /** Accept the operator's Terms of Use at this version; also confirms the user is 18 or older. */
+    accept: oc
+      .input(z.object({ version: z.string().min(1).max(100) }))
+      .output(z.object({ ok: z.literal(true) })),
   },
   health: oc.output(z.object({ ok: z.literal(true), version: z.string() })),
   me: oc.output(MeSchema),
@@ -1274,6 +1282,11 @@ export const appContract = {
   },
   runs: {
     list: oc.input(z.object({ filter: z.enum(["active", "recent"]) })).output(RunsListOutputSchema),
+    /** What the bot did during one of the caller's runs, oldest first. */
+    actions: oc.input(z.object({ runId: Id })).output(RunActionsOutputSchema),
+    /** Publishes a read-only snapshot of one of the caller's finished runs; repeat calls return the same link. */
+    share: oc.input(z.object({ runId: Id })).output(RunShareLinkSchema),
+    unshare: oc.input(z.object({ runId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {

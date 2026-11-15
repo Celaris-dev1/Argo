@@ -65,7 +65,7 @@ export class KeylessHttpWebProvider implements WebProvider {
     this.fetchTimeoutMs = options.fetchTimeoutMs ?? 15_000;
     this.maxBufferBytes = options.maxBufferBytes ?? 5 * 1024 * 1024;
     this.userAgent =
-      options.userAgent ?? "Argo/0.1 (+https://github.com/elie222/rakazo; web tools)";
+      options.userAgent ?? "Argo/0.1 (+https://github.com/celaris-dev1/argo; web tools)";
   }
 
   describe() {

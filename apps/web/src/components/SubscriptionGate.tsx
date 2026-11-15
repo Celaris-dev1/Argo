@@ -1,11 +1,12 @@
-import { useLingui } from "@lingui/react/macro";
 import type { BillingStatus, Me } from "@argo/contracts";
 import { Dialog, DialogContent } from "@argo/ui-web";
+import { useLingui } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { createContext, Suspense, useContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { fetchAuthCapabilities } from "../lib/auth-capabilities";
 import { peekInitialBootstrap } from "../lib/bootstrap";
+import { loadMe } from "../lib/me";
 import { lazyComponent } from "../lib/preload-recovery";
 import { claimStoredReferral } from "../lib/referral";
 import { rpc } from "../lib/rpc";
@@ -29,15 +30,6 @@ const BillingContext = createContext<{ status: BillingStatus | null; showPlans: 
 /** The latest billing status (`null` when the deployment does not bill) and the plan choice. */
 export function useBilling() {
   return useContext(BillingContext);
-}
-
-function loadMe(): Promise<Me> {
-  const primed = peekInitialBootstrap();
-  if (!primed) return rpc.me();
-  return primed.then(
-    (bootstrap) => bootstrap.me,
-    () => rpc.me(),
-  );
 }
 
 function gateFor(status: BillingStatus): GateState {

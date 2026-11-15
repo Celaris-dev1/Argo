@@ -1490,5 +1490,175 @@ class PageBrowserTest(unittest.TestCase):
                 self.assertIn(("Network.enable", {"maxPostDataSize": 1}), sent)
 
 
+
+
+class HeadlessTabClient:
+    """Minimal CDP stand-in: pages that are visible but never focused, as in a headless browser."""
+
+    def __init__(self, target_ids):
+        self.target_ids = list(target_ids)
+        self.created = []
+
+    def call(self, method, params=None, session_id=None):
+        if method == "Target.getTargets":
+            return {"targetInfos": [{"type": "page", "targetId": t} for t in self.target_ids]}
+        if method == "Target.attachToTarget":
+            return {"sessionId": "s-" + params["targetId"]}
+        if method == "Target.createTarget":
+            self.created.append(params["url"])
+            return {"targetId": "new"}
+        return {}
+
+
+class HeadlessAttachTests(unittest.TestCase):
+    def setUp(self):
+        self.state = Path(self.id().replace(".", "_") + ".state").absolute()
+        self.addCleanup(lambda: self.state.unlink(missing_ok=True))
+        env = patch.dict(os.environ, {"ARGO_COMPUTER_HEADLESS": "1", "ARGO_PAGE_BROWSER_STATE": str(self.state)})
+        env.start()
+        self.addCleanup(env.stop)
+        for name, value in (("ensure_world", None), ("eval_json", None)):
+            p = patch.object(helper, name, side_effect=self.fake_eval if name == "eval_json" else None)
+            p.start()
+            self.addCleanup(p.stop)
+
+    @staticmethod
+    def fake_eval(_client, _session, expression):
+        return "visibilityState" in expression
+
+    def test_keeps_driving_the_last_page_among_several(self):
+        self.state.write_text("b", encoding="utf-8")
+        self.assertEqual(helper.attach_page(HeadlessTabClient(["a", "b", "c"])), "s-b")
+
+    def test_without_history_picks_the_first_listed_page_and_remembers_it(self):
+        self.assertEqual(helper.attach_page(HeadlessTabClient(["a", "b"])), "s-a")
+        self.assertEqual(self.state.read_text(encoding="utf-8"), "a")
+
+    def test_creates_a_page_when_the_browser_has_none(self):
+        client = HeadlessTabClient([])
+        self.assertEqual(helper.attach_page(client), "s-new")
+        self.assertEqual(client.created, ["about:blank"])
+        self.assertEqual(self.state.read_text(encoding="utf-8"), "new")
+
+    def test_with_a_screen_several_unfocused_pages_still_need_a_choice(self):
+        with patch.dict(os.environ, {"ARGO_COMPUTER_HEADLESS": ""}):
+            with self.assertRaises(RuntimeError):
+                helper.attach_page(HeadlessTabClient(["a", "b"]))
+
+
+class CookieJarClient:
+    def __init__(self, cookies=None):
+        self.cookies = list(cookies or [])
+
+    def call(self, method, params=None, *, session_id=None, timeout_s=30.0):
+        if method == "Network.getAllCookies":
+            return {"cookies": list(self.cookies)}
+        if method == "Network.setCookies":
+            self.cookies.extend(params["cookies"])
+            return {}
+        raise AssertionError(method)
+
+
+class ScoutCookieProfileTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.dir = tempfile.TemporaryDirectory()
+        self.path = Path(self.dir.name) / "profile" / "cookies.json"
+        self.env = patch.dict(os.environ, {"ARGO_BROWSER_PROFILE": str(self.path)})
+        self.env.start()
+
+    def tearDown(self):
+        self.env.stop()
+        self.dir.cleanup()
+
+    def test_saves_cookies_only_the_owner_can_read_and_loads_them_into_a_fresh_browser(self):
+        helper.save_cookies(CookieJarClient([{"name": "sid", "value": "x", "domain": "a.test", "path": "/", "size": 4}]), "s")
+        self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)
+        fresh = CookieJarClient()
+        helper.restore_cookies(fresh, "s")
+        self.assertEqual(fresh.cookies, [{"name": "sid", "value": "x", "domain": "a.test", "path": "/"}])
+
+    def test_skips_expired_cookies(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.write_text(json.dumps([
+            {"name": "old", "value": "1", "domain": "a.test", "path": "/", "expires": 1},
+            {"name": "session", "value": "2", "domain": "a.test", "path": "/", "expires": -1},
+        ]))
+        fresh = CookieJarClient()
+        helper.restore_cookies(fresh, "s")
+        self.assertEqual([c["name"] for c in fresh.cookies], ["session"])
+
+    def test_leaves_a_running_browser_and_a_broken_profile_alone(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.write_text("not json")
+        fresh = CookieJarClient()
+        helper.restore_cookies(fresh, "s")
+        self.assertEqual(fresh.cookies, [])
+        self.path.write_text(json.dumps([{"name": "a", "value": "1", "domain": "a.test", "path": "/"}]))
+        running = CookieJarClient([{"name": "live", "value": "1", "domain": "a.test", "path": "/"}])
+        helper.restore_cookies(running, "s")
+        self.assertEqual([c["name"] for c in running.cookies], ["live"])
+
+
+
+class PageKeeperTests(unittest.TestCase):
+    def test_keeps_one_connection_and_page_across_commands(self):
+        client = Mock(layoutless=False)
+        with patch.object(helper, "wait_for_cdp"), patch.object(helper, "discover_ws_url", return_value="ws://x"), \
+                patch.object(helper, "CdpClient", return_value=client) as made, \
+                patch.object(helper, "attach_page", return_value="s1") as attach, \
+                patch.object(helper, "ensure_world"), patch.object(helper, "restore_cookies"), \
+                patch.object(helper, "save_cookies"), \
+                patch.object(helper, "navigate", return_value={"ok": True}), \
+                patch.object(helper, "snapshot", return_value={"ok": True, "url": "https://a.test/"}) as snap:
+            keeper = helper.PageKeeper(9222)
+            keeper.handle({"command": "navigate", "args": {"url": "https://a.test/"}})
+            keeper.handle({"command": "snapshot"})
+        self.assertEqual(made.call_count, 1)
+        self.assertEqual(attach.call_count, 1)
+        self.assertTrue(client.layoutless)
+        snap.assert_called_once_with(client, "s1")
+
+    def test_reconnects_when_the_browser_restarted(self):
+        with patch.object(helper, "wait_for_cdp"), patch.object(helper, "discover_ws_url", return_value="ws://x"), \
+                patch.object(helper, "CdpClient", side_effect=[Mock(), Mock()]) as made, \
+                patch.object(helper, "attach_page", return_value="s1"), \
+                patch.object(helper, "ensure_world", side_effect=RuntimeError("closed")), \
+                patch.object(helper, "restore_cookies"), patch.object(helper, "snapshot", return_value={"ok": True}):
+            keeper = helper.PageKeeper(9222)
+            keeper.handle({"command": "snapshot"})
+            keeper.handle({"command": "snapshot"})
+        self.assertEqual(made.call_count, 2)
+
+    def test_no_keeper_falls_back_but_a_lost_reply_is_never_retried(self):
+        import tempfile
+        with tempfile.TemporaryDirectory(dir="/tmp") as tmp, patch.dict(os.environ, {"ARGO_PAGE_KEEPER_DIR": tmp}):
+            self.assertIsNone(helper.keeper_request(9222, {"command": "act"}, start=False))
+            server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            server.bind(str(helper.keeper_socket_path(9222)))
+            server.listen(1)
+            import threading
+            def hang_up():
+                conn, _ = server.accept()
+                conn.recv(65536)
+                conn.close()
+            threading.Thread(target=hang_up, daemon=True).start()
+            reply = helper.keeper_request(9222, {"command": "act"}, start=False)
+            server.close()
+        self.assertFalse(reply["ok"])
+        self.assertTrue(reply["uncertain"])
+
+    def test_layoutless_click_goes_to_the_element(self):
+        client = Mock(layoutless=True)
+        with patch.object(helper, "ensure_helpers"), patch.object(helper, "eval_json", return_value=True) as evaluate, \
+                patch.object(helper, "click_at") as click_at, \
+                patch.object(helper, "wait_for_action", return_value=False), \
+                patch.object(helper, "page_mark", return_value=({}, 0)), \
+                patch.object(helper, "snapshot", return_value={"ok": True}):
+            helper.act(client, "s1", [{"kind": "click", "ref": "e1"}])
+        click_at.assert_not_called()
+        self.assertTrue(any("press(" in str(call) for call in evaluate.call_args_list))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -665,6 +665,10 @@ msgstr "Todo el tiempo"
 msgid "Allow"
 msgstr "Permitir"
 
+#: src/lib/dictation.ts
+msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
+msgstr "Permite que Argo use el reconocimiento de voz y el micrófono en Ajustes del Sistema."
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Allow cross-space bot communication"
 msgstr "Permitir la comunicación entre bots de distintos espacios"
@@ -676,10 +680,6 @@ msgstr "Permitir en este chat"
 #: src/components/AskCard.tsx
 msgid "Allow once"
 msgstr "Permitir una vez"
-
-#: src/lib/dictation.ts
-msgid "Allow Argo to use Speech Recognition and the microphone in System Settings."
-msgstr "Permite que Argo use el reconocimiento de voz y el micrófono en Ajustes del Sistema."
 
 #: src/components/ApprovalRulePreview.tsx
 msgid "Allow rule"
@@ -860,6 +860,19 @@ msgstr "archivado"
 msgid "Archived"
 msgstr "Archivado"
 
+#: src/pages/shell/avatar-studio-popover.tsx
+msgid "Argo"
+msgstr "Argo"
+
+#: src/components/ModelCredits.tsx
+#: src/pages/Onboarding.tsx
+msgid "Argo credits"
+msgstr "Créditos de Argo"
+
+#: src/pages/memory-providers/HonchoSettingsForm.tsx
+msgid "argo-shared and IDs starting with bot- are reserved for Argo."
+msgstr "argo-shared y los ID que empiezan con bot- están reservados para Argo."
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "Argumentos"
@@ -970,6 +983,7 @@ msgstr "Estudio de avatares"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/create-bot-dialog.tsx
 msgid "Back"
 msgstr "Atrás"
 
@@ -1009,6 +1023,7 @@ msgid "Block rule"
 msgstr "Regla de bloqueo"
 
 #: src/lib/ticket-status.ts
+#: src/pages/ActivityList.tsx
 msgid "Blocked"
 msgstr "Bloqueado"
 
@@ -1428,6 +1443,15 @@ msgctxt "email sign-in"
 msgid "Code"
 msgstr "Código"
 
+#: src/pages/shell/composer.tsx
+#: src/pages/shell/computer-overlay.tsx
+msgid "Coding"
+msgstr ""
+
+#: src/pages/shell/composer.tsx
+msgid "Coding mode"
+msgstr ""
+
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Collapse {0}"
@@ -1679,6 +1703,7 @@ msgstr "Límite de contexto"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/integrations/IntegrationSetup.tsx
 #: src/components/SignupSurvey.tsx
+#: src/components/TermsGate.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/shell/agent-import.tsx
@@ -1948,6 +1973,10 @@ msgid "Could not load"
 msgstr "No se pudo cargar"
 
 #: src/pages/ActivityList.tsx
+msgid "Could not load actions"
+msgstr ""
+
+#: src/pages/ActivityList.tsx
 msgid "Could not load activity"
 msgstr "No se pudo cargar la actividad"
 
@@ -2010,6 +2039,10 @@ msgstr "No se pudo cargar este chat."
 msgid "Could not load this file."
 msgstr "No se pudo cargar este archivo."
 
+#: src/pages/SharedRun.tsx
+msgid "Could not load this page."
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not load voice settings"
 msgstr "No se pudo cargar la configuración de voz"
@@ -2024,6 +2057,10 @@ msgstr "No se pudo cerrar sesión. Inténtalo de nuevo."
 #: src/pages/Paywall.tsx
 msgid "Could not open billing"
 msgstr "No se pudo abrir la facturación"
+
+#: src/pages/Shell.tsx
+msgid "Could not open coding mode"
+msgstr ""
 
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Could not play a test clip"
@@ -2181,6 +2218,10 @@ msgstr "No se pudo enviar el correo de restablecimiento"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "No se pudo enviar eso"
+
+#: src/pages/ActivityList.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -3036,6 +3077,10 @@ msgstr "Consigue un mes gratis por cada amigo que empiece una prueba."
 msgid "Get the mobile app"
 msgstr "Obtener la aplicación móvil"
 
+#: src/pages/SharedRun.tsx
+msgid "Get your own bot"
+msgstr ""
+
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Getting ready"
 msgstr "Preparando"
@@ -3175,6 +3220,10 @@ msgstr "Cómo comprobar"
 #: src/components/SignupSurvey.tsx
 msgid "How will you use Argo?"
 msgstr "¿Cómo usarás Argo?"
+
+#: src/components/TermsGate.tsx
+msgid "I'm 18 or older and agree to the <0>Terms of Use</0>."
+msgstr "Tengo 18 años o más y acepto los <0>Términos de uso</0>."
 
 #: src/pages/shell/computer-release-actions.tsx
 msgid "I’m done"
@@ -3411,6 +3460,10 @@ msgstr "Issue de Linear"
 msgid "Link"
 msgstr "Enlace"
 
+#: src/pages/ActivityList.tsx
+msgid "Link copied"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Link DMs"
 msgstr "Vincular mensajes privados"
@@ -3451,6 +3504,11 @@ msgstr "Cargar ejecuciones anteriores"
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Load web images automatically"
 msgstr "Cargar imágenes web automáticamente"
+
+#: src/pages/ActivityList.tsx
+#: src/pages/SharedRun.tsx
+msgid "Loading"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Loading activity…"
@@ -3790,6 +3848,10 @@ msgstr "ID del modelo"
 msgid "Model options"
 msgstr "Opciones del modelo"
 
+#: src/pages/shell/composer.tsx
+msgid "Model: {modelName}"
+msgstr ""
+
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/settings-nav.ts
 #: src/pages/SpaceSettingOverrides.tsx
@@ -4094,6 +4156,10 @@ msgstr "No hay envíos"
 msgid "No tickets yet"
 msgstr "Aún no hay tickets"
 
+#: src/pages/ActivityList.tsx
+msgid "No tools used."
+msgstr ""
+
 #: src/pages/RoutineEditor.tsx
 msgid "No trigger"
 msgstr "Sin disparador"
@@ -4186,12 +4252,6 @@ msgstr "OAuth expirado"
 msgid "Offline"
 msgstr "Sin conexión"
 
-#: src/pages/model-settings/connection-controls.tsx
-#: src/pages/Onboarding.tsx
-msgid "Ollama API key"
-msgstr "Clave de API de Ollama"
-
-#: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 msgid "Ollama Cloud"
 msgstr "Ollama Cloud"
@@ -4557,19 +4617,6 @@ msgstr "Solicitud de incorporación"
 msgid "Queued"
 msgstr "En cola"
 
-#: src/pages/shell/avatar-studio-popover.tsx
-msgid "Argo"
-msgstr "Argo"
-
-#: src/components/ModelCredits.tsx
-#: src/pages/Onboarding.tsx
-msgid "Argo credits"
-msgstr "Créditos de Argo"
-
-#: src/pages/memory-providers/HonchoSettingsForm.tsx
-msgid "argo-shared and IDs starting with bot- are reserved for Argo."
-msgstr "argo-shared y los ID que empiezan con bot- están reservados para Argo."
-
 #: src/pages/shell/message-hover-actions.tsx
 msgid "React"
 msgstr "Reaccionar"
@@ -4871,6 +4918,11 @@ msgstr "Solicita un código nuevo"
 msgid "Requests"
 msgstr "Solicitudes"
 
+#: src/pages/model-settings/connection-controls.tsx
+#: src/pages/Onboarding.tsx
+msgid "Required API key"
+msgstr ""
+
 #: src/pages/shell/message-cards.tsx
 msgid "Research & writing"
 msgstr "Investigación y redacción"
@@ -4958,15 +5010,15 @@ msgstr "Reintentar ahora"
 msgid "Retry screen"
 msgstr "Reintentar pantalla"
 
-#. placeholder {0}: call.botName
-#: src/components/call/CallCard.tsx
-msgid "Return to call with {0}"
-msgstr "Volver a la llamada con {0}"
-
 #: src/pages/McpOAuthCallback.tsx
 #: src/pages/SlackInstallCallback.tsx
 msgid "Return to Argo"
 msgstr "Volver a Argo"
+
+#. placeholder {0}: call.botName
+#: src/components/call/CallCard.tsx
+msgid "Return to call with {0}"
+msgstr "Volver a la llamada con {0}"
 
 #: src/lib/model-connection-preflight.ts
 msgid "Review provider settings and test again."
@@ -5314,6 +5366,10 @@ msgstr "Forma"
 msgid "Shape {0}"
 msgstr "Forma {0}"
 
+#: src/pages/ActivityList.tsx
+msgid "Share"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Shared"
@@ -5540,6 +5596,10 @@ msgstr "Modelo de habla"
 msgid "SSO is temporarily unavailable. Try again."
 msgstr "SSO no está disponible temporalmente. Inténtalo de nuevo."
 
+#: src/pages/SharedRun.tsx
+msgid "Star on GitHub"
+msgstr ""
+
 #: src/pages/shell/computer-overlay.tsx
 msgid "Start"
 msgstr "Iniciar"
@@ -5583,6 +5643,10 @@ msgstr "Detener"
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stop computer"
 msgstr "Detener computadora"
+
+#: src/pages/ActivityList.tsx
+msgid "Stop sharing"
+msgstr ""
 
 #: src/pages/shell/message-view.tsx
 msgid "Stop speaking"
@@ -5701,6 +5765,10 @@ msgstr "Mensaje de Teams"
 #: src/pages/RoutineEditor.tsx
 msgid "Teams not enabled"
 msgstr "Teams no está activado"
+
+#: src/components/TermsGate.tsx
+msgid "Terms of Use"
+msgstr "Términos de uso"
 
 #: src/components/teach/SkillDraftCard.tsx
 msgid "Test"
@@ -5871,6 +5939,10 @@ msgstr "Este archivo no es texto UTF-8 válido."
 #: src/lib/agent-import-errors.ts
 msgid "This import was already used. Choose the files again."
 msgstr "Esta importación ya se usó. Vuelve a elegir los archivos."
+
+#: src/pages/SharedRun.tsx
+msgid "This link is no longer shared."
+msgstr ""
 
 #: src/pages/HostComputerPrompt.tsx
 msgid "this Mac"
@@ -6194,6 +6266,10 @@ msgstr "Usa {oauthEnvReference} para el token de acceso."
 msgid "Use a found model"
 msgstr "Usar un modelo encontrado"
 
+#: src/components/ModelCredits.tsx
+msgid "Use Argo credits"
+msgstr "Usar créditos de Argo"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Use Connect to verify the key."
 msgstr "Usa Conectar para verificar la clave."
@@ -6221,10 +6297,6 @@ msgstr "Usar mi suscripción o clave de API"
 #: src/components/teach/TeachRecordingChrome.tsx
 msgid "Use Protected input for passwords."
 msgstr "Usa Entrada protegida para las contraseñas."
-
-#: src/components/ModelCredits.tsx
-msgid "Use Argo credits"
-msgstr "Usar créditos de Argo"
 
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "Use space default"
@@ -6374,6 +6446,14 @@ msgstr "¿Con qué quieres que Argo te ayude más?"
 #: src/pages/shell/message-cards.tsx
 msgid "What do you want me on first?"
 msgstr "¿En qué quieres que me enfoque primero?"
+
+#: src/pages/ActivityList.tsx
+msgid "What it did"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "What kind of bot?"
+msgstr ""
 
 #: src/components/teach/TeachComputerOverlay.tsx
 msgid "What result will you demonstrate?"
@@ -6530,21 +6610,3 @@ msgstr "Tu proveedor de voz se quedó sin crédito."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Tu proveedor de voz rechazó la clave."
-
-#: src/pages/shell/composer.tsx
-#: src/pages/shell/computer-overlay.tsx
-msgid "Coding"
-msgstr ""
-
-#: src/pages/shell/composer.tsx
-msgid "Coding mode"
-msgstr ""
-
-#: src/pages/Shell.tsx
-msgid "Could not open coding mode"
-msgstr ""
-
-#: src/pages/Onboarding.tsx
-#: src/pages/model-settings/connection-controls.tsx
-msgid "Required API key"
-msgstr ""

@@ -31,11 +31,13 @@ trap shutdown TERM INT
 # Headless image (ultra-lean profile): no X server, VNC or window manager. Keep Lightpanda
 # listening on the page-browser CDP port and stay up as PID 1 until stopped.
 if [[ "${ARGO_COMPUTER_HEADLESS:-}" =~ ^(1|true|yes|on)$ ]] || ! command -v Xvfb >/dev/null 2>&1; then
-  if command -v lightpanda >/dev/null 2>&1; then
+  if [ -x /usr/local/bin/argo-browser ] || command -v lightpanda >/dev/null 2>&1; then
+    keeper=/usr/local/bin/argo-browser
+    [ -x "$keeper" ] || keeper=/usr/local/bin/argo-lightpanda
     while true; do
-      /usr/local/bin/argo-lightpanda >/dev/null 2>&1 || true
+      "$keeper" >/dev/null 2>&1 || true
       sleep 15
-    done >/tmp/argo/lightpanda-keeper.log 2>&1 &
+    done >/tmp/argo/page-browser-keeper.log 2>&1 &
   fi
   sleep infinity &
   XVFB_PID=$!

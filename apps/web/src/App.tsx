@@ -1,8 +1,8 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { LinkFavicons } from "@argo/chat-ui/web";
 import { LinkFaviconsContext, RemoteImagesContext } from "@argo/chat-ui/web";
 import { analyticsScreen } from "@argo/core";
 import { Button } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Suspense,
   useEffect,
@@ -17,6 +17,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MarkdownLinkPrompt } from "./components/markdown-link-prompt";
 import { PageLoading } from "./components/PageLoading";
 import { SubscriptionGate } from "./components/SubscriptionGate";
+import { TermsGate } from "./components/TermsGate";
 import { authClient } from "./lib/auth";
 import { getTicketBoardEnabled, subscribeTicketBoardEnabled } from "./lib/bootstrap";
 import { syncCallIdentity } from "./lib/call-session";
@@ -40,6 +41,7 @@ import { completeSsoCallback, SSO_CALLBACK_PATH } from "./lib/sso-flow";
 import { IntegrationCallbackPage } from "./pages/IntegrationCallback";
 import { IntegrationSetupPage } from "./pages/IntegrationSetup";
 import { McpOAuthCallbackPage } from "./pages/McpOAuthCallback";
+import { SharedRunPage } from "./pages/SharedRun";
 import { ShellPage } from "./pages/Shell";
 import { SlackInstallCallbackPage } from "./pages/SlackInstallCallback";
 
@@ -205,6 +207,7 @@ function SessionApp() {
                 }
               />
               <Route path="/reset-password" element={<PasswordResetPage />} />
+              <Route path="/r/:shareId" element={<SharedRunPage />} />
               <Route
                 path={MCP_OAUTH_CALLBACK_PATH}
                 element={
@@ -255,7 +258,9 @@ function SessionApp() {
                 element={
                   user ? (
                     <SubscriptionGate fallback={<PageLoading />}>
-                      <Outlet />
+                      <TermsGate fallback={<PageLoading />}>
+                        <Outlet />
+                      </TermsGate>
                     </SubscriptionGate>
                   ) : (
                     <Navigate to="/sign-in" replace />

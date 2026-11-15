@@ -1,5 +1,6 @@
 import type { AppearancePreference, ResolvedAppearance } from "@argo/ui-tokens";
 import {
+  DEFAULT_APPEARANCE_PREFERENCE,
   normalizeAppearancePreference,
   resolveAppearance,
   tokensForAppearance,
@@ -20,7 +21,7 @@ function systemAppearance(scheme?: ColorSchemeName | null): ResolvedAppearance {
 }
 
 export function getCachedAppearancePreference(): AppearancePreference {
-  return memoryPreference ?? "system";
+  return memoryPreference ?? DEFAULT_APPEARANCE_PREFERENCE;
 }
 
 export async function loadAppearancePreference(): Promise<AppearancePreference> {
@@ -28,7 +29,7 @@ export async function loadAppearancePreference(): Promise<AppearancePreference> 
     const stored = await SecureStore.getItemAsync(UI_APPEARANCE_STORAGE_KEY);
     memoryPreference = normalizeAppearancePreference(stored);
   } catch {
-    memoryPreference = memoryPreference ?? "system";
+    memoryPreference = memoryPreference ?? DEFAULT_APPEARANCE_PREFERENCE;
   }
   applyNativeColorScheme(memoryPreference);
   notify();

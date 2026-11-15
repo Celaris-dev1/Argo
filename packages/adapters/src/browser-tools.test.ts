@@ -94,6 +94,8 @@ describe("browser tools", () => {
     });
     expect(navigated).toMatchObject({ title: "Demo" });
     expect("fallback" in navigated && navigated.fallback).toBeFalsy();
+    // The page comes back with the navigation, so the bot can act without a separate snapshot.
+    expect(String((navigated as { tree?: string }).tree)).toMatch(/\[e\d+\]/);
 
     const snap = await browserSnapshotFromTool(browser, computer, context, {});
     expect(snap).toMatchObject({ title: "Demo" });

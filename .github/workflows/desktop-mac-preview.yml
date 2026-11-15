@@ -1,0 +1,44 @@
+name: desktop-mac-preview
+
+# An unsigned macOS build for testers until signing credentials exist. It is not a release:
+# macOS asks testers to confirm the first launch, and the app does not auto-update.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - name: Generate the database client for desktop compilation
+        run: pnpm db:generate
+        env:
+          DATABASE_URL: postgres://argo:argo@127.0.0.1:5433/argo
+      - name: Build renderer and Electron main process
+        run: pnpm --filter @argo/web build && pnpm --filter @argo/desktop build
+        env:
+          ARGO_ALLOW_DEV_SECRETS: "1"
+          ARGO_DESKTOP_RELEASE: "1"
+      - name: Package unsigned universal macOS app
+        run: |
+          pnpm --filter @argo/desktop exec electron-builder \
+            --mac dmg --universal --publish never -c.mac.identity=null -c.mac.notarize=false
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: argo-mac-preview-${{ github.sha }}
+          path: apps/desktop/out/*.dmg
+          if-no-files-found: error
+          retention-days: 30

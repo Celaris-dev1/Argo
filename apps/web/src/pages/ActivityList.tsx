@@ -1,5 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { RunActivityRow, RunStatus } from "@argo/contracts";
 import { isAgedStuckWork, isRetryableError } from "@argo/core";
 import {
@@ -12,6 +10,8 @@ import {
   NativeSelectOption,
   Spinner,
 } from "@argo/ui-web";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useId, useMemo, useState } from "react";
 import type { ActivityListFilters } from "../lib/activity-list-filters";
@@ -24,6 +24,7 @@ import {
 } from "../lib/activity-list-filters";
 import { useSpaceQueries } from "../lib/query";
 import { formatRelativeTime } from "../lib/relative-time";
+import { useSpaceRpc } from "../lib/space-rpc";
 
 export function statusTone(status: RunActivityRow["status"], updatedAt?: string): string {
   if (status === "failed") return "text-destructive";
@@ -329,44 +330,194 @@ function FilterChip({ label, onClear }: { label: string; onClear: () => void }) 
 
 function ActivityRow({ run, onOpen }: { run: RunActivityRow; onOpen: () => void }) {
   const { t } = useLingui();
+  const [showActions, setShowActions] = useState(false);
+  const actionsId = useId();
   const title = run.groupName ? `${run.botName}, ${run.groupName}` : run.botName;
   const label = statusLabel(run.status);
   const activityLabel = t`${title}, ${label}`;
   const tone = statusTone(run.status, run.updatedAt);
   const preview = activityPreview(run);
+  const finished =
+    run.status === "completed" || run.status === "failed" || run.status === "cancelled";
   return (
-    <button
-      type="button"
-      aria-label={activityLabel}
-      onClick={onOpen}
-      className="flex w-full gap-3 rounded-xl px-2.5 py-[9px] text-left hover:bg-accent"
-    >
-      <span
-        className={`mt-1.5 size-2 shrink-0 rounded-full bg-current ${tone}`}
-        aria-hidden="true"
-      />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="flex min-w-0 gap-2 text-sm font-medium">
-            <span className="truncate text-foreground">{run.botName}</span>
-            {run.groupName ? (
-              <span className="truncate text-muted-foreground">{run.groupName}</span>
-            ) : null}
-          </span>
-          <span className="shrink-0 text-xs text-muted-foreground/80">
-            {formatRelativeTime(run.updatedAt)}
-          </span>
-        </div>
-        <div className="mt-0.5 flex items-baseline gap-2">
-          {preview ? (
-            <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
-              {preview}
+    <div>
+      <button
+        type="button"
+        aria-label={activityLabel}
+        onClick={onOpen}
+        className="flex w-full gap-3 rounded-xl px-2.5 py-[9px] text-left hover:bg-accent"
+      >
+        <span
+          className={`mt-1.5 size-2 shrink-0 rounded-full bg-current ${tone}`}
+          aria-hidden="true"
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="flex min-w-0 gap-2 text-sm font-medium">
+              <span className="truncate text-foreground">{run.botName}</span>
+              {run.groupName ? (
+                <span className="truncate text-muted-foreground">{run.groupName}</span>
+              ) : null}
             </span>
-          ) : null}
-          <span className={`ms-auto shrink-0 text-xs ${tone}`}>{label}</span>
+            <span className="shrink-0 text-xs text-muted-foreground/80">
+              {formatRelativeTime(run.updatedAt)}
+            </span>
+          </div>
+          <div className="mt-0.5 flex items-baseline gap-2">
+            {preview ? (
+              <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
+                {preview}
+              </span>
+            ) : null}
+            <span className={`ms-auto shrink-0 text-xs ${tone}`}>{label}</span>
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
+      {finished ? (
+        <Collapsible open={showActions} onOpenChange={setShowActions}>
+          <button
+            type="button"
+            aria-expanded={showActions}
+            aria-controls={actionsId}
+            onClick={() => setShowActions((open) => !open)}
+            className="ms-[30px] mb-1 text-[12px] text-muted-foreground hover:text-foreground"
+            data-testid="activity-actions-toggle"
+          >
+            <Trans>What it did</Trans>
+          </button>
+          <CollapsibleContent id={actionsId}>
+            {showActions ? <RunActions runId={run.runId} /> : null}
+          </CollapsibleContent>
+        </Collapsible>
+      ) : null}
+      {run.status === "completed" ? <ShareRun runId={run.runId} /> : null}
+    </div>
+  );
+}
+
+function ShareRun({ runId }: { runId: string }) {
+  const { t } = useLingui();
+  const rpc = useSpaceRpc();
+  const [url, setUrl] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "busy" | "copied" | "error">("idle");
+  async function share() {
+    setState("busy");
+    try {
+      const link = (await rpc.runs.share({ runId })).url;
+      setUrl(link);
+      await navigator.clipboard?.writeText(link).catch(() => undefined);
+      setState("copied");
+    } catch {
+      setState("error");
+    }
+  }
+  async function stop() {
+    setState("busy");
+    try {
+      await rpc.runs.unshare({ runId });
+      setUrl(null);
+      setState("idle");
+    } catch {
+      setState("error");
+    }
+  }
+  return (
+    <div className="ms-[30px] mb-1 flex flex-wrap items-baseline gap-3 text-[12px]">
+      {url ? (
+        <>
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="truncate text-foreground underline"
+          >
+            {state === "copied" ? t`Link copied` : url}
+          </a>
+          <button
+            type="button"
+            onClick={() => void stop()}
+            disabled={state === "busy"}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Trans>Stop sharing</Trans>
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          onClick={() => void share()}
+          disabled={state === "busy"}
+          className="text-muted-foreground hover:text-foreground"
+          data-testid="activity-share"
+        >
+          <Trans>Share</Trans>
+        </button>
+      )}
+      {state === "error" ? (
+        <span className="text-destructive" role="alert">
+          {t`Could not share`}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function RunActions({ runId }: { runId: string }) {
+  const { t } = useLingui();
+  const queries = useSpaceQueries();
+  const actions = useQuery(queries.runs.actions.queryOptions({ input: { runId } }));
+  if (actions.isPending) {
+    return (
+      <p className="ms-[30px] pb-2 text-[12.5px] text-muted-foreground/80">
+        <Spinner aria-label={t`Loading`} />
+      </p>
+    );
+  }
+  if (actions.error) {
+    return (
+      <p className="ms-[30px] pb-2 text-[12.5px] text-destructive" role="alert">
+        {t`Could not load actions`}
+      </p>
+    );
+  }
+  const list = actions.data?.actions ?? [];
+  if (list.length === 0) {
+    return (
+      <p className="ms-[30px] pb-2 text-[12.5px] text-muted-foreground/80">
+        <Trans>No tools used.</Trans>
+      </p>
+    );
+  }
+  return (
+    <ol className="ms-[30px] space-y-0.5 pb-2" data-testid="activity-actions">
+      {list.map((action, index) => (
+        <li key={`${action.at}-${index}`} className="flex items-baseline gap-2 text-[12.5px]">
+          <span
+            className={
+              action.outcome === "success"
+                ? "text-success"
+                : action.outcome === "denied"
+                  ? "text-warning"
+                  : "text-destructive"
+            }
+            aria-hidden="true"
+          >
+            {action.outcome === "success" ? "✓" : action.outcome === "denied" ? "⊘" : "✕"}
+          </span>
+          <span className="sr-only">
+            {action.outcome === "success"
+              ? t`Done`
+              : action.outcome === "denied"
+                ? t`Blocked`
+                : t`Failed`}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-foreground">{action.label}</span>
+          <span className="shrink-0 text-muted-foreground/70">
+            {new Date(action.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }
 

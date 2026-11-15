@@ -38,10 +38,10 @@ describe("mobile appearance", () => {
     vi.resetModules();
   });
 
-  it("defaults to system and resolves light or dark from the scheme", async () => {
+  it("defaults to dark and resolves light or dark from the scheme", async () => {
     const { getCachedAppearancePreference, resolveMobileAppearance, setAppearancePreference } =
       await import("./appearance");
-    expect(getCachedAppearancePreference()).toBe("system");
+    expect(getCachedAppearancePreference()).toBe("dark");
     expect(resolveMobileAppearance("system", "light")).toBe("light");
     expect(resolveMobileAppearance("system", "dark")).toBe("dark");
     await setAppearancePreference("light");
@@ -85,7 +85,9 @@ describe("mobile appearance", () => {
   });
 
   it("notifies subscribers when the OS scheme flips under System preference", async () => {
-    const { resolveMobileAppearance, subscribeAppearance } = await import("./appearance");
+    const { resolveMobileAppearance, setAppearancePreference, subscribeAppearance } =
+      await import("./appearance");
+    await setAppearancePreference("system");
     const listener = vi.fn();
     subscribeAppearance(listener);
 

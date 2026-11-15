@@ -1,4 +1,4 @@
-export const COMPOSER_ENTER_TO_SEND_STORAGE_KEY = "argo.exampleposerEnterToSend";
+export const COMPOSER_ENTER_TO_SEND_STORAGE_KEY = "argo.composerEnterToSend";
 
 type EnterToSendStorage = Pick<Storage, "getItem" | "setItem">;
 

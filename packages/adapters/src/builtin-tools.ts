@@ -147,7 +147,7 @@ const scheduleTimingSpecs = {
   watch: {
     type: "object",
     description:
-      'Run only when something changes, checked without a model every everyMinutes (minimum 5, default 15). kind files: paths on your computer. kind command: a shell command run in your folder every interval without a model or per-run approval, equivalent to running the command yourself; its output is compared. kind tool: a read-only connected tool and its args. If nothing changed, the routine does not run. Watch one named thing (a folder, a list, a search), never a whole account. For a list result, set track: e.g. new email matching a search -> the mail search tool with its query, track ["id"]; a Drive folder -> the tool listing that folder\'s files, track ["id", "modifiedTime"]; a ClickUp list -> the tool listing its tasks, track ["id", "date_updated"].',
+      'Run only when something changes, checked without a model every everyMinutes (minimum 5, default 15). kind files: paths on your computer. kind command: a shell command run in your folder every interval without a model or per-run approval, equivalent to running the command yourself; its output is compared. kind tool: a read-only connected tool and its args. If nothing changed, the routine does not run. Watch one named thing (a folder, a list, a search), never a whole account. For a list result, set track: e.g. new email matching a search -> the mail search tool with its query, track ["id"]; a Drive folder -> the tool listing that folder\'s files, track ["id", "modifiedTime"]; a ClickUp list -> the tool listing its tasks, track ["id", "date_updated"]; a web page price or stock -> kind command with a curl that prints only that value.',
     properties: {
       kind: { type: "string", enum: ["files", "command", "tool"] },
       paths: { type: "array", items: { type: "string" } },
@@ -319,7 +319,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "browser_navigate",
     description:
-      'Open a URL in the page browser on this bot\'s computer and return the document title. Prefer this over pixel clicks for web pages. If the result includes fallback:"computer_act", use computer_act on the desktop browser instead.',
+      "Open a URL in the page browser on this bot's computer. The result is the page's snapshot, with element refs for browser_act, so you do not need browser_snapshot right after it. Prefer this over pixel clicks for web pages. If the result includes fallback:\"computer_act\", use computer_act on the desktop browser instead.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1300,7 +1300,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "call_user",
     description:
-      "Ring the user's devices for a voice call. Use when the user asked you to call them, or when you have reminded them about the same thing three times and they have not replied. Your opening is spoken the moment they answer, then the conversation continues on the call. If they miss or decline it, the chat shows a missed call. Never call for routine updates a message can carry.",
+      "Ring the user's devices for a voice call. Use when the user asked you to call them, or when you have reminded them about the same thing three times and they have not replied. From a routine or watch, call only when the user asked to be called about what you found. Your opening is spoken the moment they answer, then the conversation continues on the call. If they miss or decline it, the chat shows a missed call. Never call for routine updates a message can carry.",
     inputSchema: {
       type: "object",
       properties: {

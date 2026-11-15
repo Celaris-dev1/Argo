@@ -1,4 +1,3 @@
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import type { ModelHeaderRow, ThinkingLevel } from "@argo/contracts";
 import {
   CLOUDFLARE_AI_GATEWAY_PROVIDER_ID,
@@ -40,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@argo/ui-web";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Check, Copy } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -60,6 +60,7 @@ import {
   runModelConnectionPreflight,
   unavailableSelectedModel,
 } from "../lib/model-connection-preflight";
+import { takePendingTask } from "../lib/pending-task";
 import { rpc } from "../lib/rpc";
 import { useModelOAuthSignIn } from "../lib/use-model-oauth-signin";
 import { errorText } from "../lib/user-error";
@@ -111,6 +112,7 @@ async function createOrReuseFirstBot(): Promise<{ id: string }> {
       instructions: "",
       notifyOnFinish: true,
       spawnKey: FIRST_BOT_SPAWN_KEY,
+      firstTask: takePendingTask(),
     });
     return { id: created.id };
   } catch (error) {

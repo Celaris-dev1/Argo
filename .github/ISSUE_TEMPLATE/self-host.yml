@@ -7,9 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        For **security vulnerabilities**, email [security@argo.example](mailto:security@argo.example). See [SECURITY.md](https://github.com/elie222/rakazo/blob/main/SECURITY.md).
+        For **security vulnerabilities**, email [security@argo.example](mailto:security@argo.example). See [SECURITY.md](https://github.com/celaris-dev1/argo/blob/main/SECURITY.md).
 
-        Setup steps are in [README.md](https://github.com/elie222/rakazo/blob/main/README.md). Do not paste `.env` contents or API keys.
+        Setup steps are in [README.md](https://github.com/celaris-dev1/argo/blob/main/README.md). Do not paste `.env` contents or API keys.
 
   - type: dropdown
     id: step

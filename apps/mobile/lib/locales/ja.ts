@@ -1,4 +1,8 @@
 export const JA_MESSAGES: Record<string, string> = {
+  "Terms of Use": "利用規約",
+  "I'm 18 or older and agree to the Terms of Use.": "18歳以上であり、利用規約に同意します。",
+  Read: "読む",
+  Agree: "同意する",
   "How other bots see it": "他のボットからの見え方",
   "Share to": "共有先",
   "{count} files": "{count}個のファイル",

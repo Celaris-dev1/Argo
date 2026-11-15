@@ -22,7 +22,7 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { z } from "zod";
 import { computerImageEnsurer } from "./computer-image.js";
-import type { ComputerEgressMode } from "./computer-spec.js";
+import type { ComputerEgressMode, ComputerProfile } from "./computer-spec.js";
 import {
   assertComputerMountSources,
   assertVolumeSubpathSupport,
@@ -50,6 +50,7 @@ import {
   resolveComputerDns,
   resolveComputerEgressMode,
   resolveComputerMounts,
+  resolveComputerProfiles,
   resolveScreenNetworkMode,
   resolveScreenPublishTarget,
   resolveSpaceComputerLimit,
@@ -115,6 +116,26 @@ const computerContext =
   process.env.ARGO_COMPUTER_CONTEXT ??
   path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../computer");
 const ensureComputerImage = computerImageEnsurer(docker, COMPUTER_IMAGE, computerContext);
+const computerProfiles = resolveComputerProfiles();
+
+/**
+ * The named profile, when this host can run it. A profile whose image is not on the host
+ * falls back to the deployment's computer so the bot still starts.
+ */
+async function usableProfile(name: string | undefined): Promise<ComputerProfile | undefined> {
+  const profile = name ? computerProfiles.get(name) : undefined;
+  if (!profile) return undefined;
+  try {
+    await docker.getImage(profile.image).inspect();
+    return profile;
+  } catch {
+    getLogger().warn("computer profile skipped: its image is not on this host", {
+      profile: name,
+      image: profile.image,
+    });
+    return undefined;
+  }
+}
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const dataDir = path.resolve(repositoryRoot, process.env.DATA_DIR ?? "./data");
 let supervisorInfo: Docker.ContainerInspectInfo | undefined;
@@ -222,6 +243,7 @@ app.post("/computers", async (c) => {
       botId: z.string().min(1),
       homePath: z.string().min(1),
       spaceId: z.string().min(1),
+      profile: z.string().max(32).optional(),
     })
     .parse(await c.req.json());
   try {
@@ -231,6 +253,8 @@ app.post("/computers", async (c) => {
     });
     return await withBotLifecycleLock(body.botId, async () => {
       await ensureComputerImage();
+      const profile = await usableProfile(body.profile);
+      const computerImage = profile?.image ?? COMPUTER_IMAGE;
       await ensureRestrictedEgressEnforced();
       const runtimeInfo = await inspectSupervisorContainer();
       // A containerized supervisor's host paths (data directory, Docker socket) are known only now.
@@ -256,7 +280,7 @@ app.post("/computers", async (c) => {
       const existing = await findBotContainer(body.botId, body.spaceId);
       if (existing) {
         const info = await existing.inspect();
-        const desired = await docker.getImage(COMPUTER_IMAGE).inspect();
+        const desired = await docker.getImage(computerImage).inspect();
         const controlPublishOk = controlPortPublicationMatches(
           info.HostConfig.PortBindings,
           controlViaLoopback,
@@ -313,7 +337,7 @@ app.post("/computers", async (c) => {
           }
           return c.json({
             id: existing.id,
-            image: COMPUTER_IMAGE,
+            image: computerImage,
             resumed: true,
             started,
           });
@@ -367,7 +391,8 @@ app.post("/computers", async (c) => {
           container = await docker.createContainer(
             containerCreateOptions({
               name,
-              image: COMPUTER_IMAGE,
+              image: computerImage,
+              limits: profile,
               botId: body.botId,
               spaceId: body.spaceId,
               ...storage,
@@ -389,7 +414,7 @@ app.post("/computers", async (c) => {
         }
         return c.json({
           id: container.id,
-          image: COMPUTER_IMAGE,
+          image: computerImage,
           resumed: false,
         });
       };
@@ -599,7 +624,10 @@ app.post("/computers/:id/browser", async (c) => {
       true,
       reuseRecent,
     );
-  const runHelper = ({ container, layout }: Awaited<ReturnType<typeof screen>>) =>
+  const runHelper = ({
+    container,
+    layout,
+  }: Pick<Awaited<ReturnType<typeof screen>>, "container" | "layout">) =>
     runContainerCommand(
       container,
       // Arguments go over stdin: origin-bound fills carry saved logins and cards, and argv is
@@ -629,6 +657,30 @@ app.post("/computers/:id/browser", async (c) => {
       },
     );
   try {
+    // A computer without a screen keeps its page browser on the first debug port; drive it there.
+    const { container } = await managedContainer(
+      c.req.param("id"),
+      c.req.header("x-argo-bot-id"),
+      c.req.header("x-argo-space-id"),
+    );
+    if (await isHeadlessComputer(c.req.param("id"), container)) {
+      let result = await runHelper({ container, layout: HEADLESS_BROWSER_LAYOUT });
+      // A computer that just started may still be opening its browser; give it one more chance
+      // here instead of spending a whole bot turn on "not ready".
+      for (let attempt = 0; attempt < 3 && pageBrowserNotReady(result); attempt++) {
+        await new Promise((resolve) => setTimeout(resolve, 1_500));
+        signal.throwIfAborted();
+        result = await runHelper({ container, layout: HEADLESS_BROWSER_LAYOUT });
+      }
+      if (result.code !== 0 || Buffer.byteLength(result.stdout) > 512 * 1024) {
+        throw new Error(
+          /command timed out/.test(result.stderr)
+            ? "Page browser timed out; the page may be busy. Retry once before using other tools."
+            : "Page browser unavailable or interrupted",
+        );
+      }
+      return c.json(JSON.parse(result.stdout));
+    }
     const reusable = await screen(true);
     let result = await runHelper(reusable);
     // A reused screen skipped setup, so a browser that has since exited gets it before one retry.
@@ -1317,6 +1369,20 @@ async function isManagedSpaceContainer(
 
 class ComputerIdentityError extends Error {}
 
+// The headless image starts its page browser without a display, which maps to screen 0.
+const HEADLESS_BROWSER_LAYOUT = screenPorts(0);
+const headlessComputers = new Map<string, boolean>();
+
+/** True for a computer image with no X server (the headless profile); cached per computer. */
+async function isHeadlessComputer(id: string, container: Docker.Container) {
+  const known = headlessComputers.get(id);
+  if (known !== undefined) return known;
+  const probe = await runContainerCommand(container, ["bash", "-c", "command -v Xvfb"]);
+  const headless = probe.code !== 0;
+  headlessComputers.set(id, headless);
+  return headless;
+}
+
 async function managedContainer(id: string, botId?: string, spaceId?: string) {
   if (!botId || !spaceId) throw new ComputerIdentityError("missing computer identity");
   const container = docker.getContainer(id);
@@ -1794,7 +1860,7 @@ export async function reclaimIdleComputerNetworks() {
   const runtime = await inspectSupervisorContainer();
   const owner = computerNetworkOwnerFor(dataDir, runtime);
   const networks = await docker.listNetworks({
-    filters: { label: [`argo.exampleputerOwner=${owner}`] },
+    filters: { label: [`argo.computerOwner=${owner}`] },
   });
   for (const { Name, Labels } of networks) {
     const botId = Labels?.["argo.botId"];

@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Security vulnerabilities
-    url: https://github.com/elie222/rakazo/blob/main/SECURITY.md
+    url: https://github.com/celaris-dev1/argo/blob/main/SECURITY.md
     about: Report security issues to security@argo.example — do not open a public issue.
   - name: User support
     url: mailto:support@argo.example

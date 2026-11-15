@@ -44,6 +44,8 @@ export interface AppEnv {
   /** SHA-256 signing certificate fingerprints of Android apps that may use this domain's passkeys. */
   passkeyAndroidCertFingerprints: string[];
   privacyPolicyUrl?: string;
+  /** Operator Terms of Use every account must accept before AI requests; absent turns the gate off. */
+  termsOfUse?: { url: string; version: string };
   apiUrl: string;
   apiHost: string;
   /** Proxies whose forwarded client address is believed; empty means local networks. */
@@ -225,6 +227,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     passkeyAppleAppIds: list(source.PASSKEY_APPLE_APP_IDS),
     passkeyAndroidCertFingerprints: androidCertFingerprints(source.PASSKEY_ANDROID_CERT_SHA256),
     privacyPolicyUrl: optional(source.PRIVACY_POLICY_URL),
+    termsOfUse: termsOfUse(source.TERMS_OF_USE_URL, source.TERMS_OF_USE_VERSION),
     apiUrl: source.API_URL ?? "http://127.0.0.1:3100",
     apiHost: source.API_HOST ?? "127.0.0.1",
     trustedProxies: (source.TRUSTED_PROXIES ?? "")
@@ -374,4 +377,17 @@ function androidCertFingerprints(value: string | undefined): string[] {
     }
     return hex.toUpperCase().match(/../g)!.join(":");
   });
+}
+
+function termsOfUse(
+  url: string | undefined,
+  version: string | undefined,
+): { url: string; version: string } | undefined {
+  const value = url?.trim();
+  if (!value) return undefined;
+  const parsed = new URL(value);
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:")
+    throw new Error("TERMS_OF_USE_URL must be an http(s) URL");
+  // Bumping the version asks every account to accept again.
+  return { url: parsed.toString(), version: version?.trim() || "1" };
 }

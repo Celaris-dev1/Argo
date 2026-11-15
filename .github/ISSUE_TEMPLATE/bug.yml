@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        For **security vulnerabilities**, email [security@argo.example](mailto:security@argo.example) — do not use this form. See [SECURITY.md](https://github.com/elie222/rakazo/blob/main/SECURITY.md).
+        For **security vulnerabilities**, email [security@argo.example](mailto:security@argo.example) — do not use this form. See [SECURITY.md](https://github.com/celaris-dev1/argo/blob/main/SECURITY.md).
 
   - type: checkboxes
     id: not-security

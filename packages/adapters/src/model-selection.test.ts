@@ -1278,6 +1278,27 @@ describe("bot model change validation", () => {
     ).resolves.toEqual({ ok: true, provider: "xai", model: "saved-model", thinkingLevel: null });
   });
 
+  it("lets anyone pick a model the operator's own model server lists", async () => {
+    vi.stubEnv("PI_DEFAULT_PROVIDER", "local");
+    vi.stubEnv("PI_DEFAULT_MODEL", "fast-model");
+    vi.stubEnv("ARGO_LOCAL_MODELS", "fast-model,other-model");
+    vi.stubEnv("ARGO_LOCAL_MODELS_URL", "http://models.example.test/v1");
+    // The catalog is built once per process, so read it fresh under this deployment's env.
+    vi.resetModules();
+    try {
+      const fresh = await import("./model-selection.js");
+      const deps = changeDeps({});
+      await expect(
+        fresh.validateBotModelChange(deps, { ...scope, provider: "local", model: "other-model" }),
+      ).resolves.toEqual({ ok: true, provider: "local", model: "other-model", thinkingLevel: null });
+      await expect(
+        fresh.validateBotModelChange(deps, { ...scope, provider: "local", model: "not-listed" }),
+      ).resolves.toMatchObject({ ok: false });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("rejects a model the stored credential cannot call", async () => {
     const deps = changeDeps({ "openai-codex": credential("openai-codex", null) });
     const result = await validateBotModelChange(deps, {
