@@ -65,6 +65,13 @@ export interface MessagingInboundDeps {
     clientNonce: string;
     downloadDeadline?: number;
   }) => Promise<{ id: string; name: string; mimeType: string; size: number }>;
+  /** Turns a stored voice note into text with the owner's voice provider. Null when none is set up. */
+  transcribeAudio?: (input: {
+    spaceId: string;
+    userId: string;
+    botId: string;
+    artifactId: string;
+  }) => Promise<string | null>;
 }
 
 type IdentityRow = {
@@ -167,7 +174,8 @@ async function handleDirectEvent(
     })
   )
     return;
-  const body = [text, ...stored.unavailable].filter(Boolean).join("\n");
+  const transcripts = await transcribeVoiceNotes(deps, ids, stored.artifacts);
+  const body = [text, ...transcripts, ...stored.unavailable].filter(Boolean).join("\n");
   const sent = await deps.events.sendUserMessage({
     spaceId: ids.spaceId,
     threadId: ids.threadId,
@@ -211,6 +219,36 @@ async function handleDirectEvent(
       getLogger().error("messaging inbound run enqueue error", error);
     });
   }
+}
+
+/** Voice notes from chat apps reach the bot as text, so models without audio input can answer them. */
+export async function transcribeVoiceNotes(
+  deps: Pick<MessagingInboundDeps, "transcribeAudio">,
+  ids: Pick<ProvisionedMessagingIdentity, "spaceId" | "userId" | "botId">,
+  artifacts: ReadonlyArray<{ id: string; mimeType: string }>,
+): Promise<string[]> {
+  const transcribe = deps.transcribeAudio;
+  if (!transcribe) return [];
+  const lines: string[] = [];
+  for (const artifact of artifacts) {
+    if (!artifact.mimeType.startsWith("audio/")) continue;
+    try {
+      const text = (
+        await transcribe({
+          spaceId: ids.spaceId,
+          userId: ids.userId,
+          botId: ids.botId,
+          artifactId: artifact.id,
+        })
+      )?.trim();
+      if (text) lines.push(`[voice note] ${text}`);
+    } catch (error) {
+      getLogger().warn("messaging voice note was not transcribed", {
+        reason: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+  return lines;
 }
 
 /** Download provider-held files into thread artifacts, mirroring the team-chat path. */

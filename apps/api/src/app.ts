@@ -191,7 +191,11 @@ import {
   TeamChatStartupRetries,
 } from "./team-chat-startup.js";
 import { mountUserDeviceRoutes } from "./user-devices.js";
-import { mountVoiceHttpRoutes, voiceAccountErrorStatus } from "./voice.js";
+import {
+  mountVoiceHttpRoutes,
+  transcribeStoredVoiceNote,
+  voiceAccountErrorStatus,
+} from "./voice.js";
 import { mountWebhookHttpRoutes } from "./webhook.js";
 
 /**
@@ -1039,6 +1043,8 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
           { spaceId, userId },
           input,
         ),
+      transcribeAudio: (input) =>
+        transcribeStoredVoiceNote({ prisma, secrets, env, artifacts }, input),
     } satisfies Parameters<typeof createMessagingInboundHandler>[0];
     const inbound = createMessagingInboundHandler(inboundDeps);
     const handleTeamChatInbound = async (
