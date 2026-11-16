@@ -53,6 +53,15 @@ describe("run shares", () => {
     ).toBe("mail [email] or call [number], key [key]");
   });
 
+  it("keeps dates and figures in reports, and long reports whole", () => {
+    expect(redactForSharing("Published 2026-11-16, fees fell 3.5% to $1 200.")).toBe(
+      "Published 2026-11-16, fees fell 3.5% to $1 200.",
+    );
+    const report = "word ".repeat(3_000);
+    expect(redactForSharing(report, 60_000)).toBe(report);
+    expect(redactForSharing(report)).toHaveLength(6_000);
+  });
+
   it("snapshots a finished run with redacted text and step labels only", async () => {
     const db = prisma(run);
     const { id } = await shareRun(db.client, actor, "r");

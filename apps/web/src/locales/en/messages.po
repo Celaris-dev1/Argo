@@ -2695,6 +2695,7 @@ msgstr "Downgrade at renewal"
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "Download"
 
@@ -3583,6 +3584,10 @@ msgstr "Low"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
+
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr "Made with Argo"
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -4574,6 +4579,10 @@ msgstr "Previous page"
 #: src/pages/SettingsOverlay.tsx
 msgid "Previous settings sections"
 msgstr "Previous settings sections"
+
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr "Print"
 
 #: src/pages/Board.tsx
 msgid "Priority"

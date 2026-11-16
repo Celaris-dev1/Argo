@@ -2696,6 +2696,7 @@ msgstr "下次續訂時降級"
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "下載"
 
@@ -3584,6 +3585,10 @@ msgstr "低"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "使用小寫英文字母、數字、連字號與底線，並以字母開頭。"
+
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -4575,6 +4580,10 @@ msgstr "上一頁"
 #: src/pages/SettingsOverlay.tsx
 msgid "Previous settings sections"
 msgstr "上一組設定區段"
+
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr ""
 
 #: src/pages/Board.tsx
 msgid "Priority"

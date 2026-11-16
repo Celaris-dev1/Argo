@@ -5,7 +5,9 @@ import { IsolationError, runAsSystem } from "@argo/db";
 import { listRunActions } from "./runs.js";
 
 const SHAREABLE = ["completed"] as const;
-const MAX_TEXT = 6_000;
+const MAX_PROMPT = 6_000;
+/** Research reports run to thousands of words; a shared page shows them whole. */
+const MAX_RESULT = 60_000;
 const ID_ALPHABET = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function shareId(): string {
@@ -16,12 +18,17 @@ function shareId(): string {
 }
 
 /** Keeps a shared page from leaking addresses or numbers the person did not mean to publish. */
-export function redactForSharing(text: string): string {
-  return text
-    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[email]")
-    .replace(/\+?\d[\d\s().-]{7,}\d/g, "[number]")
-    .replace(/\b(?:sk|pk|ak|ghp|xox[abp])[-_][A-Za-z0-9_-]{12,}\b/g, "[key]")
-    .slice(0, MAX_TEXT);
+export function redactForSharing(text: string, max = MAX_PROMPT): string {
+  return (
+    text
+      .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[email]")
+      // Phone-like runs only: dates, years and figures in a report stay readable.
+      .replace(/\+?\d[\d\s().-]{7,}\d/g, (match) =>
+        match.replace(/\D/g, "").length >= 9 ? "[number]" : match,
+      )
+      .replace(/\b(?:sk|pk|ak|ghp|xox[abp])[-_][A-Za-z0-9_-]{12,}\b/g, "[key]")
+      .slice(0, max)
+  );
 }
 
 function blocksText(blocks: unknown): string {
@@ -67,7 +74,7 @@ export async function shareRun(
     select: { blocks: true },
   });
   const prompt = redactForSharing(blocksText(run.sourceMessage?.blocks) || run.task?.prompt || "");
-  const result = redactForSharing(blocksText(reply?.blocks));
+  const result = redactForSharing(blocksText(reply?.blocks), MAX_RESULT);
   if (!result) throw new IsolationError();
   const steps = (await listRunActions(prisma, actor, run.id)).map(({ label, outcome }) => ({
     label,

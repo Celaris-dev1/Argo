@@ -2695,6 +2695,7 @@ msgstr ""
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr ""
 
@@ -3582,6 +3583,10 @@ msgstr "Niedrig"
 
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
+msgstr ""
+
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
 msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
@@ -4573,6 +4578,10 @@ msgstr "Vorherige Seite"
 
 #: src/pages/SettingsOverlay.tsx
 msgid "Previous settings sections"
+msgstr ""
+
+#: src/pages/SharedRun.tsx
+msgid "Print"
 msgstr ""
 
 #: src/pages/Board.tsx

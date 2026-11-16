@@ -2695,6 +2695,7 @@ msgstr ""
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "הורדה"
 
@@ -3583,6 +3584,10 @@ msgstr "נמוך"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "אותיות לטיניות קטנות, ספרות, מקפים וקווים תחתונים, ובהתחלה אות."
+
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -4573,6 +4578,10 @@ msgstr "העמוד הקודם"
 
 #: src/pages/SettingsOverlay.tsx
 msgid "Previous settings sections"
+msgstr ""
+
+#: src/pages/SharedRun.tsx
+msgid "Print"
 msgstr ""
 
 #: src/pages/Board.tsx
