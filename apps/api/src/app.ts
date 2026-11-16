@@ -148,6 +148,7 @@ import { storeInboundAttachment } from "./artifacts.js";
 import { mountAuditExportRoute } from "./audit-export.js";
 import { createBillingService } from "./billing.js";
 import { mountBillingRoutes } from "./billing-webhook.js";
+import { readPublicBotStatus } from "./bot-status.js";
 import { clientBuildMiddleware, readDeployedWebBuild } from "./client-build.js";
 import {
   clientIpMiddleware,
@@ -892,6 +893,13 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     if (!share) return c.json({ error: "not found" }, 404);
     c.header("cache-control", "public, max-age=60");
     return c.json(share);
+  });
+  // A status page is public by design: its owner published it and can revoke it.
+  app.get("/api/v1/status/:id", async (c) => {
+    const status = await readPublicBotStatus(prisma, c.req.param("id"));
+    if (!status) return c.json({ error: "not found" }, 404);
+    c.header("cache-control", "public, max-age=60");
+    return c.json(status);
   });
   mountApiRequestBodyLimits(app, env.maxUploadSizeBytes);
   mountScreenTarget(app, prisma, env.screenProxySecret);

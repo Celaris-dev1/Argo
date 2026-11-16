@@ -19,6 +19,11 @@ vi.mock("../../lib/rpc", () => {
       list: vi.fn().mockResolvedValue([]),
     },
     me: vi.fn().mockResolvedValue(null),
+    runs: {
+      statusPage: vi.fn().mockResolvedValue({ url: null }),
+      publishStatus: vi.fn().mockResolvedValue({ url: "https://argo.test/s/abcdef" }),
+      unpublishStatus: vi.fn().mockResolvedValue({ ok: true }),
+    },
   };
   return {
     rpc,

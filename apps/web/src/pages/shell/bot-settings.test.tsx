@@ -16,6 +16,7 @@ vi.mock("../../lib/rpc", () => {
       list: vi.fn(async () => []),
     },
     me: vi.fn(async () => ({})),
+    runs: { statusPage: vi.fn(async () => ({ url: null })) },
   };
   return {
     rpc,
