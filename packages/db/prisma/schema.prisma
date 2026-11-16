@@ -78,6 +78,8 @@ model User {
   /// IANA timezone such as "Pacific/Auckland". Null until set; bots then get UTC only.
   timezone                    String?
   marketingEmailOptOutAt      DateTime?
+  /// Release whose "what's new" note a bot last passed on; see release-notes.ts.
+  announcedRelease            String?
   sessions                    Session[]
   accounts                    Account[]
   passkeys                    Passkey[]

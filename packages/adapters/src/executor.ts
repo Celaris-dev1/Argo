@@ -6,7 +6,7 @@ import {
   SandboxUnavailableError,
   SandboxUnresponsiveError,
 } from "@argo/adapter-kit";
-import type { MessageBlock, ModelRoleChoice, RunStatus } from "@argo/contracts";
+import type { MessageBlock, ModelRoleChoice, RunStatus, RunTrigger } from "@argo/contracts";
 import { disabledBuiltinToolSet } from "@argo/contracts";
 import {
   assertTransition,
@@ -111,6 +111,7 @@ import { usesNativeShell } from "./native-shell.js";
 import { paymentWalletConnected } from "./payment-wallets.js";
 import { isRetiredModelCredentialError } from "./pi-oauth.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
+import { RELEASE_NOTES, releaseAnnouncement } from "./release-notes.js";
 import { loadReplyContext, messageToAgentHistoryText } from "./reply-context.js";
 import { backOffRoutineAfterAccountError } from "./routine-backoff.js";
 import { lateRoutineRunInstruction } from "./routine-lateness.js";
@@ -1380,13 +1381,18 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             );
         const replyContext = await loadReplyContext(deps.prisma, thread.id, run.sourceMessageId);
         let userTimeZone: string | null | undefined;
+        let releaseNote: string | undefined;
         try {
-          userTimeZone = (
-            await deps.prisma.user.findUnique({
-              where: { id: run.userId },
-              select: { timezone: true },
-            })
-          )?.timezone;
+          const user = await deps.prisma.user.findUnique({
+            where: { id: run.userId },
+            select: { timezone: true, announcedRelease: true, createdAt: true },
+          });
+          userTimeZone = user?.timezone;
+          releaseNote = releaseAnnouncement({
+            trigger: run.trigger as RunTrigger,
+            announcedRelease: user?.announcedRelease,
+            userCreatedAt: user?.createdAt,
+          });
         } catch {
           // Timezone is optional context; a lookup failure must not prevent a run.
         }
@@ -1555,6 +1561,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
               contextStrategy: deps.contextStrategy,
               instructions: userTurnInstructions({
                 botInstructions: runIdentityInstruction(bot, run.trigger),
+                releaseNote,
                 groupContext,
                 messagingContext,
                 redactedMemoryContext: memoryContext
@@ -1731,6 +1738,14 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           if (await consumeRunEvents(ctx, runtimeEvents)) return;
           if (await interruptedByShutdown()) return;
           await completeRun(ctx);
+          if (releaseNote) {
+            await deps.prisma.user
+              .updateMany({
+                where: { id: run.userId },
+                data: { announcedRelease: RELEASE_NOTES.version },
+              })
+              .catch(() => undefined);
+          }
         } catch (caughtError) {
           if (await interruptedByShutdown()) return;
           await failRun(ctx, caughtError, {
