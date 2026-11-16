@@ -2039,6 +2039,7 @@ msgstr "Dieser Chat konnte nicht geladen werden."
 msgid "Could not load this file."
 msgstr "Datei konnte nicht geladen werden."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -3507,6 +3508,7 @@ msgid "Load web images automatically"
 msgstr "Webbilder automatisch laden"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3585,6 +3587,7 @@ msgstr "Niedrig"
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr ""
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Made with Argo"
 msgstr ""
@@ -4617,6 +4620,10 @@ msgstr "Anbieter"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "Anbieter"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -5949,6 +5956,7 @@ msgstr ""
 msgid "This import was already used. Choose the files again."
 msgstr "Dieser Import wurde bereits verwendet. Wähle die Dateien erneut aus."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""

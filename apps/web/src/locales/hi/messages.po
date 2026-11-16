@@ -2039,6 +2039,7 @@ msgstr "यह चैट लोड नहीं हो सकी."
 msgid "Could not load this file."
 msgstr "यह फ़ाइल लोड नहीं हो सकी।"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -3507,6 +3508,7 @@ msgid "Load web images automatically"
 msgstr "वेब छवियाँ अपने-आप लोड करें"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3585,6 +3587,7 @@ msgstr "निम्न"
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr ""
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Made with Argo"
 msgstr ""
@@ -4617,6 +4620,10 @@ msgstr "प्रोवाइडर"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "प्रोवाइडर"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -5949,6 +5956,7 @@ msgstr ""
 msgid "This import was already used. Choose the files again."
 msgstr "यह इंपोर्ट पहले ही इस्तेमाल हो चुका है। फ़ाइलें फिर से चुनें।"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""

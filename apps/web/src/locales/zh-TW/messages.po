@@ -2040,6 +2040,7 @@ msgstr "無法載入此對話。"
 msgid "Could not load this file."
 msgstr "無法載入此檔案。"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -3508,6 +3509,7 @@ msgid "Load web images automatically"
 msgstr "自動載入網路圖片"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3586,6 +3588,7 @@ msgstr "低"
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "使用小寫英文字母、數字、連字號與底線，並以字母開頭。"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Made with Argo"
 msgstr ""
@@ -4618,6 +4621,10 @@ msgstr "供應商"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "供應商"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -5950,6 +5957,7 @@ msgstr "此檔案不是有效的 UTF-8 文字。"
 msgid "This import was already used. Choose the files again."
 msgstr "此匯入已使用過。請重新選擇檔案。"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""
