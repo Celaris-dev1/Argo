@@ -28,6 +28,45 @@ export {
   type WebhookTarget,
 } from "./webhook-inbound.js";
 
+/**
+ * Bearer, or HTTP Basic with the secret as the password. Inbound-email services and
+ * other no-code senders can only put credentials in the URL (https://any:SECRET@host/…).
+ */
+export function hasValidWebhookAuth(authorization: string | undefined, expected: string): boolean {
+  if (authorization?.slice(0, 6).toLowerCase() === "basic ") {
+    let decoded = "";
+    try {
+      decoded = Buffer.from(authorization.slice(6).trim(), "base64").toString("utf8");
+    } catch {
+      return false;
+    }
+    const colon = decoded.indexOf(":");
+    return colon >= 0 && hasValidBearerToken(`Bearer ${decoded.slice(colon + 1)}`, expected);
+  }
+  return hasValidBearerToken(authorization, expected);
+}
+
+/** Form posts (inbound email, simple form tools) become flat text fields; files are dropped. */
+async function readWebhookPayload(raw: string, contentType: string | undefined) {
+  const type = contentType?.toLowerCase() ?? "";
+  if (
+    type.startsWith("application/x-www-form-urlencoded") ||
+    type.startsWith("multipart/form-data")
+  ) {
+    try {
+      const form = await new Response(raw, {
+        headers: { "content-type": contentType! },
+      }).formData();
+      const fields: Record<string, unknown> = {};
+      for (const [key, value] of form) if (typeof value === "string") fields[key] = value;
+      return fields;
+    } catch {
+      return { text: raw.trim() };
+    }
+  }
+  return parseWebhookPayload(raw, contentType);
+}
+
 export function webhookPath(botId: string): string {
   return `/api/v1/bots/${botId}/webhook`;
 }
@@ -55,11 +94,11 @@ export function mountWebhookHttpRoutes(app: Hono, deps: WebhookDeps) {
     }
 
     // Same 401 for missing bot, missing secret, and bad bearer so bot ids are not enumerable.
-    if (!target || !hasValidBearerToken(c.req.header("authorization"), target.expected)) {
+    if (!target || !hasValidWebhookAuth(c.req.header("authorization"), target.expected)) {
       return unauthorized();
     }
 
-    const payload = parseWebhookPayload(raw, c.req.header("content-type"));
+    const payload = await readWebhookPayload(raw, c.req.header("content-type"));
     const eventPrompt = formatWebhookPrompt(payload);
 
     const webhookRoutines = await deps.prisma.routine.findMany({
