@@ -10,6 +10,29 @@ import type { ToolHandlers } from "./run-tool-gate.js";
 import { postWorkStatus } from "./work-status.js";
 
 const QUESTION_MAX = 4_000;
+const NUMERIC_OVERRIDES = ["questions", "sources", "rounds", "minutes", "words", "recencyDays"];
+
+/**
+ * Models raise depth on their own when a topic sounds big, which costs minutes and tokens nobody
+ * asked for. Keep a deeper level or a numeric override only when the request itself names it.
+ */
+export function requestedResearchArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const question = String(args.question ?? "").toLowerCase();
+  const kept: Record<string, unknown> = { ...args };
+  const depth = typeof args.depth === "string" ? args.depth.toLowerCase() : undefined;
+  if (
+    depth &&
+    depth !== "low" &&
+    (!/^[a-z]+$/.test(depth) || !new RegExp(`\\b${depth}\\b`).test(question))
+  )
+    delete kept.depth;
+  for (const key of NUMERIC_OVERRIDES) {
+    const value = args[key];
+    if (value === undefined) continue;
+    if (!new RegExp(`\\b${Number(value)}\\b`).test(question)) delete kept[key];
+  }
+  return kept;
+}
 
 /** Wires the provider-neutral research engine to this run's model, web provider and status line. */
 function researchDeps(ctx: RunContext, operationId: string): ResearchDeps {
@@ -83,7 +106,7 @@ export const researchTools: ToolHandlers = {
     if (question.length > QUESTION_MAX) {
       return call.finish({ error: `question is longer than ${QUESTION_MAX} characters` });
     }
-    const settings = resolveResearchSettings(call.args);
+    const settings = resolveResearchSettings(requestedResearchArgs(call.args));
     const deps = researchDeps(ctx, `research:${ctx.runId}:${call.executionId}`);
     try {
       const result = await runResearch(question, settings, deps);
