@@ -5,6 +5,7 @@ import type {
   ThreadMessage,
   VoiceStatus,
 } from "@argo/contracts";
+import { startersFor } from "@argo/contracts";
 import {
   answerableAskMessageIds,
   channelMessageSender,
@@ -47,6 +48,7 @@ import {
 } from "../lib/bots-sidebar-density-pref";
 import { readBotsSidebarCollapsed, writeBotsSidebarCollapsed } from "../lib/bots-sidebar-pref";
 import { setCallMinimized, startCall, useCallSession } from "../lib/call-session";
+import { writeComposerDraft } from "../lib/composer-draft";
 import {
   getComposerEnterToSend,
   subscribeComposerEnterToSend,
@@ -84,6 +86,7 @@ import { useCreateMenu } from "./shell/sidebar-header";
 import { BotsSidebarLayout } from "./shell/sidebar-layout";
 import { SidebarRoster } from "./shell/sidebar-roster";
 import { commitSpaceRename, countUnreadChats, sidebarGroupsForSpaces } from "./shell/space-sidebar";
+import { StarterTasks } from "./shell/starter-tasks";
 import { Transcript } from "./shell/transcript";
 import { useBrowserNotifications } from "./shell/use-browser-notifications";
 import { useChatRead } from "./shell/use-chat-read";
@@ -429,6 +432,15 @@ function SpaceShell() {
     () => foldPeerReplies(activeSnapshot?.messages ?? [], { includePeerReceipts: true }),
     [activeSnapshot?.messages],
   );
+  // Remounts the composer so a picked starter shows up as its draft.
+  const [starterPick, setStarterPick] = useState(0);
+  const showStarters =
+    !inGroup &&
+    Boolean(active) &&
+    Boolean(activeSnapshot) &&
+    (activeSnapshot?.messages.length ?? 0) === 0 &&
+    !activeSnapshot?.olderCursor &&
+    !composerRunning;
   const transcriptArtifactTarget = useMemo<ArtifactTarget>(
     () => (inGroup ? { groupId: groupId ?? "" } : { botId: active?.id ?? "" }),
     [active?.id, groupId, inGroup],
@@ -989,8 +1001,17 @@ function SpaceShell() {
                 <Trans>Teaching in progress. Stop teaching before sending a new message.</Trans>
               </div>
             ) : null}
+            {showStarters && !recordingSkill && active ? (
+              <StarterTasks
+                starters={startersFor(active.instructions)}
+                onPick={(text) => {
+                  writeComposerDraft(`bot:${active.id}`, text);
+                  setStarterPick((n) => n + 1);
+                }}
+              />
+            ) : null}
             <Composer
-              key={inGroup ? `group:${groupId}` : `bot:${active?.id}`}
+              key={inGroup ? `group:${groupId}` : `bot:${active?.id}:${starterPick}`}
               draftKey={inGroup ? `group:${groupId}` : `bot:${active?.id}`}
               enterToSend={enterToSend}
               activeName={inGroup ? (activeGroup?.name ?? activeSnapshot?.groupName) : active?.name}
