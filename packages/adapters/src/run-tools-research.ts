@@ -152,7 +152,7 @@ export async function runForcedResearch(ctx: RunContext, question: string): Prom
       ? "high"
       : undefined;
   const result = await researchResult(ctx, { question, depth }, `research:${ctx.runId}:forced`);
-  return `The deep_research tool already ran for this request. Its result:\n${JSON.stringify(result)}\nPresent it as the Research skill says. Do not call deep_research again for this request.`;
+  return `The deep_research tool already ran for this request. Its result:\n${JSON.stringify(result)}\nPresent it as the Research skill says, starting with the report itself: no preamble or status lines. Do not call deep_research again for this request.`;
 }
 
 export const researchTools: ToolHandlers = {
