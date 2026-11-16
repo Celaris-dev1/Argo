@@ -245,9 +245,10 @@ describe("screen frame reports", () => {
     expect(screenFrameMessage({ argoScreen: "connected" })).toEqual({
       argoScreen: "connected",
     });
-    expect(screenFrameMessage({ argoScreen: "failed", detail: "  Failed to connect  " })).toEqual(
-      { argoScreen: "failed", detail: "Failed to connect" },
-    );
+    expect(screenFrameMessage({ argoScreen: "failed", detail: "  Failed to connect  " })).toEqual({
+      argoScreen: "failed",
+      detail: "Failed to connect",
+    });
     expect(
       screenFrameMessage({ argoScreen: "failed", detail: "x".repeat(300) })?.detail,
     ).toHaveLength(200);

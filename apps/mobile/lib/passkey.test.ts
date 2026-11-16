@@ -46,9 +46,7 @@ vi.mock("./session", () => ({
 const CHALLENGE = "__Secure-better-auth.better-auth-passkey=token.c2lnbmF0dXJl%3D";
 const credential = { id: "cred", rawId: "cred", type: "public-key", response: {} };
 
-function challengeResponse(
-  body: unknown = { challenge: "challenge", rpId: "argo.example.test" },
-) {
+function challengeResponse(body: unknown = { challenge: "challenge", rpId: "argo.example.test" }) {
   return {
     response: new Response(null, {
       headers: { "set-cookie": `${CHALLENGE}; Path=/; HttpOnly; Secure; SameSite=Lax` },

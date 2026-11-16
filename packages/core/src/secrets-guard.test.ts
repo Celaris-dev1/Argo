@@ -269,9 +269,9 @@ describe("resolveContentEncryption", () => {
     expect(resolveContentEncryption({})).toBe(true);
     expect(resolveContentEncryption({ NODE_ENV: "test" })).toBe(true);
     expect(resolveContentEncryption({ NODE_ENV: "development" })).toBe(false);
-    expect(
-      resolveContentEncryption({ NODE_ENV: "production", ARGO_ALLOW_DEV_SECRETS: "1" }),
-    ).toBe(false);
+    expect(resolveContentEncryption({ NODE_ENV: "production", ARGO_ALLOW_DEV_SECRETS: "1" })).toBe(
+      false,
+    );
   });
 
   it("follows an explicit setting in every mode", () => {

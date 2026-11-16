@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
   credentialIssue,
   MAX_PASSWORD_LENGTH,
@@ -6,6 +5,7 @@ import {
   signupRequiresEmailVerification,
 } from "@argo/core";
 import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PasskeySignIn } from "../components/PasskeySignIn";

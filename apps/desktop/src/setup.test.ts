@@ -4,11 +4,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type {
+  ArgoSetup,
   DesktopLocalStackState,
   DesktopReachability,
   DesktopSetup,
   DesktopSetupState,
-  ArgoSetup,
 } from "@argo/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 

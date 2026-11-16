@@ -1,6 +1,6 @@
-import { Trans } from "@lingui/react/macro";
 import type { ComputerReleaseReason } from "@argo/contracts";
 import { Button } from "@argo/ui-web";
+import { Trans } from "@lingui/react/macro";
 
 export function ComputerReleaseActions({
   takeoverRequested,

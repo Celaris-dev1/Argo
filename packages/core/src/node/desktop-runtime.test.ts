@@ -99,9 +99,7 @@ function fixture() {
           // Lifecycle processes are stubbed here; the opt-in Docker smoke runs the real commands.
           "flock() { :; }",
           `bash() { return ${failLifecycle ? 1 : 0}; }`,
-          script
-            .replaceAll("/tmp/argo/desktop-assignments", root)
-            .replaceAll("/tmp/argo", root),
+          script.replaceAll("/tmp/argo/desktop-assignments", root).replaceAll("/tmp/argo", root),
         ].join("\n"),
       ],
       { encoding: "utf8", timeout: 5000 },

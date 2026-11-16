@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
-import { expect, test } from "@playwright/test";
 import { BOT_AVATAR_COLORS } from "@argo/core";
+import { expect, test } from "@playwright/test";
 import { captureScreenshot } from "./helpers";
 
 test.use({ viewport: { width: 1260, height: 1000 } });
@@ -727,10 +727,7 @@ test("directional vector rim follows the source edge falloff without whitening t
   page,
 }) => {
   const original = await readFile(
-    new URL(
-      "../../../packages/ui-tokens/assets/Argo.icon/Assets/orange-bot.png",
-      import.meta.url,
-    ),
+    new URL("../../../packages/ui-tokens/assets/Argo.icon/Assets/orange-bot.png", import.meta.url),
   );
   await page.goto("/e2e/fixtures/logo-avatars.html?compare=1&theme=light");
   const art = await page

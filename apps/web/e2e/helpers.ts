@@ -1,6 +1,6 @@
+import { signupRequiresEmailVerification } from "@argo/core";
 import type { Locator, Page, TestInfo } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import { signupRequiresEmailVerification } from "@argo/core";
 
 export function isRealSandboxProvider(provider = process.env.SANDBOX_PROVIDER) {
   return (
@@ -30,6 +30,11 @@ export async function rpc<T>(page: Page, procedure: string, body: unknown): Prom
     throw new Error(`${procedure} ${response.status()}: ${parsed.error?.message ?? "failed"}`);
   }
   return parsed.json as T;
+}
+
+/** New accounts run without asking; tests of approval cards opt back into asking. */
+export async function askBeforeActing(page: Page) {
+  await rpc(page, "autoReview/set", { scope: "account", mode: "ask" });
 }
 
 export async function completeOnboarding(page: Page, testInfo?: TestInfo) {

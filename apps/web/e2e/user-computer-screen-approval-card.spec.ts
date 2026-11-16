@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { captureScreenshot, completeOnboarding, signup } from "./helpers";
+import { askBeforeActing, captureScreenshot, completeOnboarding, signup } from "./helpers";
 
 test("asks before using an app on the user's computer", async ({ page }, testInfo) => {
   const stamp = Date.now();
   await signup(page, `user-screen-${stamp}@argo.test`, "password12", "User Screen");
   await completeOnboarding(page);
+  await askBeforeActing(page);
 
   const composer = page.getByPlaceholder(/Message/);
   await composer.fill("look at TextEdit on my computer");

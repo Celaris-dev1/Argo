@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import type { Me, ModelHeaderRow, SettingsScope, ThinkingLevel } from "@argo/contracts";
 import {
   CLOUDFLARE_AI_GATEWAY_PROVIDER_ID,
@@ -31,6 +30,7 @@ import {
   savedCompatibleModelIds,
 } from "@argo/core";
 import { fetchFresh } from "@argo/core/query";
+import { useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useCopyText } from "../../lib/copy-text";

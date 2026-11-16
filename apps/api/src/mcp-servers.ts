@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import type { McpOAuthBroker, McpOAuthSummary, McpStdioPolicy } from "@argo/adapters";
 import {
   assertNoMcpEndpointCredential,
@@ -13,6 +12,7 @@ import { mcpOAuthEnvReferences } from "@argo/contracts";
 import type { McpServer as McpServerRow, Prisma } from "@argo/db";
 import { itemSecretIn, spaceAvailability } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 import { isAdmin } from "./admins.js";
 import { assertNameFreeWhereAvailable, userAddedAvailability } from "./availability.js";
 import { dismissMcpServerApprovals } from "./mcp-approval.js";

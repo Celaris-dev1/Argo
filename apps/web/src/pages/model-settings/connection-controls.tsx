@@ -1,6 +1,6 @@
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { compatiblePresetNeedsKey } from "@argo/contracts";
 import { Button, Disclosure, Input } from "@argo/ui-web";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import {

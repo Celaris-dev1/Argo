@@ -1,8 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import type { Machine } from "@boxd-sh/sdk";
-import { Boxd, ConflictError, FilesystemError, NotFoundError, RateLimitError } from "@boxd-sh/sdk";
 import type {
   AdapterContext,
   CommandRequest,
@@ -25,6 +23,8 @@ import {
 } from "@argo/adapter-kit";
 import { boundedSandboxCommandTimeoutMs } from "@argo/core";
 import { getLogger } from "@argo/logging";
+import type { Machine } from "@boxd-sh/sdk";
+import { Boxd, ConflictError, FilesystemError, NotFoundError, RateLimitError } from "@boxd-sh/sdk";
 import { normalizeWorkspacePath, shellQuote, workspacePath } from "./computer-support.js";
 import { PORTABLE_TRANSFER_BATCH_BYTES } from "./computer-workspace.js";
 import {
@@ -823,8 +823,7 @@ function sourceEnvironmentCommand(envFile: string, argv: string): string {
 }
 
 function boxdCwd(cwd: string | undefined): string {
-  if (!cwd || cwd === "." || cwd === "/" || cwd === "/home/argo" || cwd === HOME)
-    return WORKSPACE;
+  if (!cwd || cwd === "." || cwd === "/" || cwd === "/home/argo" || cwd === HOME) return WORKSPACE;
   const relative = cwd.startsWith(`${WORKSPACE}/`)
     ? cwd.slice(WORKSPACE.length + 1)
     : cwd.startsWith("/home/argo/")

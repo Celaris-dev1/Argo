@@ -1,18 +1,11 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { SignupSurvey as SignupSurveyAnswers } from "@argo/contracts";
 import {
   SIGNUP_SURVEY_TEAM_SIZES,
   signupSurveyAsksTeamSize,
   signupSurveyTeamSizeLabel,
 } from "@argo/contracts";
-import {
-  Button,
-  Input,
-  OptionSelect,
-  Textarea,
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@argo/ui-web";
+import { Button, Input, OptionSelect, Textarea, ToggleGroup, ToggleGroupItem } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useId, useState } from "react";
 import { rpc } from "../lib/rpc";
 

@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { Bot } from "@argo/contracts";
 import {
   BotAvatar,
@@ -9,6 +8,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Info, Lock, Plus, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { IconTooltip } from "../../components/IconTooltip";

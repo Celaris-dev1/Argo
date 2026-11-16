@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { RoutineRun, RoutineRunCursor } from "@argo/contracts";
 import {
   formatRoutineRunAt,
@@ -9,6 +8,7 @@ import {
   routineRunAt,
 } from "@argo/core";
 import { Button, Spinner } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useSpaceQueries } from "../lib/query";

@@ -1,5 +1,17 @@
 import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
+import type { SecretStore } from "@argo/adapter-kit";
+import { SecretStoreUnavailableError } from "@argo/adapter-kit";
+import {
+  isLocalhostOrLoopbackIp,
+  MCP_OAUTH_CLIENT_REQUIRED,
+  mcpOAuthEnvReferences,
+  parseMcpOAuthAuthorizationParams,
+} from "@argo/contracts";
+import { readBoundedResponseBytes } from "@argo/core";
+import type { Prisma, PrismaClient } from "@argo/db";
+import { availableInSpace, itemSecretIn, runAsSystem } from "@argo/db";
+import { getLogger } from "@argo/logging";
 import type {
   OAuthClientProvider,
   OAuthDiscoveryState,
@@ -18,18 +30,6 @@ import type {
   OAuthClientMetadata,
   OAuthTokens,
 } from "@modelcontextprotocol/sdk/shared/auth.js";
-import type { SecretStore } from "@argo/adapter-kit";
-import { SecretStoreUnavailableError } from "@argo/adapter-kit";
-import {
-  isLocalhostOrLoopbackIp,
-  MCP_OAUTH_CLIENT_REQUIRED,
-  mcpOAuthEnvReferences,
-  parseMcpOAuthAuthorizationParams,
-} from "@argo/contracts";
-import { readBoundedResponseBytes } from "@argo/core";
-import type { Prisma, PrismaClient } from "@argo/db";
-import { availableInSpace, itemSecretIn, runAsSystem } from "@argo/db";
-import { getLogger } from "@argo/logging";
 import { sanitizeConnectorError } from "./connector-safety.js";
 import { MCP_DYNAMIC_REGISTRATION_UNSUPPORTED, needsMcpOAuthClient } from "./mcp-server-health.js";
 import { secureFetch, validateUrl, withEndpointOriginFallback } from "./mcp-transport.js";

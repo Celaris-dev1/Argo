@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   AgentSkillCatalogEntry,
   Bot,
@@ -20,6 +19,7 @@ import { fetchFresh, writeSaved } from "@argo/core/query";
 import type { GroupAvatarMember } from "@argo/ui-web";
 import { Button } from "@argo/ui-web";
 import { useIsMobile } from "@argo/ui-web/hooks/use-mobile";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { Lock, Monitor, Moon, Plug, Plus, ScrollText, Sun, Users } from "lucide-react";
 import {

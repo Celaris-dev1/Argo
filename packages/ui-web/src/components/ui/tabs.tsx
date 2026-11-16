@@ -1,5 +1,5 @@
-import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import { cn } from "@argo/ui-web/lib/utils";
+import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 

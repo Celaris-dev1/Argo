@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { BillingStatus } from "@argo/contracts";
 import {
   DEFAULT_MONTHLY_CREDIT_AMOUNT,
@@ -23,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { formatBillingAmount, formatBillingDate, formatBillingPrice } from "../lib/billing";

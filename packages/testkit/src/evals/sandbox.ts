@@ -1,9 +1,4 @@
-import type {
-  AdapterContext,
-  CommandRequest,
-  ComputerRef,
-  ProcessEvent,
-} from "@argo/adapter-kit";
+import type { AdapterContext, CommandRequest, ComputerRef, ProcessEvent } from "@argo/adapter-kit";
 import { FakeSandboxProvider } from "@argo/adapters";
 
 /** A model must not receive successful shell results for commands the fixture never ran. */

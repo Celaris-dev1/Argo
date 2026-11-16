@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
-import { i18n } from "@lingui/core";
 import type { AgentSkillCatalogEntry, ThreadMessage } from "@argo/contracts";
 import type { ComposerMention } from "@argo/core";
 import { MODEL_REQUIRED_SEND_ERROR, resolveComposerSendPlan } from "@argo/core";
+import { i18n } from "@lingui/core";
 import type { ComponentProps, ReactNode } from "react";
 import { act, createRef } from "react";
 import type { Root } from "react-dom/client";
@@ -1334,9 +1334,7 @@ it("accepts file drops in transparent padding only during file drags", () => {
 it("names the chat's model and opens the model picker from it", () => {
   const onOpenModels = vi.fn();
   renderComposer(async () => true, { modelName: "o4-mini", onOpenModels });
-  const chip = container?.querySelector<HTMLButtonElement>(
-    '[data-testid="composer-model-button"]',
-  );
+  const chip = container?.querySelector<HTMLButtonElement>('[data-testid="composer-model-button"]');
   expect(chip?.textContent).toBe("o4-mini");
   expect(chip?.getAttribute("aria-label")).toBe("Model: o4-mini");
   act(() => chip?.click());

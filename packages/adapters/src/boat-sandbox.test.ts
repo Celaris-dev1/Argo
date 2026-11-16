@@ -1,7 +1,5 @@
 import { createHash } from "node:crypto";
 import type * as TimersPromises from "node:timers/promises";
-import type { FileUrlResponse, SandboxStateEnum } from "@boatdev/sdk";
-import { FetchError, ResponseError } from "@boatdev/sdk";
 import type { ComputerRef, PortableFile, StreamedPortableFile } from "@argo/adapter-kit";
 import {
   SandboxDamagedError,
@@ -12,6 +10,8 @@ import {
 } from "@argo/adapter-kit";
 import { screenDisplayArgv, shellQuote } from "@argo/core/node/desktop-runtime";
 import { createLogger, createTestSink, installLogger } from "@argo/logging";
+import type { FileUrlResponse, SandboxStateEnum } from "@boatdev/sdk";
+import { FetchError, ResponseError } from "@boatdev/sdk";
 import { parse } from "shell-quote";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -356,9 +356,7 @@ describe("BoatSandboxProvider", () => {
     };
     await expect(run()).rejects.toThrow("connection reset");
     const commands = command.mock.calls.map(([request]) => request.commandRequest.command);
-    expect(commands.at(-1)).toMatch(
-      /^rm -f -- '\/home\/user\/\.argo-command-env\/[0-9a-f-]{36}'$/,
-    );
+    expect(commands.at(-1)).toMatch(/^rm -f -- '\/home\/user\/\.argo-command-env\/[0-9a-f-]{36}'$/);
     expect(
       [...api.files(computer.id).keys()].some((file) => file.includes(".argo-command-env")),
     ).toBe(false);

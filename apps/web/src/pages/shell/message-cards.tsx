@@ -1,8 +1,8 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useLinkPrompt } from "@argo/chat-ui/web";
 import type { MessageBlock } from "@argo/contracts";
 import { appConnectedInput, waitForConnection } from "@argo/core";
 import { Button, Dialog, DialogClose, DialogContent, DialogTitle } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BuiCard, SuccessPop } from "../../components/ai/primitives";

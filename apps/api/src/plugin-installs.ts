@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import { ORPCError } from "@orpc/server";
 import type { SecretStore } from "@argo/adapter-kit";
 import type { PluginMcpServerEntry, PluginRepoFetcher } from "@argo/adapters";
 import {
@@ -17,6 +16,7 @@ import {
   runAsSystemInTransaction,
   spaceAvailability,
 } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import { assertNameFreeWhereAvailable, lockOwner } from "./availability.js";
 import { grantMcpServerToExistingBots } from "./mcp-grant.js";
 

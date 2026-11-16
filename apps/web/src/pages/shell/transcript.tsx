@@ -1,5 +1,3 @@
-import { i18n } from "@lingui/core";
-import { useLingui } from "@lingui/react/macro";
 import type {
   BotAvatarSet,
   LoginFieldInput,
@@ -22,6 +20,8 @@ import {
 } from "@argo/core";
 import type { GroupAvatarMember } from "@argo/ui-web";
 import { Button, cn, Spinner } from "@argo/ui-web";
+import { i18n } from "@lingui/core";
+import { useLingui } from "@lingui/react/macro";
 import { ArrowDown } from "lucide-react";
 import type { CSSProperties, RefObject } from "react";
 import {

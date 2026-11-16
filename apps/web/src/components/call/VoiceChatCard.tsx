@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import type { VoiceChatGroup } from "@argo/core";
 import {
   callRequestBlock,
@@ -7,6 +6,7 @@ import {
   voiceChatSummary,
 } from "@argo/core";
 import { Button, buttonVariants, Collapsible, CollapsibleContent, cn } from "@argo/ui-web";
+import { useLingui } from "@lingui/react/macro";
 import { ChevronDown, Phone, PhoneIncoming, PhoneMissed } from "lucide-react";
 import { useState } from "react";
 import { BuiCard } from "../ai/primitives";

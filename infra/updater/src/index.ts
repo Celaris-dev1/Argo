@@ -4,7 +4,6 @@ import { randomUUID } from "node:crypto";
 import { access, lstat, open, readFile, rename, unlink } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { serve } from "@hono/node-server";
 import type { ServerUpdateRun } from "@argo/contracts";
 import type { ComposeUpdateStep } from "@argo/core";
 import {
@@ -38,6 +37,7 @@ import type { Logger } from "@argo/logging";
 import { SERVICE_NAMES } from "@argo/logging";
 import { createRootLogger } from "@argo/logging/axiom";
 import { requestLogging } from "@argo/logging/hono";
+import { serve } from "@hono/node-server";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import type { UpdaterConfig } from "./updater-logic.js";

@@ -1,5 +1,3 @@
-import type { ConnectedAccountStatus, ToolRouterCreateSessionConfig } from "@composio/core";
-import { Composio } from "@composio/core";
 import type {
   AdapterContext,
   ConnectedConnector,
@@ -12,6 +10,8 @@ import type {
 } from "@argo/adapter-kit";
 import { ConnectorAuthUnavailableError } from "@argo/adapter-kit";
 import { getLogger } from "@argo/logging";
+import type { ConnectedAccountStatus, ToolRouterCreateSessionConfig } from "@composio/core";
+import { Composio } from "@composio/core";
 import { COMPOSIO_MULTI_EXECUTE_TOOL, composioToolBatch } from "./composio-batch.js";
 import type { ToolkitDirectoryEntry } from "./composio-catalog-cache.js";
 import {

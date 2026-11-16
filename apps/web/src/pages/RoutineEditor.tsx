@@ -1,5 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   ModelCatalogEntry,
   ModelCredential,
@@ -36,6 +34,8 @@ import {
   Switch,
   Textarea,
 } from "@argo/ui-web";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ChevronLeft,
   Clock,

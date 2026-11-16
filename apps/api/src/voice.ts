@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import type { AdapterContext, SecretStore } from "@argo/adapter-kit";
 import { VoiceAccountError } from "@argo/adapter-kit";
 import {
@@ -40,6 +39,7 @@ import {
   voicePreferenceTarget,
 } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 import type { Context, Hono } from "hono";
 import { readBoundedBody } from "./http-body.js";
 import { withSerializableRetry } from "./serializable-retry.js";

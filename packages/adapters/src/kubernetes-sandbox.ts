@@ -1,8 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import { PassThrough, Readable } from "node:stream";
-import type * as KubernetesClient from "@kubernetes/client-node";
-import type { CoreV1Api, Exec, V1Pod, V1PodSpec, V1Status } from "@kubernetes/client-node";
 import type {
   AdapterContext,
   CommandRequest,
@@ -21,6 +19,8 @@ import type {
 } from "@argo/adapter-kit";
 import { boundedSandboxCommandTimeoutMs } from "@argo/core";
 import { COMPUTER_CACHE_ENV } from "@argo/core/node/desktop-runtime";
+import type * as KubernetesClient from "@kubernetes/client-node";
+import type { CoreV1Api, Exec, V1Pod, V1PodSpec, V1Status } from "@kubernetes/client-node";
 import { normalizeWorkspacePath, shellQuote, workspacePath } from "./computer-support.js";
 import { LinuxDesktop, onBotScreen } from "./linux-desktop.js";
 import { sandboxCommandArgv } from "./sandbox-command-environment.js";

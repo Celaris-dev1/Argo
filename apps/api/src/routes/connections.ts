@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import type { AdapterContext, ConnectorCatalogItem } from "@argo/adapter-kit";
 import { ConnectorAuthUnavailableError } from "@argo/adapter-kit";
 import {
@@ -16,6 +15,7 @@ import {
   runProviderTransaction,
 } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 import { connectionCreatedEvent } from "../security-audit.js";
 import type { RouterContext } from "./context.js";
 

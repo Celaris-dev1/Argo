@@ -15,8 +15,8 @@ export function referralEmail(
     <>
       <Text>Hi {displayName(user.name, "there")},</Text>
       <Text>
-        Invite a friend to Argo and earn a free month when they start a qualifying subscription
-        with a new card.{" "}
+        Invite a friend to Argo and earn a free month when they start a qualifying subscription with
+        a new card.{" "}
         <Link href={invitePageUrl} style={linkStyle}>
           Open Argo
         </Link>{" "}

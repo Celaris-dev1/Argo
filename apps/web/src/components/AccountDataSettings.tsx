@@ -1,6 +1,6 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { isIdentityConfirmationRequired } from "@argo/contracts";
 import { Button, Spinner } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRef, useState } from "react";
 import { recheckSessionOnUnauthorized, rpc } from "../lib/rpc";
 import { errorText } from "../lib/user-error";

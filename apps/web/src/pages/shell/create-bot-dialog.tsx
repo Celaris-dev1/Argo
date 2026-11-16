@@ -1,10 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { BotAvatarSet, BotKind } from "@argo/contracts";
-import {
-  BOT_KINDS,
-  BOT_NAME_MAX_LENGTH,
-  DEFAULT_NEW_BOT_AVATAR_SET,
-} from "@argo/contracts";
+import { BOT_KINDS, BOT_NAME_MAX_LENGTH, DEFAULT_NEW_BOT_AVATAR_SET } from "@argo/contracts";
 import {
   newClientId,
   ORGANIC_AVATAR_HEART_FAMILY,
@@ -24,14 +19,13 @@ import {
   Input,
   parseBotAvatar,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useRef, useState } from "react";
 import { errorText } from "../../lib/user-error";
 import { BotLookPicker } from "./avatar-studio-popover";
 
 /** One preview identity per organic look, so the dialog can show a body before the bot has an id. */
-const ORGANIC_IDENTITIES = ORGANIC_AVATAR_LOOKS.map(
-  organicAvatarSampleIdentity,
-);
+const ORGANIC_IDENTITIES = ORGANIC_AVATAR_LOOKS.map(organicAvatarSampleIdentity);
 
 function pick<T>(options: readonly T[]): T {
   return options[Math.floor(Math.random() * options.length)]!;
@@ -72,30 +66,23 @@ export function CreateBotDialog({
     value: pick(BOT_AVATAR_COLORS),
     identity: pick(ORGANIC_IDENTITIES),
   }));
-  const [avatarSet, setAvatarSet] = useState<BotAvatarSet>(
-    DEFAULT_NEW_BOT_AVATAR_SET,
-  );
+  const [avatarSet, setAvatarSet] = useState<BotAvatarSet>(DEFAULT_NEW_BOT_AVATAR_SET);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const trimmed =
-    name.trim() || (kind && kind.id !== "custom" ? kind.name : "");
+  const trimmed = name.trim() || (kind && kind.id !== "custom" ? kind.name : "");
 
   async function create() {
     if (!trimmed || submitting) return;
     setError(null);
     setSubmitting(true);
-    const organic =
-      avatarSet === "organic" &&
-      parseBotAvatar(look.value).shapeIndex === undefined;
+    const organic = avatarSet === "organic" && parseBotAvatar(look.value).shapeIndex === undefined;
     try {
       await onCreate({
         name: trimmed,
         color: look.value,
         ...(avatarSet === "argo" ? { id: previewId } : {}),
         avatarSet,
-        ...(organic
-          ? { avatarFamily: organicAvatarFamily(look.identity) }
-          : {}),
+        ...(organic ? { avatarFamily: organicAvatarFamily(look.identity) } : {}),
         ...(kind?.instructions
           ? { description: kind.description, instructions: kind.instructions }
           : {}),
@@ -139,9 +126,7 @@ export function CreateBotDialog({
                   }}
                   className="rounded-lg border border-border p-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
                 >
-                  <span className="block text-sm font-medium">
-                    {option.name}
-                  </span>
+                  <span className="block text-sm font-medium">{option.name}</span>
                   <span className="mt-1 block text-xs text-muted-foreground">
                     {option.description}
                   </span>

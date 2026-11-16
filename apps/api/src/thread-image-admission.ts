@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import type { SecretStore } from "@argo/adapter-kit";
 import type { CodexLiveCatalog } from "@argo/adapters";
 import {
@@ -18,6 +17,7 @@ import type { Actor, MessageBlock } from "@argo/contracts";
 import { MODEL_IMAGE_INPUT_ERROR, MODEL_IMAGE_INPUT_UNKNOWN } from "@argo/core";
 import type { PrismaClient } from "@argo/db";
 import { appliedModelRole, findModelCredential, findModelCredentialById } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 
 type ModelChoice = {
   modelProvider: string | null;

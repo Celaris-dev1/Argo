@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   PluginSubmission,
   PluginSubmissionReview,
@@ -19,6 +18,7 @@ import {
   Textarea,
   toast,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import type { FormEvent } from "react";

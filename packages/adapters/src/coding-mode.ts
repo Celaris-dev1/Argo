@@ -1,9 +1,4 @@
-import type {
-  AdapterContext,
-  ComputerRef,
-  ProcessEvent,
-  SandboxProvider,
-} from "@argo/adapter-kit";
+import type { AdapterContext, ComputerRef, ProcessEvent, SandboxProvider } from "@argo/adapter-kit";
 import { redactSecrets } from "@argo/core";
 import { shellCommandEnvironment } from "./bot-secrets.js";
 import { resolveBotWorkspaceCwd } from "./computer-support.js";

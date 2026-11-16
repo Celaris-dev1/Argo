@@ -1,8 +1,8 @@
-import type { Credential, OAuthCredential } from "@earendil-works/pi-ai";
 import type { ModelCredentialFailedState, ModelCredentialRetireReason } from "@argo/adapter-kit";
 import { isModelCredentialRejected } from "@argo/adapter-kit";
 import { containsSecret, redactSecrets } from "@argo/core";
 import type { PrismaClient } from "@argo/db";
+import type { Credential, OAuthCredential } from "@earendil-works/pi-ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { PiOAuthBegin } from "./pi-oauth.js";
 import {

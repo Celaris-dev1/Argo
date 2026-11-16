@@ -1,8 +1,4 @@
-import {
-  CLIENT_UPDATE_REQUIRED_STATUS,
-  compareBuilds,
-  SERVER_BUILD_HEADER,
-} from "@argo/contracts";
+import { CLIENT_UPDATE_REQUIRED_STATUS, compareBuilds, SERVER_BUILD_HEADER } from "@argo/contracts";
 import { getSnapshot as activeCall } from "./call-session";
 import { CLIENT_BUILD } from "./client-build";
 import { composerHoldsUnsavedWork, hasUnsentComposerDraft } from "./composer-draft";

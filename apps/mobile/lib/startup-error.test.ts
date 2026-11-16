@@ -47,10 +47,7 @@ describe("persisted startup error", () => {
       release: "com.example.app@1.0.8+20",
       dist: "20",
     });
-    store.values.set(
-      "argo.startup-error",
-      JSON.stringify({ server, name: "Error", message: "x" }),
-    );
+    store.values.set("argo.startup-error", JSON.stringify({ server, name: "Error", message: "x" }));
     expect(readStartupError(secureStorage)).toEqual({
       error: expect.objectContaining({ message: "x" }),
       release: undefined,

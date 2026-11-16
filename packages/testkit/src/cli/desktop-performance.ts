@@ -6,14 +6,14 @@ import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 import { brotliCompressSync, gzipSync } from "node:zlib";
-import { serve } from "@hono/node-server";
-import type { CDPSession, ElectronApplication, Page } from "@playwright/test";
-import { _electron as electron, expect } from "@playwright/test";
 import type { createApp } from "@argo/api/app";
 import { abortableDelay } from "@argo/core";
 import { loadRootEnv } from "@argo/core/node/load-root-env";
 import type { PrismaClient } from "@argo/db";
 import { createThreadMessage } from "@argo/db";
+import { serve } from "@hono/node-server";
+import type { CDPSession, ElectronApplication, Page } from "@playwright/test";
+import { _electron as electron, expect } from "@playwright/test";
 import type { NumericSummary, PerformanceReport } from "../performance-report.js";
 import {
   PERFORMANCE_REPORT_SCHEMA_VERSION,
@@ -527,8 +527,7 @@ async function measureInteractions(app: ElectronApplication, page: Page) {
   );
   const keyPaintMs = await page.evaluate(
     () =>
-      (window as typeof window & { __argoKeyPaintSamples?: number[] }).__argoKeyPaintSamples ??
-      [],
+      (window as typeof window & { __argoKeyPaintSamples?: number[] }).__argoKeyPaintSamples ?? [],
   );
   const typingAfter = await cdpMetrics(session);
 

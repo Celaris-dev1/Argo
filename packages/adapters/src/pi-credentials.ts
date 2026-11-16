@@ -1,17 +1,17 @@
 import type {
-  AuthOperationOptions,
-  Credential,
-  CredentialInfo,
-  CredentialStore,
-  OAuthCredential,
-} from "@earendil-works/pi-ai";
-import type {
   AgentModelOAuthCredential,
   ModelCredentialFailedState,
   ModelCredentialRetireReason,
 } from "@argo/adapter-kit";
 import { canonicalPiProviderId } from "@argo/contracts";
 import { getLogger } from "@argo/logging";
+import type {
+  AuthOperationOptions,
+  Credential,
+  CredentialInfo,
+  CredentialStore,
+  OAuthCredential,
+} from "@earendil-works/pi-ai";
 import {
   OAUTH_ACCOUNT_CHANGED_ERROR,
   OAUTH_RECONNECT_REQUIRED_ERROR,

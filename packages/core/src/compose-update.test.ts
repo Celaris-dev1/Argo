@@ -505,12 +505,9 @@ describe("rollback", () => {
 
 describe("managed env assignments", () => {
   it("replaces a managed key in place and leaves everything else alone", () => {
-    const contents = [
-      "# deployment",
-      "POSTGRES_PASSWORD=secret",
-      "ARGO_IMAGE_TAG=v1.0.0",
-      "",
-    ].join("\n");
+    const contents = ["# deployment", "POSTGRES_PASSWORD=secret", "ARGO_IMAGE_TAG=v1.0.0", ""].join(
+      "\n",
+    );
     expect(upsertEnvAssignments(contents, { ARGO_IMAGE_TAG: "v1.1.0" })).toBe(
       ["# deployment", "POSTGRES_PASSWORD=secret", "ARGO_IMAGE_TAG=v1.1.0", ""].join("\n"),
     );
@@ -538,10 +535,9 @@ describe("managed env assignments", () => {
   });
 
   it("rewrites every duplicate managed assignment so the last value cannot win", () => {
-    const result = upsertEnvAssignments(
-      "ARGO_IMAGE_TAG=stale\nA=1\nARGO_IMAGE_TAG=still-stale\n",
-      { ARGO_IMAGE_TAG: "sha-0123456789abcdef0123456789abcdef01234567" },
-    );
+    const result = upsertEnvAssignments("ARGO_IMAGE_TAG=stale\nA=1\nARGO_IMAGE_TAG=still-stale\n", {
+      ARGO_IMAGE_TAG: "sha-0123456789abcdef0123456789abcdef01234567",
+    });
     expect(result.match(/ARGO_IMAGE_TAG=sha-/g)).toHaveLength(2);
     expect(result).not.toContain("stale");
   });
@@ -612,12 +608,9 @@ describe("managed env assignments", () => {
   );
 
   it("preserves a leading BOM when rewriting managed duplicates", () => {
-    const result = upsertEnvAssignments(
-      "\uFEFFARGO_IMAGE_TAG=v1.1.0\nARGO_IMAGE_TAG = v1.2.0\n",
-      {
-        ARGO_IMAGE_TAG: "v2.0.0",
-      },
-    );
+    const result = upsertEnvAssignments("\uFEFFARGO_IMAGE_TAG=v1.1.0\nARGO_IMAGE_TAG = v1.2.0\n", {
+      ARGO_IMAGE_TAG: "v2.0.0",
+    });
     expect(result).toBe("\uFEFFARGO_IMAGE_TAG=v2.0.0\nARGO_IMAGE_TAG=v2.0.0\n");
     expect(parse(result).ARGO_IMAGE_TAG).toBe("v2.0.0");
   });

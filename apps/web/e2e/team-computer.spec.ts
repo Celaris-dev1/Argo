@@ -77,12 +77,7 @@ test("opening and releasing the computer keep a view-only stream; a failed relea
 test("an active Team bot must be stopped before user takeover", async ({ page }, testInfo) => {
   const stamp = Date.now();
 
-  await signup(
-    page,
-    `active-team-control-${stamp}@argo.test`,
-    "password12",
-    "Active Team Control",
-  );
+  await signup(page, `active-team-control-${stamp}@argo.test`, "password12", "Active Team Control");
   await completeOnboarding(page);
   const chiefId = activeBotId(page);
 

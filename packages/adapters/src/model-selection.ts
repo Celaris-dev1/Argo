@@ -9,7 +9,6 @@ import {
 import type { PrismaClient } from "@argo/db";
 import { chooseModelCredential, findModelCredential, findModelCredentialById } from "@argo/db";
 import { resolveDeploymentModel } from "./deployment-model.js";
-import { LOCAL_PROVIDER_ID } from "./pi-local-provider.js";
 import { modelCredentialDto } from "./model-connect.js";
 import type { ModelCredentialAuthKind } from "./pi-catalog-availability.js";
 import {
@@ -21,6 +20,7 @@ import {
 import type { CodexLiveCatalog, CodexLiveReadOptions } from "./pi-codex-catalog.js";
 import { codexLiveListsModel } from "./pi-codex-catalog.js";
 import { liveCatalogEntry, providerLiveListsModel } from "./pi-live-catalog.js";
+import { LOCAL_PROVIDER_ID } from "./pi-local-provider.js";
 import { listPiCatalog, offeredCatalog, scriptedCatalogEntry } from "./pi-models.js";
 import type { StoredModelSecret } from "./pi-oauth.js";
 import { parseModelSecret } from "./pi-oauth.js";

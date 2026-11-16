@@ -1,19 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 import { buffer } from "node:stream/consumers";
-import type {
-  AdapterContext,
-  ArtifactPut,
-  ArtifactStore,
-  ObjectStorage,
-} from "@argo/adapter-kit";
+import type { AdapterContext, ArtifactPut, ArtifactStore, ObjectStorage } from "@argo/adapter-kit";
 import type { PrismaClient } from "@argo/db";
-import {
-  ContentDecryptionError,
-  contentEncryptionOf,
-  openArtifact,
-  sealArtifact,
-} from "@argo/db";
+import { ContentDecryptionError, contentEncryptionOf, openArtifact, sealArtifact } from "@argo/db";
 import type { ArtifactKeys } from "./artifacts.js";
 import { LocalArtifactStore } from "./artifacts.js";
 import { objectStorageConfigFromEnv, S3ObjectStorage } from "./s3-object-storage.js";
