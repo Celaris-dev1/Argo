@@ -99,34 +99,66 @@ function researchDeps(ctx: RunContext, operationId: string): ResearchDeps {
   };
 }
 
+/** Runs one research request and returns the tool result the model presents. */
+async function researchResult(
+  ctx: RunContext,
+  args: Record<string, unknown>,
+  operationId: string,
+): Promise<Record<string, unknown>> {
+  const question = String(args.question ?? "").trim();
+  if (!question) return { error: "question is required" };
+  if (question.length > QUESTION_MAX) {
+    return { error: `question is longer than ${QUESTION_MAX} characters` };
+  }
+  const settings = resolveResearchSettings(requestedResearchArgs(args));
+  try {
+    const result = await runResearch(question, settings, researchDeps(ctx, operationId));
+    getLogger().info("research.completed", {
+      runId: ctx.runId,
+      depth: result.stats.depth,
+      read: result.stats.read,
+      searches: result.stats.searches,
+      elapsedMs: result.stats.elapsedMs,
+    });
+    return {
+      report: result.report,
+      stats: result.stats,
+      note: result.stats.stoppedEarly
+        ? "The time budget ran out, so this report uses what was gathered before then."
+        : undefined,
+    };
+  } catch (error) {
+    ctx.context.signal.throwIfAborted();
+    return { error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+const FORCED_RESEARCH = /^\s*(?:\/|use\s+skill:\s*)research\b[ \t]*:?([\s\S]*)$/i;
+
+/** The request after a composer-forced `/Research`, or null when the turn did not force it. */
+export function forcedResearchRequest(prompt: string): string | null {
+  const question = FORCED_RESEARCH.exec(prompt)?.[1]?.trim();
+  return question ? question : null;
+}
+
+/**
+ * Small models often answer `/Research` from a quick search instead of calling the tool, so a
+ * forced turn runs the research itself and hands the model the result to present.
+ */
+export async function runForcedResearch(ctx: RunContext, question: string): Promise<string> {
+  const depth = /\bultra\b/i.test(question)
+    ? "ultra"
+    : /\bhigh\b/i.test(question)
+      ? "high"
+      : undefined;
+  const result = await researchResult(ctx, { question, depth }, `research:${ctx.runId}:forced`);
+  return `The deep_research tool already ran for this request. Its result:\n${JSON.stringify(result)}\nPresent it as the Research skill says. Do not call deep_research again for this request.`;
+}
+
 export const researchTools: ToolHandlers = {
   async deep_research(ctx, call) {
-    const question = String(call.args.question ?? "").trim();
-    if (!question) return call.finish({ error: "question is required" });
-    if (question.length > QUESTION_MAX) {
-      return call.finish({ error: `question is longer than ${QUESTION_MAX} characters` });
-    }
-    const settings = resolveResearchSettings(requestedResearchArgs(call.args));
-    const deps = researchDeps(ctx, `research:${ctx.runId}:${call.executionId}`);
-    try {
-      const result = await runResearch(question, settings, deps);
-      getLogger().info("research.completed", {
-        runId: ctx.runId,
-        depth: result.stats.depth,
-        read: result.stats.read,
-        searches: result.stats.searches,
-        elapsedMs: result.stats.elapsedMs,
-      });
-      return call.finish({
-        report: result.report,
-        stats: result.stats,
-        note: result.stats.stoppedEarly
-          ? "The time budget ran out, so this report uses what was gathered before then."
-          : undefined,
-      });
-    } catch (error) {
-      ctx.context.signal.throwIfAborted();
-      return call.finish({ error: error instanceof Error ? error.message : String(error) });
-    }
+    return call.finish(
+      await researchResult(ctx, call.args, `research:${ctx.runId}:${call.executionId}`),
+    );
   },
 };

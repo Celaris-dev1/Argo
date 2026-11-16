@@ -173,6 +173,7 @@ import {
 } from "./run-tool-selection.js";
 import { applyTool } from "./run-tools.js";
 import { historyMyChatsAllowed } from "./run-tools-memory.js";
+import { forcedResearchRequest, runForcedResearch } from "./run-tools-research.js";
 import type { UserComputerState } from "./run-tools-user-computer.js";
 import { USER_COMPUTER_SHELL_TOOL, userComputerOwner } from "./run-tools-user-computer.js";
 import { createRunTrustLoaders } from "./run-trust.js";
@@ -1360,12 +1361,16 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const invokedSkill = savedSkills.find((skill) =>
           promptInvokesSkill(taskPrompt, skill.name || skill.goal),
         );
-        const basePrompt = invokedSkill
+        const skillPrompt = invokedSkill
           ? `${formatSkillRunPrompt(
               invokedSkill.name || invokedSkill.goal.slice(0, 80),
               parsePlaybook(invokedSkill.playbook),
             )}\n\n${taskPrompt}`
           : taskPrompt;
+        const forcedResearch = turnCheckpoint ? null : forcedResearchRequest(task.prompt);
+        const basePrompt = forcedResearch
+          ? `${skillPrompt}\n\n${await runForcedResearch(ctx, forcedResearch)}`
+          : skillPrompt;
         if (turnCheckpoint) {
           turnCheckpoint = restoreTurnCheckpointEffects(ctx, turnCheckpoint, {
             provider: runModelProvider,
