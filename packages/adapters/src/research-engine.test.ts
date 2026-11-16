@@ -1,5 +1,5 @@
 import { resolveResearchSettings } from "@argo/contracts";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { ResearchDeps } from "./research-engine.js";
 import { allowedUrl, checkCitations, isStale, parseJson, runResearch } from "./research-engine.js";
 
@@ -10,7 +10,7 @@ function fakeDeps(options: {
   gapQueries?: string[][];
   failSearch?: (query: string) => boolean;
   shortPage?: (url: string) => boolean;
-  writeReply?: (prompt: string) => string;
+  writeReply?: (prompt: string) => string | Promise<string>;
   now?: () => number;
   signal?: AbortSignal;
 }) {
@@ -235,5 +235,44 @@ describe("research helpers", () => {
     expect(parseJson('Sure: {"a": [1]} done')).toEqual({ a: [1] });
     expect(parseJson("```json\n[1,2]\n```")).toEqual([1, 2]);
     expect(parseJson("no json")).toBeNull();
+  });
+});
+
+describe("report writing never hangs", () => {
+  it("falls back to a short brief, then to cited findings, when the writer never answers", async () => {
+    vi.useFakeTimers();
+    try {
+      const settings = resolveResearchSettings({ depth: "low", sources: 4 });
+      const prompts: string[] = [];
+      const { deps } = fakeDeps({
+        // Ignores the abort signal entirely, like a stalled stream or a retry loop.
+        writeReply: (prompt) => {
+          prompts.push(prompt);
+          return new Promise<string>(() => undefined);
+        },
+      });
+      const pending = runResearch("Cheapest way to send money", settings, deps);
+      for (let i = 0; i < 20 && prompts.length < 2; i++) await vi.advanceTimersByTimeAsync(60_000);
+      await vi.advanceTimersByTimeAsync(120_000);
+      const result = await pending;
+      expect(prompts).toHaveLength(2);
+      expect(prompts[1]).toContain("A short brief");
+      expect(result.report).toContain("key findings");
+      expect(result.report).toMatch(/\[\d+\]/);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("uses the short brief when the full write comes back empty", async () => {
+    const settings = resolveResearchSettings({ depth: "low", sources: 4 });
+    const { deps } = fakeDeps({
+      writeReply: (prompt) =>
+        prompt.includes("A short brief")
+          ? "Short answer that is long enough to count as a real paragraph of text [1]."
+          : "",
+    });
+    const result = await runResearch("Cheapest way to send money", settings, deps);
+    expect(result.report).toContain("Short answer");
   });
 });

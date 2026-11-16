@@ -65,8 +65,11 @@ const EXTRACT_CONCURRENCY = 4;
 const PAGE_CHARS = 7_000;
 const FETCH_TIMEOUT_MS = 20_000;
 const MODEL_TIMEOUT_MS = 120_000;
-const WRITE_TIMEOUT_MS = 300_000;
-const NOTES_CHARS = 70_000;
+const WRITE_TIMEOUT_MS = 240_000;
+const NOTES_CHARS = 40_000;
+/** The fallback write: fewer findings and a shorter answer, for when the full write fails. */
+const SHORT_WRITE_TIMEOUT_MS = 90_000;
+const SHORT_NOTES_CHARS = 12_000;
 const MAX_SKEPTIC_QUERIES = 8;
 /** Leave this much of the budget for the final write. */
 const WRITE_RESERVE_MS = 90_000;
@@ -185,14 +188,32 @@ export async function runResearch(
   };
 }
 
+/**
+ * One model call that always settles by its deadline. A runtime that ignores the abort (a
+ * provider retry loop, a stalled stream) would otherwise hold the whole job forever.
+ */
 async function ask(deps: ResearchDeps, prompt: string, timeoutMs = MODEL_TIMEOUT_MS) {
-  const signal = AbortSignal.any([deps.signal, AbortSignal.timeout(timeoutMs)]);
+  const timer = new AbortController();
+  const timeout = setTimeout(() => timer.abort(), timeoutMs);
+  const signal = AbortSignal.any([deps.signal, timer.signal]);
+  let onAbort: (() => void) | undefined;
+  const deadline = new Promise<string>((resolve) => {
+    onAbort = () => resolve("");
+    if (signal.aborted) onAbort();
+    else signal.addEventListener("abort", onAbort, { once: true });
+  });
+  const call = deps.ask({ system: SYSTEM, prompt, signal });
+  call.catch(() => undefined); // A call that loses the race may still reject later.
   try {
-    return await deps.ask({ system: SYSTEM, prompt, signal });
+    return await Promise.race([call, deadline]);
   } catch (error) {
     deps.signal.throwIfAborted();
     void error;
     return "";
+  } finally {
+    clearTimeout(timeout);
+    if (onAbort) signal.removeEventListener("abort", onAbort);
+    deps.signal.throwIfAborted();
   }
 }
 
@@ -441,22 +462,36 @@ async function writeReport(
   const sourceList = sources
     .map((s) => `[${s.n}] ${s.counter ? "COUNTER " : ""}${s.title} — ${s.url}`)
     .join("\n");
-  const reply = await ask(
-    deps,
+  const prompt = (words: number, form: string, notesChars: number) =>
     [
-      `Write the research answer for the request below, about ${settings.words} words. ${shape}`,
+      `Write the research answer for the request below, about ${words} words. ${form}`,
       "Cite every factual sentence with its source number in square brackets, like [3] or [2][5]. Use only the findings below; never invent facts, numbers or sources. If findings disagree, say so. If something important is unknown, say so.",
       verification,
       "Do not add a sources list; it is added for you.",
       `<request>${request}</request>`,
       `<sources>\n${sourceList}\n</sources>`,
-      `<findings>\n${notesDigest(notes, NOTES_CHARS)}\n</findings>`,
+      `<findings>\n${notesDigest(notes, notesChars)}\n</findings>`,
     ]
       .filter(Boolean)
-      .join("\n"),
-    WRITE_TIMEOUT_MS,
+      .join("\n");
+  const full = await ask(deps, prompt(settings.words, shape, NOTES_CHARS), WRITE_TIMEOUT_MS);
+  if (full.trim()) return full.trim();
+  const short = await ask(
+    deps,
+    prompt(
+      Math.min(settings.words, 500),
+      "A short brief: a 3-sentence answer, then up to 8 bullet points.",
+      SHORT_NOTES_CHARS,
+    ),
+    SHORT_WRITE_TIMEOUT_MS,
   );
-  return reply.trim() || "The model did not return a report. Please try again.";
+  if (short.trim()) return short.trim();
+  // No model answer at all: hand back what was found, still cited, rather than nothing.
+  return [
+    "The model couldn't write the report, so here are the key findings from the sources.",
+    "",
+    ...notes.slice(0, 20).map((note) => `- ${note.claim} [${note.source}]`),
+  ].join("\n");
 }
 
 /** Drops citations to sources that don't exist, counts uncited paragraphs, appends sources. */
