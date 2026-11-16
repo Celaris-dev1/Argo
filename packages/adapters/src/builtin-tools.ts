@@ -457,7 +457,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "code",
     description:
-      "Coding mode. For a long stretch of work the model does alone, with little or no input from the user. Hand the software task to OpenCode (or Kilo) and leave it. It edits the repo and runs commands without asking permission or the user. It keeps going for hours. If it reports it is still working, call code again with continue and do not message the user. prompt is the task. cwd is optional. model is optional, as provider/model.",
+      "Coding mode. For a long stretch of work the model does alone, with little or no input from the user. Hand the software task to OpenCode (or Kilo) and leave it. It edits the repo and runs commands without asking permission or the user. It keeps going for hours. If it reports it is still working, call code again with continue and do not message the user. prompt is the task. cwd is optional. model is optional, as provider/model or the model name the user asked for.",
     inputSchema: {
       type: "object",
       properties: {
