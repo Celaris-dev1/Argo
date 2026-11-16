@@ -800,7 +800,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "deep_research",
     description:
-      "Research a question in depth on the public web and return a cited report. Plans sub-questions, searches, reads many pages, chases gaps, checks claims, and writes the answer with numbered sources. Takes minutes, so use it only when the user asks for research, a deep dive, or a thorough comparison; use web_search for a quick fact. Does not need a computer. Present the returned report to the user as written.",
+      "Research a question in depth on the public web and return a cited report. Plans sub-questions, searches, reads many pages, chases gaps, checks claims, and writes the answer with numbered sources. Takes minutes, so use it only when the user asks for research, a deep dive, or a thorough comparison; use web_search for a quick fact. Does not need a computer. Present the returned report to the user as written. Pass overrides only when the user stated them.",
     inputSchema: {
       type: "object",
       properties: {
@@ -809,7 +809,7 @@ export const builtinAgentTools: ConnectorTool[] = [
           type: "string",
           enum: ["low", "high", "ultra"],
           description:
-            "low (default): about 8 questions, 40 sources, a few minutes. high: about 3x, two rounds, claims need two sources. ultra: about 5x, three rounds, plus a sceptic pass for counter-evidence.",
+            "Leave unset (low) unless the user asked for high or ultra by name. low: about 8 questions, 40 sources, a few minutes. high: about 3x, two rounds, claims need two sources. ultra: about 5x, three rounds, plus a sceptic pass for counter-evidence.",
         },
         questions: { type: "number", description: "Override: sub-questions to plan." },
         sources: { type: "number", description: "Override: pages to read." },

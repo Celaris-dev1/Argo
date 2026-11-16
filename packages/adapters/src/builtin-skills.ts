@@ -12,7 +12,7 @@ const SKILLS: Array<{ name: string; description: string; body: string }> = [
     body: `Run the deep_research tool on the user's request and present its report.
 
 1. Use the user's words as the question. Do not ask clarifying questions unless the request is empty.
-2. Depth: low by default. Use high when the user says high, thorough, or detailed. Use ultra when they say ultra, exhaustive, or maximum.
+2. Depth: leave it unset (low) unless the user says high or ultra. Do not raise it because the topic seems broad or important.
 3. Pass any adjustments the user states: number of sources or questions, rounds, time limit, report length, "only these sites", "never these sites", "last N days/months" (as recencyDays), and format (brief, table, or report).
 4. Reply with the report exactly as the tool returned it, including its Sources list. Add one short line first saying how many sources it read. If the tool says the time budget ran out, say so.
 5. If the tool fails, say what failed in one sentence and offer to retry at a lower depth.`,
