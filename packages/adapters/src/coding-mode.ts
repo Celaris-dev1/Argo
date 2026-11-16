@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import type { AdapterContext, ComputerRef, ProcessEvent, SandboxProvider } from "@argo/adapter-kit";
 import { redactSecrets } from "@argo/core";
 import { shellCommandEnvironment } from "./bot-secrets.js";
@@ -234,13 +235,30 @@ function localCodingModelIds(source = process.env): string[] {
     .filter(Boolean);
 }
 
+const CODING_TOKEN_HOURS = 12;
+
 /**
- * OpenCode runs on the member's computer, so it gets a narrower key that only covers the coding
- * models, never the deployment's main key. Without one, coding gets no deployment model.
+ * A short-lived token naming the member, signed with the deployment's coding key, so the model
+ * gateway can meter each member's coding use without ever seeing the key itself on a computer.
+ */
+export function mintCodingToken(key: string, userId: string, nowMs = Date.now()): string {
+  const payload = Buffer.from(
+    JSON.stringify({ u: userId, e: Math.floor(nowMs / 1000) + CODING_TOKEN_HOURS * 3600 }),
+  ).toString("base64url");
+  const sig = createHmac("sha256", key).update(payload).digest("base64url");
+  return `ck1.${payload}.${sig}`;
+}
+
+/**
+ * OpenCode runs on the member's computer, so it gets a per-member token that only covers the
+ * coding models, never the deployment's main key. Without a coding key, coding gets no
+ * deployment model.
  */
 export function localCodingEnv(
   requested: string,
+  userId: string,
   source = process.env,
+  nowMs = Date.now(),
 ): { env: Record<string, string>; model?: string; secret?: string } {
   const key = source.ARGO_LOCAL_CODING_KEY?.trim();
   const models = localCodingModelIds(source);
@@ -250,6 +268,7 @@ export function localCodingEnv(
     (wanted && models.find((id) => id.toLowerCase() === wanted)) ||
     (wanted && models.find((id) => id.toLowerCase().includes(wanted))) ||
     models[0]!;
+  const token = mintCodingToken(key, userId, nowMs);
   const config = {
     $schema: "https://opencode.ai/config.json",
     provider: {
@@ -262,9 +281,9 @@ export function localCodingEnv(
     },
   };
   return {
-    env: { OPENCODE_CONFIG_CONTENT: JSON.stringify(config), ARGO_LOCAL_CODING_KEY: key },
+    env: { OPENCODE_CONFIG_CONTENT: JSON.stringify(config), ARGO_LOCAL_CODING_KEY: token },
     model: `${LOCAL_PROVIDER_ID}/${chosen}`,
-    secret: key,
+    secret: token,
   };
 }
 
@@ -276,7 +295,7 @@ async function codingProviderEnv(
   const provider = choice.modelProvider?.trim();
   const modelId = choice.modelId?.trim();
   if (provider === LOCAL_PROVIDER_ID) {
-    const local = localCodingEnv(requested);
+    const local = localCodingEnv(requested, ctx.run.userId);
     if (local.secret) addRunSecrets(ctx, [local.secret]);
     return { env: local.env, model: local.model, fixed: Boolean(local.model) };
   }
