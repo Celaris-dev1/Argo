@@ -223,7 +223,7 @@ export function withOutputBudget(
 }
 
 const REASONING_EFFORT_CHOICES =
-  /\breasoning_effort\b[\s\S]{0,120}?\b(?:one of|supported values are)\b([^.}"]*)/i;
+  /\breasoning_effort\b[\s\S]{0,120}?\b(?:one of|supported values are|must be)\b([^.}"]*)/i;
 
 /**
  * The thinking levels of a model whose endpoint rejected `reasoning_effort` and listed the values

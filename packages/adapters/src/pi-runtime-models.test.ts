@@ -229,6 +229,16 @@ describe("reasoning efforts an endpoint refuses", () => {
     });
   });
 
+  it("reads a list that follows 'must be' and steps medium up to an accepted level", () => {
+    const levels = acceptedReasoningEfforts(
+      model({ off: "none", xhigh: "xhigh", max: "max" }),
+      '400: {"message":"Example V4 reasoning_effort must be low, high, xhigh, max, or an integer within [1, 100] in chat_template_kwargs","type":"BadRequestError"}',
+    );
+    const narrowed = model(levels);
+    expect(getSupportedThinkingLevels(narrowed)).toEqual(["off", "low", "high", "xhigh", "max"]);
+    expect(clampThinkingLevel(narrowed, "medium")).not.toBe("medium");
+  });
+
   it.each([
     '400: {"message":"Unexpected message role.","type":"invalid_request_error"}',
     '400: {"message":"reasoning_effort must be one of: turbo","type":"invalid_request_error"}',
