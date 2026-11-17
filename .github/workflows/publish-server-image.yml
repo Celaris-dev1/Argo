@@ -75,6 +75,8 @@ jobs:
             dockerfile: infra/sandboxes/computer/Dockerfile
             context: infra/sandboxes/computer
     steps:
+      - name: Lowercase image repository
+        run: echo "IMAGE_REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
@@ -82,7 +84,7 @@ jobs:
       - id: meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
-          images: ghcr.io/${{ github.repository }}/${{ matrix.name }}
+          images: ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }}
           tags: type=sha,prefix=sha-
       - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
@@ -136,6 +138,8 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
     steps:
+      - name: Lowercase image repository
+        run: echo "IMAGE_REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
@@ -150,7 +154,7 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           # Labels only; publication applies tags after validation.
-          images: ghcr.io/${{ github.repository }}/${{ matrix.name }}
+          images: ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }}
           tags: type=sha,prefix=sha-
       - id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
@@ -162,7 +166,7 @@ jobs:
           # A fork can publish only to its own namespace; no credential can redirect this value.
           # The app's filesystem is also written locally so the credential scan needs no registry pull.
           outputs: |
-            type=image,name=ghcr.io/${{ github.repository }}/${{ matrix.name }},push-by-digest=true,name-canonical=true,push=true
+            type=image,name=ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }},push-by-digest=true,name-canonical=true,push=true
             ${{ matrix.name == 'app' && 'type=tar,dest=/tmp/rootfs.tar' || '' }}
           # GET /health can report the exact source commit without a deployment-supplied override.
           build-args: ${{ matrix.name == 'app' && format('GIT_SHA={0}', github.sha) || '' }}
@@ -224,6 +228,8 @@ jobs:
             dockerfile: infra/sandboxes/computer/Dockerfile
             context: infra/sandboxes/computer
     steps:
+      - name: Lowercase image repository
+        run: echo "IMAGE_REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
@@ -238,7 +244,7 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           # Labels only; publication applies tags after validation.
-          images: ghcr.io/${{ github.repository }}/${{ matrix.name }}
+          images: ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }}
           tags: type=sha,prefix=sha-
       - id: build
         uses: depot/build-push-action@98e78adca7817480b8185f474a400b451d74e287 # v1.18.0
@@ -250,7 +256,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
           # A fork can publish only to its own namespace; no credential can redirect this value.
-          outputs: type=image,name=ghcr.io/${{ github.repository }}/${{ matrix.name }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }},push-by-digest=true,name-canonical=true,push=true
           build-args: ${{ matrix.name == 'app' && format('GIT_SHA={0}', github.sha) || '' }}
           provenance: mode=max
           sbom: true
@@ -264,7 +270,7 @@ jobs:
       - name: Check the app image ships no credentials
         if: matrix.name == 'app' && steps.build.outcome == 'success'
         env:
-          IMAGE: ghcr.io/${{ github.repository }}/app@${{ steps.build.outputs.digest }}
+          IMAGE: ghcr.io/${{ env.IMAGE_REPO }}/app@${{ steps.build.outputs.digest }}
         # Exporting a filesystem needs no emulation, so one runner checks both platforms.
         run: |
           set -euo pipefail
@@ -286,7 +292,7 @@ jobs:
       - if: steps.build.outcome == 'success'
         uses: ./.github/actions/publish-image
         with:
-          image: ghcr.io/${{ github.repository }}/${{ matrix.name }}
+          image: ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }}
           digests-directory: /tmp/digests
 
   publish:
@@ -314,6 +320,8 @@ jobs:
           - name: updater
           - name: computer
     steps:
+      - name: Lowercase image repository
+        run: echo "IMAGE_REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
@@ -329,5 +337,5 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: ./.github/actions/publish-image
         with:
-          image: ghcr.io/${{ github.repository }}/${{ matrix.name }}
+          image: ghcr.io/${{ env.IMAGE_REPO }}/${{ matrix.name }}
           digests-directory: /tmp/digests
