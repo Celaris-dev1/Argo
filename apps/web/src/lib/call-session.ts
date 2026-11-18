@@ -1,4 +1,3 @@
-import { t } from "@lingui/core/macro";
 import type { BotAvatarSet, ProductEvent, ThreadMessage, ThreadSnapshot } from "@argo/contracts";
 import type { CallExchange } from "@argo/core";
 import {
@@ -16,6 +15,7 @@ import {
   spokenDecision,
   spokenMemory,
 } from "@argo/core";
+import { t } from "@lingui/core/macro";
 import { getGlobalBroadcastChannel } from "better-auth/client";
 import { useSyncExternalStore } from "react";
 import { pickUp } from "./call-pickup.js";

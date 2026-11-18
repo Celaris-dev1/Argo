@@ -1,10 +1,10 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { ORPCError } from "@orpc/client";
 import type { AgentSkill, AgentSkillCatalogEntry, MemoryDocument } from "@argo/contracts";
 import { isDeletableMemoryDocument, isEmptyBotMemory } from "@argo/contracts";
 import { fetchFresh, writeSaved } from "@argo/core/query";
 import { Badge, Button, Skeleton, Textarea } from "@argo/ui-web";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@argo/ui-web/components/ui/tooltip";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ORPCError } from "@orpc/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

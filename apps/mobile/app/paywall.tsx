@@ -1,4 +1,3 @@
-import { MenuView } from "@expo/ui/community/menu";
 import type { BillingStatus } from "@argo/contracts";
 import {
   AI_PRIVACY_URL,
@@ -7,6 +6,7 @@ import {
   ModelCreditAmountSchema,
 } from "@argo/contracts";
 import { botColors, botEyeColor, typeScale } from "@argo/ui-tokens";
+import { MenuView } from "@expo/ui/community/menu";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import type { ComponentProps, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";

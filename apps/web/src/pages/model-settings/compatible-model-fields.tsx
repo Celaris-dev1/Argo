@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { ThinkingLevel } from "@argo/contracts";
 import { compatiblePresetNeedsKey } from "@argo/contracts";
 import { toggleEnabledModelId } from "@argo/core";
@@ -12,6 +11,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ModelPreflightFeedback } from "../../components/ModelConnectionPreflightNotice";
 import { ModelHeadersEditor } from "../../components/ModelHeadersEditor";
 

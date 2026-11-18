@@ -1290,7 +1290,12 @@ describe("bot model change validation", () => {
       const deps = changeDeps({});
       await expect(
         fresh.validateBotModelChange(deps, { ...scope, provider: "local", model: "other-model" }),
-      ).resolves.toEqual({ ok: true, provider: "local", model: "other-model", thinkingLevel: null });
+      ).resolves.toEqual({
+        ok: true,
+        provider: "local",
+        model: "other-model",
+        thinkingLevel: null,
+      });
       await expect(
         fresh.validateBotModelChange(deps, { ...scope, provider: "local", model: "not-listed" }),
       ).resolves.toMatchObject({ ok: false });

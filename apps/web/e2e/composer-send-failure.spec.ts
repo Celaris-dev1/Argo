@@ -1,6 +1,6 @@
+import type { Routine } from "@argo/contracts";
 import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import type { Routine } from "@argo/contracts";
 import { activeBotId, completeOnboarding, createNamedBot, rpc, signup } from "./helpers";
 
 async function openComposer(page: Page, prefix: string) {

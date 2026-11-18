@@ -1,4 +1,3 @@
-import { Plural, Trans } from "@lingui/react/macro";
 import { ChatMarkdown } from "@argo/chat-ui/web";
 import type { ThreadMessage } from "@argo/contracts";
 import { formatCompactDuration } from "@argo/core";
@@ -7,6 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@argo/ui-web/components/ui/collapsible";
+import { Plural, Trans } from "@lingui/react/macro";
 import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Fragment } from "react";

@@ -1,7 +1,7 @@
-import { i18n } from "@lingui/core";
 import type { ModelCatalogEntry, ModelCredential, ThinkingLevel } from "@argo/contracts";
 import type { ConnectedModelChoice } from "@argo/core";
 import { connectedModelChoices } from "@argo/core";
+import { i18n } from "@lingui/core";
 
 export { modelOptionKey, parseModelOptionKey } from "@argo/core";
 

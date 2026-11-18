@@ -136,3 +136,9 @@ export const RunShareSchema = z.object({
 });
 export type RunShare = z.infer<typeof RunShareSchema>;
 export const RunShareLinkSchema = z.object({ url: z.string() });
+/** A bot's public status page: its name and the titles of recently finished tasks, nothing else. */
+export const BotStatusSchema = z.object({
+  botName: z.string(),
+  tasks: z.array(z.object({ title: z.string(), at: z.string() })),
+});
+export type BotStatus = z.infer<typeof BotStatusSchema>;

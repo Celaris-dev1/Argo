@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { SecretStoreUnavailableError } from "@argo/adapter-kit";
 import {
   listPiCatalog,
@@ -42,6 +41,7 @@ import {
   updateModelRole,
   writeModelRole,
 } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import { mayUsePrivateEndpoint } from "../mcp-servers.js";
 import { firstModelConnectAnalytics } from "../model-connect-analytics.js";
 import {

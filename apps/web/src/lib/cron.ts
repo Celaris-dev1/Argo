@@ -1,6 +1,6 @@
-import { t } from "@lingui/core/macro";
 import type { CronLabels, CronUnit } from "@argo/core";
 import { ENGLISH_CRON_LABELS, localizedClock, russianInterval } from "@argo/core";
+import { t } from "@lingui/core/macro";
 
 export function cronUnitLabel(unit: CronUnit): string {
   switch (unit) {

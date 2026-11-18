@@ -88,6 +88,15 @@ ARGO_LOCAL_MODELS_NAME=Example Models
 Only configure an endpoint you control: prompts, attachments, and tool results sent to that model
 leave Argo through this URL. Leave `ARGO_LOCAL_MODELS` blank to disable the provider.
 
+Coding mode runs OpenCode on the member's computer, where its environment is readable, so it never
+gets `ARGO_LOCAL_MODELS_KEY`. To let it use this endpoint, issue a narrower key that only covers
+the coding models and list them, default first. Members can ask for another listed model by name:
+
+```env
+ARGO_LOCAL_CODING_KEY=sk-...
+ARGO_LOCAL_CODING_MODELS=coder-large,coder-fast
+```
+
 ## Ollama Cloud
 
 In **Settings → Models**, choose **Ollama Cloud**, paste an API key from ollama.com, then **Find models**. This uses an OpenAI-compatible connection with no environment configuration, and stays available when `ARGO_OPENAI_COMPAT_ALLOW_PUBLIC=0`.

@@ -1287,6 +1287,10 @@ export const appContract = {
     /** Publishes a read-only snapshot of one of the caller's finished runs; repeat calls return the same link. */
     share: oc.input(z.object({ runId: Id })).output(RunShareLinkSchema),
     unshare: oc.input(z.object({ runId: Id })).output(z.object({ ok: z.literal(true) })),
+    /** The bot's public status link, or null while it is not published. */
+    statusPage: oc.input(z.object({ botId: Id })).output(z.object({ url: z.string().nullable() })),
+    publishStatus: oc.input(z.object({ botId: Id })).output(RunShareLinkSchema),
+    unpublishStatus: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {

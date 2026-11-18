@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   AgentSkillCatalogEntry,
   Bot,
@@ -36,6 +35,7 @@ import {
   Textarea,
   Toggle,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { Download, Settings, X } from "lucide-react";
 import type { ReactNode } from "react";
@@ -46,6 +46,7 @@ import { botProfilePatch } from "../../lib/bot-profile-patch";
 import { thinkingLevelLabel } from "../../lib/model-catalog";
 import { lazyComponent } from "../../lib/preload-recovery";
 import { useSpaceQueries } from "../../lib/query";
+import { useSpaceRpc } from "../../lib/space-rpc";
 import { errorText } from "../../lib/user-error";
 import { AvatarStudioPopover } from "./avatar-studio-popover";
 import { ChatModelPicker } from "./chat-model-picker";
@@ -745,6 +746,7 @@ export function BotSettings({
                   }}
                 />
               </div>
+              <StatusPageRow botId={bot.id} />
             </SettingsGroup>
             <InstructionSettings key={bot.id} bot={bot} />
             <SettingsGroup label={t`How other bots see it`} plain>
@@ -947,4 +949,63 @@ function SettingsGroup({
 function humanizeTool(name: string) {
   const words = name.replaceAll("_", " ");
   return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** Owner-only switch for the bot's public page of recently finished task titles. */
+function StatusPageRow({ botId }: { botId: string }) {
+  const { t } = useLingui();
+  const rpc = useSpaceRpc();
+  const id = useId();
+  const [url, setUrl] = useState<string | null>(null);
+  const [busy, setBusy] = useState(true);
+  useEffect(() => {
+    let live = true;
+    rpc.runs
+      .statusPage({ botId })
+      .then((result) => live && setUrl(result.url))
+      .catch(() => undefined)
+      .finally(() => live && setBusy(false));
+    return () => {
+      live = false;
+    };
+  }, [rpc, botId]);
+  async function toggle(on: boolean) {
+    setBusy(true);
+    try {
+      if (on) {
+        const link = (await rpc.runs.publishStatus({ botId })).url;
+        setUrl(link);
+        await navigator.clipboard?.writeText(link).catch(() => undefined);
+      } else {
+        await rpc.runs.unpublishStatus({ botId });
+        setUrl(null);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+      <label htmlFor={id} className="min-w-0">
+        <Trans>Public status page</Trans>
+        {url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="block truncate text-xs text-muted-foreground underline"
+          >
+            {url}
+          </a>
+        ) : null}
+      </label>
+      <Switch
+        id={id}
+        aria-label={t`Public status page`}
+        checked={Boolean(url)}
+        disabled={busy}
+        onCheckedChange={(checked) => void toggle(checked)}
+      />
+    </div>
+  );
 }

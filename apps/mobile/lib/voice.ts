@@ -591,10 +591,7 @@ async function playWithNativeAudio(bytes: Uint8Array, session?: HostedSession): 
     interruptionMode: "mixWithOthers",
     shouldPlayInBackground: playsInBackground,
   });
-  const file = new File(
-    Paths.cache,
-    `argo-voice-${Date.now()}.${speechClipType(bytes).extension}`,
-  );
+  const file = new File(Paths.cache, `argo-voice-${Date.now()}.${speechClipType(bytes).extension}`);
   file.create({ overwrite: true });
   file.write(bytesToBase64(bytes), { encoding: "base64" });
   const player = createAudioPlayer({ uri: file.uri });

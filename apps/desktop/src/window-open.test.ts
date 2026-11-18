@@ -28,9 +28,9 @@ describe("desktop child windows", () => {
 
   it("rejects malformed URLs and non-HTTPS third-party targets", () => {
     expect(shouldOpenInAppPopup(appOrigin, "not a url", "argo-model-oauth")).toBe(false);
-    expect(
-      shouldOpenInAppPopup(appOrigin, "http://provider.example.com", "argo-model-oauth"),
-    ).toBe(false);
+    expect(shouldOpenInAppPopup(appOrigin, "http://provider.example.com", "argo-model-oauth")).toBe(
+      false,
+    );
   });
 });
 

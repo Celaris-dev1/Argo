@@ -126,10 +126,7 @@ describe("server request headers", () => {
 
   it("ignores a damaged saved value", async () => {
     store.set("argo.api_base", SERVER);
-    store.set(
-      "argo.server_headers",
-      JSON.stringify({ apiBase: SERVER, headers: { origin: "x" } }),
-    );
+    store.set("argo.server_headers", JSON.stringify({ apiBase: SERVER, headers: { origin: "x" } }));
     await loadApiBase();
     expect(serverHeaders(SERVER)).toEqual({});
   });

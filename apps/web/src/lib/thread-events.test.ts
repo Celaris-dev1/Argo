@@ -1,9 +1,4 @@
-import type {
-  ComputerStatus,
-  ProductEvent,
-  ThreadMessage,
-  ThreadSnapshot,
-} from "@argo/contracts";
+import type { ComputerStatus, ProductEvent, ThreadMessage, ThreadSnapshot } from "@argo/contracts";
 import {
   answerableAskMessageIds,
   dismissableAskMessageIds,

@@ -3198,11 +3198,7 @@ describeJourneys("required product journeys", () => {
 
   describe("bot management", () => {
     async function fleetOwner(label: string) {
-      const cookie = await signup(
-        app,
-        `bot-management-${label}-${stamp}@argo.test`,
-        "Bot Manager",
-      );
+      const cookie = await signup(app, `bot-management-${label}-${stamp}@argo.test`, "Bot Manager");
       const me = await rpc<Me>(app, cookie, "me");
       const chief = await createBot(cookie, "Chief");
       await rpc(app, cookie, "bots/update", { botId: chief.id, fleetManagement: true });

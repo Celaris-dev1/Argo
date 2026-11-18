@@ -1,5 +1,5 @@
-import type { Api, Model, MutableModels } from "@earendil-works/pi-ai";
 import { canonicalPiProviderId } from "@argo/contracts";
+import type { Api, Model, MutableModels } from "@earendil-works/pi-ai";
 
 /** Apply provider protocol capabilities before catalog and runtime selection. */
 export function applyPiModelCompatibility(models: MutableModels): MutableModels {

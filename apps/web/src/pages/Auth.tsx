@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
   credentialIssue,
   MAX_PASSWORD_LENGTH,
@@ -6,6 +5,7 @@ import {
   signupRequiresEmailVerification,
 } from "@argo/core";
 import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PasskeySignIn } from "../components/PasskeySignIn";
@@ -241,11 +241,11 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               </Button>
             </div>
           ) : null}
-          {reset?.sso && !reset.passwordAuth && mode !== "forgot" ? (
+          {reset?.sso && mode !== "forgot" && !codeStep ? (
             <Button
               type="button"
               disabled={pending}
-              className={submitClass}
+              className={reset.passwordAuth ? `${submitClass} mb-6` : submitClass}
               onClick={() => void signInWithSso()}
             >
               <Trans>Continue with {reset.sso.name}</Trans>
@@ -351,6 +351,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               <Button
                 type="submit"
                 size="lg"
+                variant={reset.sso && mode !== "forgot" && !codeStep ? "outline" : "default"}
                 disabled={pending || (codeStep && code.length < CODE_LENGTH)}
                 className={submitClass}
               >
@@ -384,18 +385,6 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
                   onClick={leaveCodeStep}
                 >
                   <Trans>Back</Trans>
-                </Button>
-              ) : null}
-              {reset.sso && mode !== "forgot" && !codeStep ? (
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  disabled={pending}
-                  className="mt-3 text-muted-foreground"
-                  onClick={() => void signInWithSso()}
-                >
-                  <Trans>Continue with {reset.sso.name}</Trans>
                 </Button>
               ) : null}
               {codeStep ? null : (

@@ -1,3 +1,4 @@
+import { tokensForAppearance } from "@argo/ui-tokens";
 import type { ModalBottomSheetRef } from "@expo/ui/jetpack-compose";
 import { Box, Host, LazyColumn, ListItem, ModalBottomSheet, Text } from "@expo/ui/jetpack-compose";
 import {
@@ -11,7 +12,6 @@ import {
   selectable,
   size,
 } from "@expo/ui/jetpack-compose/modifiers";
-import { tokensForAppearance } from "@argo/ui-tokens";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import {
   dismissMessageActionSheet,

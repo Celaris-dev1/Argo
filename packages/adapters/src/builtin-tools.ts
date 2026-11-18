@@ -457,7 +457,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "code",
     description:
-      "Coding mode. For a long stretch of work the model does alone, with little or no input from the user. Hand the software task to OpenCode (or Kilo) and leave it. It edits the repo and runs commands without asking permission or the user. It keeps going for hours. If it reports it is still working, call code again with continue and do not message the user. prompt is the task. cwd is optional. model is optional, as provider/model.",
+      "Coding mode. For a long stretch of work the model does alone, with little or no input from the user. Hand the software task to OpenCode (or Kilo) and leave it. It edits the repo and runs commands without asking permission or the user. It keeps going for hours. If it reports it is still working, call code again with continue and do not message the user. prompt is the task. cwd is optional. model is optional, as provider/model or the model name the user asked for.",
     inputSchema: {
       type: "object",
       properties: {
@@ -794,6 +794,54 @@ export const builtinAgentTools: ConnectorTool[] = [
         },
       },
       required: ["url"],
+    },
+    readOnly: true,
+  },
+  {
+    name: "deep_research",
+    description:
+      "Research a question in depth on the public web and return a cited report. Plans sub-questions, searches, reads many pages, chases gaps, checks claims, and writes the answer with numbered sources. Takes minutes, so use it only when the user asks for research, a deep dive, or a thorough comparison; use web_search for a quick fact. Does not need a computer. Present the returned report to the user as written. Pass overrides only when the user stated them.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        question: { type: "string", description: "The research request in the user's words." },
+        depth: {
+          type: "string",
+          enum: ["low", "high", "ultra"],
+          description:
+            "Leave unset (low) unless the user asked for high or ultra by name. low: about 8 questions, 40 sources, a few minutes. high: about 3x, two rounds, claims need two sources. ultra: about 5x, three rounds, plus a sceptic pass for counter-evidence.",
+        },
+        questions: { type: "number", description: "Override: sub-questions to plan." },
+        sources: { type: "number", description: "Override: pages to read." },
+        rounds: { type: "number", description: "Override: search-and-read rounds (1-4)." },
+        verification: {
+          type: "string",
+          enum: ["none", "two-sources", "skeptic"],
+          description: "Override: how claims are checked.",
+        },
+        minutes: { type: "number", description: "Override: time budget in minutes." },
+        words: { type: "number", description: "Override: target report length in words." },
+        format: {
+          type: "string",
+          enum: ["report", "brief", "table"],
+          description: "Shape of the answer (default report).",
+        },
+        recencyDays: {
+          type: "number",
+          description: "Only use pages from roughly the last N days.",
+        },
+        includeDomains: {
+          type: "array",
+          items: { type: "string" },
+          description: 'Only read these sites, for example ["gov.uk"].',
+        },
+        excludeDomains: {
+          type: "array",
+          items: { type: "string" },
+          description: "Never read these sites.",
+        },
+      },
+      required: ["question"],
     },
     readOnly: true,
   },

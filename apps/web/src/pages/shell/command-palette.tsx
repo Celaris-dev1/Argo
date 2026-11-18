@@ -1,8 +1,5 @@
-import { t } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
 import type { Bot } from "@argo/contracts";
 import {
-  Badge,
   BotAvatar,
   Command,
   CommandDialog,
@@ -14,6 +11,8 @@ import {
   CommandShortcut,
   Kbd,
 } from "@argo/ui-web";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { Check } from "lucide-react";
 import type { ComponentType } from "react";
 import { useEffect, useMemo, useState } from "react";

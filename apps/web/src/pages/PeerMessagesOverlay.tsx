@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ChatMarkdown } from "@argo/chat-ui/web";
 import type { BotAvatarSet } from "@argo/contracts";
 import { loadPeerHistory, peerConversations } from "@argo/core";
@@ -11,6 +10,7 @@ import {
   DialogTitle,
   Spinner,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { XIcon } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef } from "react";

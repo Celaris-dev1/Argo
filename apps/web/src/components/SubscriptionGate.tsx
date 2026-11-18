@@ -1,11 +1,10 @@
-import type { BillingStatus, Me } from "@argo/contracts";
+import type { BillingStatus } from "@argo/contracts";
 import { Dialog, DialogContent } from "@argo/ui-web";
 import { useLingui } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { createContext, Suspense, useContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { fetchAuthCapabilities } from "../lib/auth-capabilities";
-import { peekInitialBootstrap } from "../lib/bootstrap";
 import { loadMe } from "../lib/me";
 import { lazyComponent } from "../lib/preload-recovery";
 import { claimStoredReferral } from "../lib/referral";

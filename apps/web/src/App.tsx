@@ -38,6 +38,7 @@ import {
 } from "./lib/session-gate";
 import { syncLogOutFailure } from "./lib/sign-out";
 import { completeSsoCallback, SSO_CALLBACK_PATH } from "./lib/sso-flow";
+import { BotStatusPage } from "./pages/BotStatus";
 import { IntegrationCallbackPage } from "./pages/IntegrationCallback";
 import { IntegrationSetupPage } from "./pages/IntegrationSetup";
 import { McpOAuthCallbackPage } from "./pages/McpOAuthCallback";
@@ -208,6 +209,7 @@ function SessionApp() {
               />
               <Route path="/reset-password" element={<PasswordResetPage />} />
               <Route path="/r/:shareId" element={<SharedRunPage />} />
+              <Route path="/s/:statusId" element={<BotStatusPage />} />
               <Route
                 path={MCP_OAUTH_CALLBACK_PATH}
                 element={

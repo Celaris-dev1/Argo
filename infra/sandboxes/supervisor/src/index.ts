@@ -5,7 +5,6 @@ import http from "node:http";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { serve } from "@hono/node-server";
 import {
   boundedSandboxCommandTimeoutMs,
   readBoundedJsonResponse,
@@ -16,6 +15,7 @@ import { loadRootEnv } from "@argo/core/node/load-root-env";
 import { getLogger, SERVICE_NAMES } from "@argo/logging";
 import { createRootLogger } from "@argo/logging/axiom";
 import { requestLogging } from "@argo/logging/hono";
+import { serve } from "@hono/node-server";
 import Docker from "dockerode";
 import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
@@ -976,11 +976,7 @@ app.post("/computers/:id/terminal", async (c) => {
   try {
     const id = c.req.param("id");
     const botId = c.req.header("x-argo-bot-id");
-    const { container, info } = await managedContainer(
-      id,
-      botId,
-      c.req.header("x-argo-space-id"),
-    );
+    const { container, info } = await managedContainer(id, botId, c.req.header("x-argo-space-id"));
     const cwd = workspaceTarget(normalizeWorkspaceRelative(body.cwd));
     const terminalToken = randomUUID();
     const layout = await withComputerScreenLock(id, async () => {
@@ -1357,8 +1353,7 @@ async function isManagedSpaceContainer(
   try {
     const info = await docker.getContainer(item.Id).inspect();
     const infoLabels = info.Config?.Labels ?? {};
-    const managed =
-      infoLabels["argo.managed"] === "true" || info.Config?.Image === COMPUTER_IMAGE;
+    const managed = infoLabels["argo.managed"] === "true" || info.Config?.Image === COMPUTER_IMAGE;
     const infoSpaceId = infoLabels["argo.spaceId"] ?? infoLabels["argo.workspaceId"];
     return managed && infoSpaceId === spaceId;
   } catch {

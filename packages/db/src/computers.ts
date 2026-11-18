@@ -93,6 +93,15 @@ export function resolveMaxBotsPerUser(value = process.env.ARGO_MAX_BOTS_PER_USER
   return limit;
 }
 
+/** Users exempt from the per-user bot and computer caps (ARGO_QUOTA_EXEMPT_USER_IDS, comma-separated). */
+export function isQuotaExemptUser(
+  userId: string,
+  value = process.env.ARGO_QUOTA_EXEMPT_USER_IDS,
+): boolean {
+  if (!value) return false;
+  return value.split(",").some((id) => id.trim() === userId);
+}
+
 export class BotLimitError extends Error {
   constructor(limit: number) {
     super(
@@ -114,7 +123,7 @@ export async function assertBotQuota(
   userId: string,
 ): Promise<void> {
   const limit = resolveMaxBotsPerUser();
-  if (limit <= 0) return;
+  if (limit <= 0 || isQuotaExemptUser(userId)) return;
   await lockUserForComputerQuota(tx, userId);
   const live = await runAsSystemInTransaction(
     tx as Pick<PrismaClient, "$queryRaw">,
@@ -177,7 +186,7 @@ export async function assertComputerQuotaForRestore(
   input: { userId: string; computerId: string },
 ): Promise<void> {
   const limit = resolveMaxComputersPerUser();
-  if (limit <= 0) return;
+  if (limit <= 0 || isQuotaExemptUser(input.userId)) return;
   // If another live bot already references this row (a team computer shared
   // by the user's bots in the space), restoring this bot adds nothing to the count.
   const alreadyLive = await prisma.computer.count({
@@ -313,7 +322,9 @@ export async function ensureComputerRecord(
 ) {
   const limit = resolveMaxComputersPerUser();
   const scopeKey = computerScopeKey(input);
-  if (limit <= 0) return upsertComputerRecord(prisma, input, scopeKey);
+  if (limit <= 0 || isQuotaExemptUser(input.userId)) {
+    return upsertComputerRecord(prisma, input, scopeKey);
+  }
 
   // Cap is set: hold a per-user advisory lock across find + count + create so
   // concurrent creates for different spaces cannot both pass the check.

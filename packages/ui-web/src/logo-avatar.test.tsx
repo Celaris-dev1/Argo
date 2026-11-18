@@ -11,9 +11,9 @@ describe("logo-derived avatar prototype", () => {
       expect(renderToString(<LogoAvatar identity={identity} />)).toContain(
         `data-color="${expected}"`,
       );
-      expect(
-        renderToString(<BotAvatar color="" identity={identity} avatarSet="argo" />),
-      ).toContain(`data-color="${expected}"`);
+      expect(renderToString(<BotAvatar color="" identity={identity} avatarSet="argo" />)).toContain(
+        `data-color="${expected}"`,
+      );
     }
   });
   it("renders the eye-free brand body with vector eyes and an accessible name", () => {

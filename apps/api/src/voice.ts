@@ -1,6 +1,5 @@
-import { ORPCError } from "@orpc/server";
-import type { AdapterContext, SecretStore } from "@argo/adapter-kit";
-import { VoiceAccountError } from "@argo/adapter-kit";
+import type { AdapterContext, ArtifactStore, SecretStore } from "@argo/adapter-kit";
+import { createAdapterContext, VoiceAccountError } from "@argo/adapter-kit";
 import {
   createVoiceProvider,
   isFishSpeechModelId,
@@ -40,6 +39,7 @@ import {
   voicePreferenceTarget,
 } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 import type { Context, Hono } from "hono";
 import { readBoundedBody } from "./http-body.js";
 import { withSerializableRetry } from "./serializable-retry.js";
@@ -565,6 +565,41 @@ export async function transcribeVoice(
     },
     voiceContext(actor, input.signal),
   );
+}
+
+/**
+ * Transcribes a voice note a chat app delivered, with the owner's own voice provider.
+ * Null when the owner has no provider that transcribes; the note stays a file.
+ */
+export async function transcribeStoredVoiceNote(
+  deps: VoiceDeps & { artifacts: ArtifactStore },
+  input: { spaceId: string; userId: string; botId: string; artifactId: string },
+): Promise<string | null> {
+  const [row, user] = await Promise.all([
+    deps.prisma.artifact.findFirst({
+      where: { id: input.artifactId, spaceId: input.spaceId },
+      select: { storageKey: true, mimeType: true, size: true },
+    }),
+    deps.prisma.user.findUnique({ where: { id: input.userId }, select: { email: true } }),
+  ]);
+  if (!row || !user || row.size > MAX_TRANSCRIBE_BYTES) return null;
+  const actor: Actor = {
+    userId: input.userId,
+    spaceId: input.spaceId,
+    email: user.email,
+    isDeploymentOwner: false,
+  };
+  try {
+    const audio = await deps.artifacts.get(
+      row.storageKey,
+      createAdapterContext(actor, input.botId, `voice-note:${input.artifactId}`),
+    );
+    const result = await transcribeVoice(deps, actor, { audio, mimeType: row.mimeType });
+    return result.text || null;
+  } catch (error) {
+    if (error instanceof NoVoiceConfigured || error instanceof ORPCError) return null;
+    throw error;
+  }
 }
 
 export function mountVoiceHttpRoutes(

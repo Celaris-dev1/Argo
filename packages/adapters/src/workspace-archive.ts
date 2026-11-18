@@ -1,11 +1,7 @@
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { createGunzip } from "node:zlib";
-import type {
-  PortableFile,
-  StreamedPortableFile,
-  WorkspaceExportLimits,
-} from "@argo/adapter-kit";
+import type { PortableFile, StreamedPortableFile, WorkspaceExportLimits } from "@argo/adapter-kit";
 import { WorkspaceTooLargeError } from "@argo/adapter-kit";
 import { normalizeWorkspacePath } from "./computer-support.js";
 

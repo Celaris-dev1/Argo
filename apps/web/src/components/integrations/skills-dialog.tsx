@@ -1,4 +1,3 @@
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import type { CapabilityInstall, PluginMarketplaceEntry } from "@argo/contracts";
 import { PluginPreviewSchema } from "@argo/contracts";
 import { installedPluginParts, matchesPluginQuery } from "@argo/core";
@@ -14,6 +13,7 @@ import {
   Input,
   Spinner,
 } from "@argo/ui-web";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, X } from "lucide-react";
 import { useState } from "react";

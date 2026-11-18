@@ -8,12 +8,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import type { Duplex } from "node:stream";
 import { gzipSync } from "node:zlib";
-import { expect, test } from "@playwright/test";
-import {
-  addScreenProxyCapability,
-  openScreenCapability,
-} from "@argo/core/node/screen-capability";
+import { addScreenProxyCapability, openScreenCapability } from "@argo/core/node/screen-capability";
 import { screenProbeUrl } from "@argo/core/screen-reconnect";
+import { expect, test } from "@playwright/test";
 import type { Plugin, ViteDevServer } from "vite";
 import { createServer, preview } from "vite";
 

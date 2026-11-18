@@ -1,8 +1,8 @@
-import { I18nProvider } from "@lingui/react";
 import type { MessageBlock, ThreadMessage } from "@argo/contracts";
 import { BOT_COLOR_LIST, instructionUpdateDiff } from "@argo/core";
 import type { GroupAvatarMember } from "@argo/ui-web";
 import { Button } from "@argo/ui-web";
+import { I18nProvider } from "@lingui/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";

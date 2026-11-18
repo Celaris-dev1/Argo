@@ -1,5 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ChatMarkdown } from "@argo/chat-ui/web";
 import type { Artifact, Bot } from "@argo/contracts";
 import { isAttachmentImageMimeType } from "@argo/contracts";
@@ -23,6 +21,8 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@argo/ui-web";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { skipToken, useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ChevronLeft,

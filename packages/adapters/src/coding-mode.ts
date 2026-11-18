@@ -1,13 +1,10 @@
-import type {
-  AdapterContext,
-  ComputerRef,
-  ProcessEvent,
-  SandboxProvider,
-} from "@argo/adapter-kit";
+import { createHmac } from "node:crypto";
+import type { AdapterContext, ComputerRef, ProcessEvent, SandboxProvider } from "@argo/adapter-kit";
 import { redactSecrets } from "@argo/core";
 import { shellCommandEnvironment } from "./bot-secrets.js";
 import { resolveBotWorkspaceCwd } from "./computer-support.js";
 import { findConnectedModelCredential, runModelChoice } from "./model-selection.js";
+import { LOCAL_PROVIDER_ID, localBaseUrl, localModelsName } from "./pi-local-provider.js";
 import type { RunContext } from "./run-context.js";
 import { addRunSecrets } from "./run-context.js";
 import { resolveModelKey } from "./run-model.js";
@@ -230,12 +227,78 @@ function clip(text: string, max: number): string {
   return `${trimmed.slice(0, max - 1).trimEnd()}…`;
 }
 
+/** Model ids, first is the default, that OpenCode may use on the deployment's endpoint. */
+function localCodingModelIds(source = process.env): string[] {
+  return (source.ARGO_LOCAL_CODING_MODELS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
+const CODING_TOKEN_HOURS = 12;
+
+/**
+ * A short-lived token naming the member, signed with the deployment's coding key, so the model
+ * gateway can meter each member's coding use without ever seeing the key itself on a computer.
+ */
+export function mintCodingToken(key: string, userId: string, nowMs = Date.now()): string {
+  const payload = Buffer.from(
+    JSON.stringify({ u: userId, e: Math.floor(nowMs / 1000) + CODING_TOKEN_HOURS * 3600 }),
+  ).toString("base64url");
+  const sig = createHmac("sha256", key).update(payload).digest("base64url");
+  return `ck1.${payload}.${sig}`;
+}
+
+/**
+ * OpenCode runs on the member's computer, so it gets a per-member token that only covers the
+ * coding models, never the deployment's main key. Without a coding key, coding gets no
+ * deployment model.
+ */
+export function localCodingEnv(
+  requested: string,
+  userId: string,
+  source = process.env,
+  nowMs = Date.now(),
+): { env: Record<string, string>; model?: string; secret?: string } {
+  const key = source.ARGO_LOCAL_CODING_KEY?.trim();
+  const models = localCodingModelIds(source);
+  if (!key || models.length === 0) return { env: {} };
+  const wanted = requested.replace(new RegExp(`^${LOCAL_PROVIDER_ID}/`), "").toLowerCase();
+  const chosen =
+    (wanted && models.find((id) => id.toLowerCase() === wanted)) ||
+    (wanted && models.find((id) => id.toLowerCase().includes(wanted))) ||
+    models[0]!;
+  const token = mintCodingToken(key, userId, nowMs);
+  const config = {
+    $schema: "https://opencode.ai/config.json",
+    provider: {
+      [LOCAL_PROVIDER_ID]: {
+        npm: "@ai-sdk/openai-compatible",
+        name: localModelsName() ?? "Local",
+        options: { baseURL: localBaseUrl(), apiKey: "{env:ARGO_LOCAL_CODING_KEY}" },
+        models: Object.fromEntries(models.map((id) => [id, { name: id }])),
+      },
+    },
+  };
+  return {
+    env: { OPENCODE_CONFIG_CONTENT: JSON.stringify(config), ARGO_LOCAL_CODING_KEY: token },
+    model: `${LOCAL_PROVIDER_ID}/${chosen}`,
+    secret: token,
+  };
+}
+
 async function codingProviderEnv(
   ctx: RunContext,
-): Promise<{ env: Record<string, string>; model?: string }> {
+  requested: string,
+): Promise<{ env: Record<string, string>; model?: string; fixed?: boolean }> {
   const choice = runModelChoice(ctx.run, ctx.bot);
   const provider = choice.modelProvider?.trim();
   const modelId = choice.modelId?.trim();
+  if (provider === LOCAL_PROVIDER_ID) {
+    const local = localCodingEnv(requested, ctx.run.userId);
+    if (local.secret) addRunSecrets(ctx, [local.secret]);
+    return { env: local.env, model: local.model, fixed: Boolean(local.model) };
+  }
   const names = provider ? PROVIDER_KEY_ENV[provider] : undefined;
   if (!provider || !modelId || !names) return { env: {} };
   try {
@@ -291,8 +354,8 @@ export const codingTools: ToolHandlers = {
       scope: run,
       registerRedactions: (values) => addRunSecrets(ctx, values),
     });
-    const provider = await codingProviderEnv(ctx);
-    const model = requestedModel || provider.model;
+    const provider = await codingProviderEnv(ctx, requestedModel);
+    const model = provider.fixed ? provider.model : requestedModel || provider.model;
     const env = { ...provider.env, ...commandEnvironment.env, OPENCODE_DISABLE_AUTOUPDATE: "1" };
     ctx.computer.checkpoint.markDirty();
     const computer = await ctx.computer.get("tool", name);

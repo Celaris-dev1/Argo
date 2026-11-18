@@ -528,4 +528,17 @@ describe("bot quota", () => {
     await expect(assertBotQuota(tx, "user-1")).rejects.toThrow(BotLimitError);
     expect(count).toHaveBeenCalledWith({ where: { userId: "user-1", archivedAt: null } });
   });
+
+  it("skips the cap for exempt users only", async () => {
+    process.env.ARGO_MAX_BOTS_PER_USER = "1";
+    process.env.ARGO_QUOTA_EXEMPT_USER_IDS = "user-9, user-1";
+    try {
+      const { tx, count } = fakeTx(5);
+      await expect(assertBotQuota(tx, "user-1")).resolves.toBeUndefined();
+      expect(count).not.toHaveBeenCalled();
+      await expect(assertBotQuota(fakeTx(1).tx, "user-2")).rejects.toThrow(BotLimitError);
+    } finally {
+      delete process.env.ARGO_QUOTA_EXEMPT_USER_IDS;
+    }
+  });
 });

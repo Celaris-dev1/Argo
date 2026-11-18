@@ -5,7 +5,7 @@ import { readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { HostScreen } from "@argo/adapters/host-screen";
 import { startUserDeviceClient } from "@argo/adapters/user-device-client";
-import type { DesktopReachability, DesktopSetup, ArgoDesktopDevice } from "@argo/contracts";
+import type { ArgoDesktopDevice, DesktopReachability, DesktopSetup } from "@argo/contracts";
 import { parseServerHeaders } from "@argo/contracts";
 import type { Session } from "electron";
 import {
@@ -62,6 +62,7 @@ import { revealSecondInstanceWindow, secondInstanceWindow } from "./second-insta
 import { installServerHeaders } from "./server-request-headers.js";
 import { installSessionPermissions } from "./session-permissions.js";
 import {
+  ARGO_CLOUD_URL,
   DEFAULT_LOCAL_WEB_URL,
   desktopStackImageTag,
   isArgoHealth,
@@ -70,7 +71,6 @@ import {
   normalizeServerUrl,
   parseSetupInput,
   probeFailureMessage,
-  ARGO_CLOUD_URL,
   readProbeJson,
   resolveStartupTarget,
   safeExternalUrl,

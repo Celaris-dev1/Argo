@@ -1,10 +1,10 @@
+import type { AgentRunRequest } from "@argo/adapter-kit";
 import type { Api, Model } from "@earendil-works/pi-ai";
 import {
   clampThinkingLevel,
   getSupportedThinkingLevels,
   normalizeContext,
 } from "@earendil-works/pi-ai";
-import type { AgentRunRequest } from "@argo/adapter-kit";
 import { describe, expect, it, vi } from "vitest";
 import { buildModelConnectPlaintext, modelCredentialDto } from "./model-connect.js";
 import { defaultCatalogModelId, isCatalogModelChoice } from "./model-selection.js";
@@ -227,6 +227,16 @@ describe("reasoning efforts an endpoint refuses", () => {
       xhigh: null,
       max: null,
     });
+  });
+
+  it("reads a list that follows 'must be' and steps medium up to an accepted level", () => {
+    const levels = acceptedReasoningEfforts(
+      model({ off: "none", xhigh: "xhigh", max: "max" }),
+      '400: {"message":"Example V4 reasoning_effort must be low, high, xhigh, max, or an integer within [1, 100] in chat_template_kwargs","type":"BadRequestError"}',
+    );
+    const narrowed = model(levels);
+    expect(getSupportedThinkingLevels(narrowed)).toEqual(["off", "low", "high", "xhigh", "max"]);
+    expect(clampThinkingLevel(narrowed, "medium")).not.toBe("medium");
   });
 
   it.each([

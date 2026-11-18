@@ -1,7 +1,7 @@
-import { t } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
 import type { SearchHit } from "@argo/contracts";
 import { searchHitListKey } from "@argo/core";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 export function SpaceSearchResults({
   hits,

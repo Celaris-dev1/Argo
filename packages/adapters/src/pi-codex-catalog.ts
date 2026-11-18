@@ -1,8 +1,8 @@
-import type { OAuthCredential } from "@earendil-works/pi-ai";
 import type { SecretStore } from "@argo/adapter-kit";
 import type { ThinkingLevel } from "@argo/contracts";
 import { ThinkingLevelSchema } from "@argo/contracts";
 import type { PrismaClient } from "@argo/db";
+import type { OAuthCredential } from "@earendil-works/pi-ai";
 import { LiveCatalogCache, liveModelCatalogEnabled } from "./pi-live-cache.js";
 import type { CatalogSpaceAuth } from "./pi-live-catalog.js";
 import { liveCatalogEntry, overlayLiveCatalog } from "./pi-live-catalog.js";

@@ -309,6 +309,47 @@ describe("inbound webhook HTTP route", () => {
     expect(deps.enqueue).toHaveBeenCalled();
   });
 
+  it("accepts the secret as a Basic password and reads form-encoded email posts", async () => {
+    const deps = createDeps();
+    const app = mount(deps);
+    const body = new URLSearchParams({
+      from: "sender@example.com",
+      subject: "Invoice 42",
+      text: "Please pay by Friday.",
+    });
+    const res = await app.request("/api/v1/bots/bot-1/webhook", {
+      method: "POST",
+      headers: {
+        authorization: `Basic ${Buffer.from(`inbox:${SECRET}`).toString("base64")}`,
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      body: body.toString(),
+    });
+    expect(res.status).toBe(200);
+    expect(deps.sendUserMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prompt: expect.stringMatching(
+          /"subject": "Invoice 42"[\s\S]*"text": "Please pay by Friday\."/,
+        ),
+      }),
+    );
+  });
+
+  it("rejects a wrong Basic password", async () => {
+    const deps = createDeps();
+    const app = mount(deps);
+    const res = await app.request("/api/v1/bots/bot-1/webhook", {
+      method: "POST",
+      headers: {
+        authorization: `Basic ${Buffer.from("inbox:wrong").toString("base64")}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ text: "hi" }),
+    });
+    expect(res.status).toBe(401);
+    expect(deps.sendUserMessage).not.toHaveBeenCalled();
+  });
+
   it("pins a routine model when every matching routine chose it", async () => {
     const deps = createDeps({
       routines: [

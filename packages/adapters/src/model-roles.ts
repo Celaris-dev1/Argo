@@ -1,10 +1,5 @@
 import type { AgentRunRequest, SecretStore } from "@argo/adapter-kit";
-import type {
-  ModelRole,
-  ModelRoleChoice,
-  ModelRoleSettings,
-  SettingsScope,
-} from "@argo/contracts";
+import type { ModelRole, ModelRoleChoice, ModelRoleSettings, SettingsScope } from "@argo/contracts";
 import { backupChoiceKey, usableModelId } from "@argo/contracts";
 import type { PrismaClient } from "@argo/db";
 import { appliedModelRole } from "@argo/db";

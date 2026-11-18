@@ -2039,6 +2039,7 @@ msgstr "Could not load this chat."
 msgid "Could not load this file."
 msgstr "Could not load this file."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr "Could not load this page."
@@ -2695,6 +2696,7 @@ msgstr "Downgrade at renewal"
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "Download"
 
@@ -3506,6 +3508,7 @@ msgid "Load web images automatically"
 msgstr "Load web images automatically"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr "Loading"
@@ -3583,6 +3586,11 @@ msgstr "Low"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
+
+#: src/pages/BotStatus.tsx
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr "Made with Argo"
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -4575,6 +4583,10 @@ msgstr "Previous page"
 msgid "Previous settings sections"
 msgstr "Previous settings sections"
 
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr "Print"
+
 #: src/pages/Board.tsx
 msgid "Priority"
 msgstr "Priority"
@@ -4608,6 +4620,10 @@ msgstr "Provider"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "Providers"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr "Public status page"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -5940,6 +5956,7 @@ msgstr "This file is not valid UTF-8 text."
 msgid "This import was already used. Choose the files again."
 msgstr "This import was already used. Choose the files again."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr "This link is no longer shared."

@@ -1,5 +1,3 @@
-import { expo } from "@better-auth/expo";
-import { passkey } from "@better-auth/passkey";
 import type { ProductAnalytics, TransactionalEmailProvider } from "@argo/adapter-kit";
 import {
   displayName,
@@ -11,6 +9,8 @@ import {
 } from "@argo/core";
 import type { PrismaClient, SecurityEventType } from "@argo/db";
 import { bootstrapUserSpace, personalOrganizationIds, recordSecurityEvent } from "@argo/db";
+import { expo } from "@better-auth/expo";
+import { passkey } from "@better-auth/passkey";
 import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";

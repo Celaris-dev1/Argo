@@ -1,5 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { BotMcpServer, McpServer, McpTransport } from "@argo/contracts";
 import { MCP_OAUTH_CLIENT_REQUIRED } from "@argo/contracts";
 import { deriveMcpSlug, isRetryableError } from "@argo/core";
@@ -30,6 +28,8 @@ import {
   toast,
 } from "@argo/ui-web";
 import { Disclosure } from "@argo/ui-web/components/ui/disclosure";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, LoaderCircle, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";

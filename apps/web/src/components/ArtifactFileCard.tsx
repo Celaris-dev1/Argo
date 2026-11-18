@@ -1,10 +1,10 @@
-import { i18n } from "@lingui/core";
-import { t as translate } from "@lingui/core/macro";
-import { useLingui } from "@lingui/react/macro";
 import { ChatMarkdown } from "@argo/chat-ui/web";
 import { isAttachmentAudioMimeType } from "@argo/contracts";
 import { fileSizeParts } from "@argo/core";
 import { Button, Dialog, DialogClose, DialogContent, DialogTitle, Spinner } from "@argo/ui-web";
+import { i18n } from "@lingui/core";
+import { t as translate } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { Code2, Download, FileText, Play, X } from "lucide-react";
 import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";

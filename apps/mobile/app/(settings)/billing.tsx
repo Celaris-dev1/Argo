@@ -1,10 +1,10 @@
-import { MenuView } from "@expo/ui/community/menu";
 import type { BillingStatus } from "@argo/contracts";
 import {
   DEFAULT_MONTHLY_CREDIT_AMOUNT,
   MODEL_CREDIT_AMOUNTS,
   ModelCreditAmountSchema,
 } from "@argo/contracts";
+import { MenuView } from "@expo/ui/community/menu";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, AppState, ScrollView, Share, StyleSheet } from "react-native";

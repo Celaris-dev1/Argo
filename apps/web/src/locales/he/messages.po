@@ -2039,6 +2039,7 @@ msgstr "לא ניתן לטעון את הצ׳אט הזה."
 msgid "Could not load this file."
 msgstr "לא ניתן לטעון את הקובץ הזה."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -2695,6 +2696,7 @@ msgstr ""
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "הורדה"
 
@@ -3506,6 +3508,7 @@ msgid "Load web images automatically"
 msgstr "טעינה אוטומטית של תמונות מהרשת"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3583,6 +3586,11 @@ msgstr "נמוך"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "אותיות לטיניות קטנות, ספרות, מקפים וקווים תחתונים, ובהתחלה אות."
+
+#: src/pages/BotStatus.tsx
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -4575,6 +4583,10 @@ msgstr "העמוד הקודם"
 msgid "Previous settings sections"
 msgstr ""
 
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr ""
+
 #: src/pages/Board.tsx
 msgid "Priority"
 msgstr "עדיפות"
@@ -4608,6 +4620,10 @@ msgstr "ספק"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "ספקים"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -5940,6 +5956,7 @@ msgstr "הקובץ אינו טקסט UTF-8 תקין."
 msgid "This import was already used. Choose the files again."
 msgstr "הייבוא הזה כבר נוצל. יש לבחור את הקבצים שוב."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""

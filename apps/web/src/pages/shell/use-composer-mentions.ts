@@ -1,10 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
 import type { Bot, Connection, ConnectionCatalogItem, Group, Routine } from "@argo/contracts";
 import {
   buildComposerMentionOptions,
   createRoutineMentionBatcher,
   mentionConnectorsFrom,
 } from "@argo/core";
+import { useLingui } from "@lingui/react/macro";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { connectedAppMarks } from "../../lib/connected-apps";

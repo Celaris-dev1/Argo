@@ -6,7 +6,7 @@ import {
   SandboxUnavailableError,
   SandboxUnresponsiveError,
 } from "@argo/adapter-kit";
-import type { MessageBlock, ModelRoleChoice, RunStatus } from "@argo/contracts";
+import type { MessageBlock, ModelRoleChoice, RunStatus, RunTrigger } from "@argo/contracts";
 import { disabledBuiltinToolSet } from "@argo/contracts";
 import {
   assertTransition,
@@ -111,6 +111,7 @@ import { usesNativeShell } from "./native-shell.js";
 import { paymentWalletConnected } from "./payment-wallets.js";
 import { isRetiredModelCredentialError } from "./pi-oauth.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
+import { RELEASE_NOTES, releaseAnnouncement } from "./release-notes.js";
 import { loadReplyContext, messageToAgentHistoryText } from "./reply-context.js";
 import { backOffRoutineAfterAccountError } from "./routine-backoff.js";
 import { lateRoutineRunInstruction } from "./routine-lateness.js";
@@ -172,6 +173,7 @@ import {
 } from "./run-tool-selection.js";
 import { applyTool } from "./run-tools.js";
 import { historyMyChatsAllowed } from "./run-tools-memory.js";
+import { forcedResearchRequest, runForcedResearch } from "./run-tools-research.js";
 import type { UserComputerState } from "./run-tools-user-computer.js";
 import { USER_COMPUTER_SHELL_TOOL, userComputerOwner } from "./run-tools-user-computer.js";
 import { createRunTrustLoaders } from "./run-trust.js";
@@ -1359,12 +1361,16 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const invokedSkill = savedSkills.find((skill) =>
           promptInvokesSkill(taskPrompt, skill.name || skill.goal),
         );
-        const basePrompt = invokedSkill
+        const skillPrompt = invokedSkill
           ? `${formatSkillRunPrompt(
               invokedSkill.name || invokedSkill.goal.slice(0, 80),
               parsePlaybook(invokedSkill.playbook),
             )}\n\n${taskPrompt}`
           : taskPrompt;
+        const forcedResearch = turnCheckpoint ? null : forcedResearchRequest(task.prompt);
+        const basePrompt = forcedResearch
+          ? `${skillPrompt}\n\n${await runForcedResearch(ctx, forcedResearch)}`
+          : skillPrompt;
         if (turnCheckpoint) {
           turnCheckpoint = restoreTurnCheckpointEffects(ctx, turnCheckpoint, {
             provider: runModelProvider,
@@ -1380,13 +1386,18 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             );
         const replyContext = await loadReplyContext(deps.prisma, thread.id, run.sourceMessageId);
         let userTimeZone: string | null | undefined;
+        let releaseNote: string | undefined;
         try {
-          userTimeZone = (
-            await deps.prisma.user.findUnique({
-              where: { id: run.userId },
-              select: { timezone: true },
-            })
-          )?.timezone;
+          const user = await deps.prisma.user.findUnique({
+            where: { id: run.userId },
+            select: { timezone: true, announcedRelease: true, createdAt: true },
+          });
+          userTimeZone = user?.timezone;
+          releaseNote = releaseAnnouncement({
+            trigger: run.trigger as RunTrigger,
+            announcedRelease: user?.announcedRelease,
+            userCreatedAt: user?.createdAt,
+          });
         } catch {
           // Timezone is optional context; a lookup failure must not prevent a run.
         }
@@ -1555,6 +1566,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
               contextStrategy: deps.contextStrategy,
               instructions: userTurnInstructions({
                 botInstructions: runIdentityInstruction(bot, run.trigger),
+                releaseNote,
                 groupContext,
                 messagingContext,
                 redactedMemoryContext: memoryContext
@@ -1731,6 +1743,14 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           if (await consumeRunEvents(ctx, runtimeEvents)) return;
           if (await interruptedByShutdown()) return;
           await completeRun(ctx);
+          if (releaseNote) {
+            await deps.prisma.user
+              .updateMany({
+                where: { id: run.userId },
+                data: { announcedRelease: RELEASE_NOTES.version },
+              })
+              .catch(() => undefined);
+          }
         } catch (caughtError) {
           if (await interruptedByShutdown()) return;
           await failRun(ctx, caughtError, {

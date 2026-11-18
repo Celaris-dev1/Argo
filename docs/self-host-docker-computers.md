@@ -29,7 +29,7 @@ user's bots may have, and `SANDBOX_MAX_COMPUTERS_PER_SPACE` caps concurrent comp
 Space. `SANDBOX_TEAM_SCREEN_LIMIT` caps active bot desktops on one Team Computer; desktops and
 browsers otherwise start only when needed. `0`, the default, leaves each to the machine.
 `ARGO_MAX_BOTS_PER_USER` caps the live bots one person may have across their Spaces, counting bots
-other bots create; archiving one frees its slot.
+other bots create; archiving one frees its slot. `ARGO_QUOTA_EXEMPT_USER_IDS` (comma-separated user ids) skips the bot and computer caps for those accounts.
 
 `ARGO_FIRST_BOT_TASK` gives each person's first bot a task to start on as soon as it exists, sent
 as their opening message, instead of the bot asking what it is for. `ARGO_FIRST_BOT_SITE_TASK`

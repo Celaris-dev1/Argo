@@ -1,6 +1,6 @@
-import { t } from "@lingui/core/macro";
 import type { ThreadMessage } from "@argo/contracts";
 import { previewMessageText as previewText } from "@argo/core";
+import { t } from "@lingui/core/macro";
 
 export type PendingAttachment = {
   id: string;

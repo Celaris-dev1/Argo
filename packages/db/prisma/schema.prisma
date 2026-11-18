@@ -8,6 +8,19 @@ datasource db {
 }
 
 /// A public, read-only snapshot of one finished run that its owner chose to share.
+/// A bot's opt-in public page listing its recently finished tasks; deleting the row revokes the link.
+model BotStatusPage {
+  id        String   @id
+  botId     String   @unique
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([spaceId, userId])
+  @@map("bot_status_pages")
+}
+
 model RunShare {
   id        String   @id
   runId     String   @unique
@@ -65,6 +78,8 @@ model User {
   /// IANA timezone such as "Pacific/Auckland". Null until set; bots then get UTC only.
   timezone                    String?
   marketingEmailOptOutAt      DateTime?
+  /// Release whose "what's new" note a bot last passed on; see release-notes.ts.
+  announcedRelease            String?
   sessions                    Session[]
   accounts                    Account[]
   passkeys                    Passkey[]
@@ -714,6 +729,7 @@ model Bot {
   memoryDocuments   MemoryDocument[]
   agentHome         AgentHome?
   browserProfile    BrowserProfile?
+  statusPage        BotStatusPage?
   artifacts         Artifact[]
   tasks             Task[]
   runs              Run[]

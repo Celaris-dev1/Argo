@@ -1,12 +1,8 @@
-import { ORPCError } from "@orpc/server";
 import { PaymentWalletRequestRejected } from "@argo/adapter-kit";
 import type { PaymentWalletDeps } from "@argo/adapters";
-import {
-  connectPaymentWallet,
-  disconnectPaymentWallet,
-  paymentWalletStatus,
-} from "@argo/adapters";
+import { connectPaymentWallet, disconnectPaymentWallet, paymentWalletStatus } from "@argo/adapters";
 import { recordSecurityEvent } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import { paymentWalletConnectedEvent } from "../security-audit.js";
 import type { RouterContext } from "./context.js";
 

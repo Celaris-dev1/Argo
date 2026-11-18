@@ -1,5 +1,4 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { createMemoryState } from "@chat-adapter/state-memory";
 import type {
   AdapterContext,
   AdapterDescriptor,
@@ -16,6 +15,7 @@ import type {
   MessagingSurface,
 } from "@argo/adapter-kit";
 import { getLogger } from "@argo/logging";
+import { createMemoryState } from "@chat-adapter/state-memory";
 import type { Adapter, Message, PostableMarkdown, Thread } from "chat";
 import { Chat, isLinkNode, parseMarkdown, text, toPlainText, walkAst } from "chat";
 import { getLarkTextParts } from "./lark/text-parts.js";

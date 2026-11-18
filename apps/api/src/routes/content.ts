@@ -15,6 +15,12 @@ import {
   listArtifactVersions,
   listSpaceArtifacts,
 } from "../artifacts.js";
+import {
+  publishBotStatus,
+  readBotStatusLink,
+  statusUrl,
+  unpublishBotStatus,
+} from "../bot-status.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
 import { shareRun, shareUrl, unshareRun } from "../run-shares.js";
 import { listRunActions, listSpaceRuns } from "../runs.js";
@@ -276,6 +282,20 @@ export function contentRoutes(ctx: RouterContext) {
       }),
       unshare: authed.runs.unshare.handler(async ({ context, input }) => {
         await unshareRun(deps.prisma, context.actor, input.runId);
+        return { ok: true as const };
+      }),
+      statusPage: authed.runs.statusPage.handler(async ({ context, input }) => {
+        const id = await readBotStatusLink(deps.prisma, context.actor, input.botId);
+        return { url: id ? statusUrl(deps.env.webOrigin, id) : null };
+      }),
+      publishStatus: authed.runs.publishStatus.handler(async ({ context, input }) => ({
+        url: statusUrl(
+          deps.env.webOrigin,
+          await publishBotStatus(deps.prisma, context.actor, input.botId),
+        ),
+      })),
+      unpublishStatus: authed.runs.unpublishStatus.handler(async ({ context, input }) => {
+        await unpublishBotStatus(deps.prisma, context.actor, input.botId);
         return { ok: true as const };
       }),
     },

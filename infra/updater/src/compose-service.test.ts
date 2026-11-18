@@ -133,9 +133,7 @@ describe("the updater compose service", () => {
     expect(updater.environment?.ARGO_COMPOSE_FILE).toBe(
       interpolated("ARGO_COMPOSE_FILE", "infra/compose/docker-compose.prod.yml"),
     );
-    expect(updater.environment?.ARGO_UPDATE_SERVICES).toBe(
-      interpolated("ARGO_UPDATE_SERVICES"),
-    );
+    expect(updater.environment?.ARGO_UPDATE_SERVICES).toBe(interpolated("ARGO_UPDATE_SERVICES"));
     expect(updater.environment?.COMPOSE_PATH_SEPARATOR).toBe(
       interpolated("COMPOSE_PATH_SEPARATOR"),
     );

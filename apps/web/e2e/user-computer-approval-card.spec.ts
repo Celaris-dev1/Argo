@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { captureScreenshot, completeOnboarding, signup } from "./helpers";
+import { askBeforeActing, captureScreenshot, completeOnboarding, signup } from "./helpers";
 
 test("asks before running a command on the user's computer", async ({ page }, testInfo) => {
   const stamp = Date.now();
   await signup(page, `user-computer-${stamp}@argo.test`, "password12", "User Computer");
   await completeOnboarding(page);
+  await askBeforeActing(page);
 
   const composer = page.getByPlaceholder(/Message/);
   await composer.fill("run hostname on my computer");

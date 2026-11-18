@@ -1,9 +1,5 @@
 import { lookup } from "node:dns/promises";
 import type { LookupFunction } from "node:net";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import type { ConnectorTool } from "@argo/adapter-kit";
 import {
   ipVersion,
@@ -16,6 +12,10 @@ import {
   isNonPublicAddress,
   normalizeHost,
 } from "@argo/contracts";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js";
+import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { Agent } from "undici";
 import { composioToolBatch } from "./composio-batch.js";
 import { sensitiveQueryParameter } from "./connector-http.js";

@@ -1,3 +1,5 @@
+import type { AgentRunRequest } from "@argo/adapter-kit";
+import { canonicalPiProviderId, usableModelId } from "@argo/contracts";
 import type {
   Api,
   Model,
@@ -7,8 +9,6 @@ import type {
 } from "@earendil-works/pi-ai";
 import { clampThinkingLevel } from "@earendil-works/pi-ai";
 import { builtinModels } from "@earendil-works/pi-ai/providers/all";
-import type { AgentRunRequest } from "@argo/adapter-kit";
-import { canonicalPiProviderId, usableModelId } from "@argo/contracts";
 import { DEFAULT_OPENROUTER_MODEL_ID } from "./deployment-model.js";
 import { PiRuntimeCredentialStore, toOAuthCredential } from "./pi-credentials.js";
 import { liveModelSibling, withLiveImageInput } from "./pi-live-model.js";
@@ -223,7 +223,7 @@ export function withOutputBudget(
 }
 
 const REASONING_EFFORT_CHOICES =
-  /\breasoning_effort\b[\s\S]{0,120}?\b(?:one of|supported values are)\b([^.}"]*)/i;
+  /\breasoning_effort\b[\s\S]{0,120}?\b(?:one of|supported values are|must be)\b([^.}"]*)/i;
 
 /**
  * The thinking levels of a model whose endpoint rejected `reasoning_effort` and listed the values

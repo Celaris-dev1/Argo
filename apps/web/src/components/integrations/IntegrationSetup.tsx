@@ -1,7 +1,7 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { IntegrationCatalogResult } from "@argo/contracts";
 import { newClientId } from "@argo/core";
 import { Button, Disclosure, Input } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { connectMcpOauth } from "../../lib/mcp-connect";
 import { rpc } from "../../lib/rpc";
