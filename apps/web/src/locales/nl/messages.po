@@ -1771,6 +1771,14 @@ msgstr "Prompt kopiëren"
 msgid "Copy rows"
 msgstr "Rijen kopiëren"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "Kosten"
@@ -3454,6 +3462,10 @@ msgstr "Verlaten"
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "Laat bots feiten op betekenis opslaan en terugvinden, naast MEMORY.md."
@@ -4316,6 +4328,10 @@ msgstr "{name} openen"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "Open <0>{0}</0> en voer deze code in:"
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -5919,6 +5935,10 @@ msgstr "Deze back-up kon niet worden gelezen."
 #: src/pages/shell/agent-import.tsx
 msgid "This bot"
 msgstr "Deze bot"
+
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
 
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."

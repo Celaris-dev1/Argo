@@ -36,7 +36,7 @@ export function taskTitle(prompt: string): string {
 async function ownBot(prisma: PrismaClient, actor: Actor, botId: string) {
   const bot = await prisma.bot.findFirst({
     where: { id: botId, spaceId: actor.spaceId, userId: actor.userId, archivedAt: null },
-    select: { id: true, statusPage: { select: { id: true } } },
+    select: { id: true, statusPage: { select: { id: true, allowCopy: true } } },
   });
   if (!bot) throw new IsolationError();
   return bot;
@@ -46,8 +46,52 @@ export async function readBotStatusLink(
   prisma: PrismaClient,
   actor: Actor,
   botId: string,
-): Promise<string | null> {
-  return (await ownBot(prisma, actor, botId)).statusPage?.id ?? null;
+): Promise<{ id: string; allowCopy: boolean } | null> {
+  return (await ownBot(prisma, actor, botId)).statusPage ?? null;
+}
+
+/** Lets visitors of the owner's published page copy the bot, or stops them. */
+export async function setBotStatusCopy(
+  prisma: PrismaClient,
+  actor: Actor,
+  botId: string,
+  allowCopy: boolean,
+): Promise<void> {
+  const bot = await ownBot(prisma, actor, botId);
+  if (!bot.statusPage) throw new IsolationError();
+  await prisma.botStatusPage.updateMany({
+    where: { botId, spaceId: actor.spaceId, userId: actor.userId },
+    data: { allowCopy },
+  });
+}
+
+/**
+ * What a visitor copies from a published bot its owner allowed copies of: its name, description,
+ * instructions and look. Never its memory, files, connections, secrets or history.
+ */
+export async function readCopyableBot(prisma: PrismaClient, id: string) {
+  if (!/^[A-Za-z0-9]{6,32}$/.test(id)) return null;
+  return runAsSystem("copy a published bot", async () => {
+    const page = await prisma.botStatusPage.findUnique({
+      where: { id },
+      select: {
+        allowCopy: true,
+        bot: {
+          select: {
+            name: true,
+            description: true,
+            instructions: true,
+            color: true,
+            avatarSet: true,
+            archivedAt: true,
+          },
+        },
+      },
+    });
+    if (!page?.allowCopy || page.bot.archivedAt) return null;
+    const { archivedAt: _archived, ...bot } = page.bot;
+    return bot;
+  });
 }
 
 /** Publishes the owner's bot status page, or returns the one already published. */
@@ -88,6 +132,7 @@ export async function readPublicBotStatus(
     const page = await prisma.botStatusPage.findUnique({
       where: { id },
       select: {
+        allowCopy: true,
         bot: {
           select: {
             id: true,
@@ -130,6 +175,7 @@ export async function readPublicBotStatus(
       color: page.bot.color,
       avatarSet: BotAvatarSetSchema.catch("organic").parse(page.bot.avatarSet),
       working: active > 0,
+      copyable: page.allowCopy,
       description,
       completed,
       shared: shares

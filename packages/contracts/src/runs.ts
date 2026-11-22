@@ -144,6 +144,8 @@ export const BotStatusSchema = z.object({
   color: z.string().default(""),
   avatarSet: BotAvatarSetSchema.catch("organic"),
   working: z.boolean().default(false),
+  /** The owner lets visitors copy this bot into their own account. */
+  copyable: z.boolean().default(false),
   description: z.string().default(""),
   completed: z.number().int().nonnegative().default(0),
   tasks: z.array(z.object({ title: z.string(), at: z.string() })),

@@ -18,6 +18,7 @@ import {
 import {
   publishBotStatus,
   readBotStatusLink,
+  setBotStatusCopy,
   statusUrl,
   unpublishBotStatus,
 } from "../bot-status.js";
@@ -285,8 +286,15 @@ export function contentRoutes(ctx: RouterContext) {
         return { ok: true as const };
       }),
       statusPage: authed.runs.statusPage.handler(async ({ context, input }) => {
-        const id = await readBotStatusLink(deps.prisma, context.actor, input.botId);
-        return { url: id ? statusUrl(deps.env.webOrigin, id) : null };
+        const page = await readBotStatusLink(deps.prisma, context.actor, input.botId);
+        return {
+          url: page ? statusUrl(deps.env.webOrigin, page.id) : null,
+          allowCopy: page?.allowCopy ?? false,
+        };
+      }),
+      setStatusCopy: authed.runs.setStatusCopy.handler(async ({ context, input }) => {
+        await setBotStatusCopy(deps.prisma, context.actor, input.botId, input.allowCopy);
+        return { ok: true as const };
       }),
       publishStatus: authed.runs.publishStatus.handler(async ({ context, input }) => ({
         url: statusUrl(

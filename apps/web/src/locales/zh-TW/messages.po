@@ -1772,6 +1772,14 @@ msgstr "複製提示詞"
 msgid "Copy rows"
 msgstr "複製列"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "費用"
@@ -3455,6 +3463,10 @@ msgstr "退出"
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "讓機器人在 MEMORY.md 之外，依語意儲存和回想事實。"
@@ -4317,6 +4329,10 @@ msgstr "開啟 {name}"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "開啟 <0>{0}</0> 並輸入以下代碼："
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -5920,6 +5936,10 @@ msgstr "無法讀取此備份。"
 #: src/pages/shell/agent-import.tsx
 msgid "This bot"
 msgstr "此機器人"
+
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
 
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."

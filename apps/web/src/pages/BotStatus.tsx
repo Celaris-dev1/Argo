@@ -112,9 +112,18 @@ export function BotStatusPage() {
             <Link to="/" className="text-[13px] text-muted-foreground hover:text-foreground">
               <Trans>Made with Argo</Trans>
             </Link>
-            <Link to="/sign-up" className={buttonVariants({ size: "sm" })}>
-              <Trans>Create your bot</Trans>
-            </Link>
+            {status.data.copyable ? (
+              <Link
+                to={`/copy/${encodeURIComponent(statusId)}`}
+                className={buttonVariants({ size: "sm" })}
+              >
+                <Trans>Copy this bot</Trans>
+              </Link>
+            ) : (
+              <Link to="/sign-up" className={buttonVariants({ size: "sm" })}>
+                <Trans>Create your bot</Trans>
+              </Link>
+            )}
           </footer>
         </>
       )}

@@ -1771,6 +1771,14 @@ msgstr "프롬프트 복사"
 msgid "Copy rows"
 msgstr "행 복사"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "비용"
@@ -3454,6 +3462,10 @@ msgstr "나가기"
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "MEMORY.md와 함께 봇이 의미를 기준으로 사실을 저장하고 떠올릴 수 있게 합니다."
@@ -4315,6 +4327,10 @@ msgstr "{name} 열기"
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
 msgstr ""
 
 #: src/pages/shell/chat-header.tsx
@@ -5919,6 +5935,10 @@ msgstr "이 백업을 읽지 못했습니다."
 #: src/pages/shell/agent-import.tsx
 msgid "This bot"
 msgstr "이 봇"
+
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
 
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."

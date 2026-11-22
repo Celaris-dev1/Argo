@@ -457,6 +457,8 @@ export const appContract = {
     importCreate: oc.input(AgentImportCreateInput).output(BotSchema),
     importSetupState: oc.input(AgentImportSetupStateInput).output(AgentImportSetupStateSchema),
     duplicate: oc.input(botId).output(BotSchema),
+    /** Copy a bot whose owner published it and allowed copies into the caller's account. */
+    copyPublished: oc.input(z.object({ statusId: z.string().min(6).max(32) })).output(BotSchema),
     reorder: oc.input(ReorderBotsInput).output(z.object({ ok: z.literal(true) })),
     update: oc.input(UpdateBotInput).output(BotSchema),
     restoreInstructions: oc
@@ -1288,7 +1290,12 @@ export const appContract = {
     share: oc.input(z.object({ runId: Id })).output(RunShareLinkSchema),
     unshare: oc.input(z.object({ runId: Id })).output(z.object({ ok: z.literal(true) })),
     /** The bot's public status link, or null while it is not published. */
-    statusPage: oc.input(z.object({ botId: Id })).output(z.object({ url: z.string().nullable() })),
+    statusPage: oc
+      .input(z.object({ botId: Id }))
+      .output(z.object({ url: z.string().nullable(), allowCopy: z.boolean().default(false) })),
+    setStatusCopy: oc
+      .input(z.object({ botId: Id, allowCopy: z.boolean() }))
+      .output(z.object({ ok: z.literal(true) })),
     publishStatus: oc.input(z.object({ botId: Id })).output(RunShareLinkSchema),
     unpublishStatus: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },

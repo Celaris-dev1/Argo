@@ -956,13 +956,19 @@ function StatusPageRow({ botId }: { botId: string }) {
   const { t } = useLingui();
   const rpc = useSpaceRpc();
   const id = useId();
+  const copyId = useId();
   const [url, setUrl] = useState<string | null>(null);
+  const [allowCopy, setAllowCopy] = useState(false);
   const [busy, setBusy] = useState(true);
   useEffect(() => {
     let live = true;
     rpc.runs
       .statusPage({ botId })
-      .then((result) => live && setUrl(result.url))
+      .then((result) => {
+        if (!live) return;
+        setUrl(result.url);
+        setAllowCopy(result.allowCopy);
+      })
       .catch(() => undefined)
       .finally(() => live && setBusy(false));
     return () => {
@@ -979,33 +985,59 @@ function StatusPageRow({ botId }: { botId: string }) {
       } else {
         await rpc.runs.unpublishStatus({ botId });
         setUrl(null);
+        setAllowCopy(false);
       }
     } finally {
       setBusy(false);
     }
   }
+  async function toggleCopy(on: boolean) {
+    setBusy(true);
+    try {
+      await rpc.runs.setStatusCopy({ botId, allowCopy: on });
+      setAllowCopy(on);
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
-    <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
-      <label htmlFor={id} className="min-w-0">
-        <Trans>Public status page</Trans>
-        {url ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className="block truncate text-xs text-muted-foreground underline"
-          >
-            {url}
-          </a>
-        ) : null}
-      </label>
-      <Switch
-        id={id}
-        aria-label={t`Public status page`}
-        checked={Boolean(url)}
-        disabled={busy}
-        onCheckedChange={(checked) => void toggle(checked)}
-      />
-    </div>
+    <>
+      <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+        <label htmlFor={id} className="min-w-0">
+          <Trans>Public status page</Trans>
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="block truncate text-xs text-muted-foreground underline"
+            >
+              {url}
+            </a>
+          ) : null}
+        </label>
+        <Switch
+          id={id}
+          aria-label={t`Public status page`}
+          checked={Boolean(url)}
+          disabled={busy}
+          onCheckedChange={(checked) => void toggle(checked)}
+        />
+      </div>
+      {url ? (
+        <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+          <label htmlFor={copyId}>
+            <Trans>Let visitors copy this bot</Trans>
+          </label>
+          <Switch
+            id={copyId}
+            aria-label={t`Let visitors copy this bot`}
+            checked={allowCopy}
+            disabled={busy}
+            onCheckedChange={(checked) => void toggleCopy(checked)}
+          />
+        </div>
+      ) : null}
+    </>
   );
 }

@@ -1771,6 +1771,14 @@ msgstr "प्रॉम्प्ट कॉपी करें"
 msgid "Copy rows"
 msgstr "पंक्तियाँ कॉपी करें"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "लागत"
@@ -3454,6 +3462,10 @@ msgstr ""
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "बॉट्स को MEMORY.md के साथ-साथ अर्थ के आधार पर तथ्य सहेजने और याद करने देता है।"
@@ -4315,6 +4327,10 @@ msgstr "{name} खोलें"
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
 msgstr ""
 
 #: src/pages/shell/chat-header.tsx
@@ -5919,6 +5935,10 @@ msgstr "यह बैकअप पढ़ा नहीं जा सका।"
 #: src/pages/shell/agent-import.tsx
 msgid "This bot"
 msgstr "यह बॉट"
+
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
 
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."

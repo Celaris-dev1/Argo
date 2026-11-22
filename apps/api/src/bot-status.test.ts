@@ -2,7 +2,9 @@ import { IsolationError } from "@argo/db";
 import { describe, expect, it, vi } from "vitest";
 import {
   publishBotStatus,
+  readCopyableBot,
   readPublicBotStatus,
+  setBotStatusCopy,
   statusUrl,
   taskTitle,
   unpublishBotStatus,
@@ -16,6 +18,7 @@ function fake(bot: unknown, page: unknown = null, runs: unknown[] = [], shares: 
     botStatusPage: {
       create: vi.fn(async ({ data }: { data: { id: string } }) => ({ id: data.id })),
       deleteMany: vi.fn(async () => ({ count: 1 })),
+      updateMany: vi.fn(async () => ({ count: 1 })),
       findUnique: vi.fn(async () => page),
     },
     run: {
@@ -61,6 +64,7 @@ describe("bot status page", () => {
     const client = fake(
       null,
       {
+        allowCopy: false,
         bot: {
           id: "b",
           name: "Chief",
@@ -81,6 +85,7 @@ describe("bot status page", () => {
       color: "#7c3aed",
       avatarSet: "organic",
       working: true,
+      copyable: false,
       description: "Researches [email] leads",
       completed: 2,
       shared: [{ id: "share1", title: "Compare laptops", at: at.toISOString() }],
@@ -97,5 +102,47 @@ describe("bot status page", () => {
     expect(await readPublicBotStatus(archived as never, "abcdef1234")).toBeNull();
     expect(await readPublicBotStatus(fake(null) as never, "../x")).toBeNull();
     expect(statusUrl("https://argo.test/", "abc")).toBe("https://argo.test/s/abc");
+  });
+
+  it("lets only the owner of a published page allow copies", async () => {
+    await expect(
+      setBotStatusCopy(fake({ id: "b", statusPage: null }) as never, actor, "b", true),
+    ).rejects.toBeInstanceOf(IsolationError);
+    const owned = fake({ id: "b", statusPage: { id: "abcdef1234", allowCopy: false } });
+    await setBotStatusCopy(owned as never, actor, "b", true);
+    expect(owned.botStatusPage.updateMany).toHaveBeenCalledWith({
+      where: { botId: "b", spaceId: "s", userId: "u" },
+      data: { allowCopy: true },
+    });
+  });
+
+  it("copies only what the owner allowed, and nothing private", async () => {
+    const bot = {
+      name: "Chief",
+      description: "Research",
+      instructions: "Cite sources",
+      color: "#7c3aed",
+      avatarSet: "organic",
+      archivedAt: null,
+    };
+    expect(
+      await readCopyableBot(fake(null, { allowCopy: false, bot }) as never, "abcdef1234"),
+    ).toBeNull();
+    expect(
+      await readCopyableBot(
+        fake(null, { allowCopy: true, bot: { ...bot, archivedAt: new Date() } }) as never,
+        "abcdef1234",
+      ),
+    ).toBeNull();
+    expect(
+      await readCopyableBot(fake(null, { allowCopy: true, bot }) as never, "abcdef1234"),
+    ).toEqual({
+      name: "Chief",
+      description: "Research",
+      instructions: "Cite sources",
+      color: "#7c3aed",
+      avatarSet: "organic",
+    });
+    expect(await readCopyableBot(fake(null) as never, "../bad")).toBeNull();
   });
 });

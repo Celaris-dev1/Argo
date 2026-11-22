@@ -1771,6 +1771,14 @@ msgstr "העתקת ההנחיה"
 msgid "Copy rows"
 msgstr "העתקת שורות"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "עלות"
@@ -3454,6 +3462,10 @@ msgstr "יציאה"
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "מאפשר לבוטים לשמור ולשלוף עובדות לפי משמעות, לצד MEMORY.md."
@@ -4316,6 +4328,10 @@ msgstr "פתיחת {name}"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "יש לפתוח את <0>{0}</0> ולהזין את הקוד הזה:"
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -5919,6 +5935,10 @@ msgstr "לא ניתן לקרוא את הגיבוי הזה."
 #: src/pages/shell/agent-import.tsx
 msgid "This bot"
 msgstr "הבוט הזה"
+
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
 
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."
