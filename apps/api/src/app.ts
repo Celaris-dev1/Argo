@@ -148,6 +148,7 @@ import { storeInboundAttachment } from "./artifacts.js";
 import { mountAuditExportRoute } from "./audit-export.js";
 import { createBillingService } from "./billing.js";
 import { mountBillingRoutes } from "./billing-webhook.js";
+import { mountBotInboxRoute } from "./bot-inbox.js";
 import { readPublicBotStatus } from "./bot-status.js";
 import { clientBuildMiddleware, readDeployedWebBuild } from "./client-build.js";
 import {
@@ -806,6 +807,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       privacyPolicyUrl: env.privacyPolicyUrl,
       termsOfUse: env.termsOfUse,
       screenProxySecret: env.screenProxySecret,
+      inbox: env.inbox,
       sandboxProvider: env.sandboxProvider,
       gitSha: env.gitSha,
       integrationsCatalogUrl: env.integrationsCatalogUrl,
@@ -922,6 +924,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     ["/api/v1/bots/*", "bot webhook"],
     ["/api/v1/messaging/*", "messaging webhook"],
     ["/api/v1/phone/*", "messaging webhook"],
+    ["/api/v1/inbox", "bot inbox mail"],
   ] as const) {
     app.use(path, (_c, next) => runAsSystem(reason, next));
   }
@@ -1023,6 +1026,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     sessionActor,
   );
   mountWebhookHttpRoutes(app, { prisma, secrets, events, jobs });
+  if (env.inbox) mountBotInboxRoute(app, { prisma, events, jobs }, env.inbox);
   if (billing && billingProvider) {
     mountBillingRoutes(app, {
       billing,

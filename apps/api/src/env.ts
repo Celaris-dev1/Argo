@@ -39,6 +39,8 @@ export interface AppEnv {
   authSecret: string;
   authUrl: string;
   webOrigin: string;
+  /** Domain whose mail reaches bots' inboxes, and the token its mail relay sends; both or neither. */
+  inbox?: { domain: string; token: string };
   /** `<TEAM_ID>.<bundle id>` of iOS apps that may use this domain's passkeys. */
   passkeyAppleAppIds: string[];
   /** SHA-256 signing certificate fingerprints of Android apps that may use this domain's passkeys. */
@@ -224,6 +226,10 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     authSecret,
     authUrl: source.BETTER_AUTH_URL ?? source.WEB_ORIGIN ?? "http://127.0.0.1:5173",
     webOrigin: source.WEB_ORIGIN ?? "http://127.0.0.1:5173",
+    inbox:
+      source.INBOX_DOMAIN && source.INBOX_RELAY_TOKEN
+        ? { domain: source.INBOX_DOMAIN, token: source.INBOX_RELAY_TOKEN }
+        : undefined,
     passkeyAppleAppIds: list(source.PASSKEY_APPLE_APP_IDS),
     passkeyAndroidCertFingerprints: androidCertFingerprints(source.PASSKEY_ANDROID_CERT_SHA256),
     privacyPolicyUrl: optional(source.PRIVACY_POLICY_URL),

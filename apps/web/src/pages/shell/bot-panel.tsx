@@ -748,6 +748,7 @@ export function BotSettings({
               </div>
               <StatusPageRow botId={bot.id} />
               <BudgetRow botId={bot.id} />
+              <InboxRow botId={bot.id} />
             </SettingsGroup>
             <InstructionSettings key={bot.id} bot={bot} />
             <SettingsGroup label={t`How other bots see it`} plain>
@@ -953,6 +954,53 @@ function humanizeTool(name: string) {
 }
 
 /** Owner-only monthly spend limit, shown once a wallet is connected. Empty means no limit. */
+/** The bot's own email address, shown only when the deployment can receive mail. */
+function InboxRow({ botId }: { botId: string }) {
+  const { t } = useLingui();
+  const rpc = useSpaceRpc();
+  const id = useId();
+  const [state, setState] = useState<{ available: boolean; address: string | null } | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let live = true;
+    rpc.bots
+      .inbox({ botId })
+      .then((result) => live && setState(result))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [rpc, botId]);
+  if (!state?.available) return null;
+  async function toggle(enabled: boolean) {
+    setBusy(true);
+    try {
+      const { address } = await rpc.bots.setInbox({ botId, enabled });
+      setState({ available: true, address });
+      if (address) await navigator.clipboard?.writeText(address).catch(() => undefined);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+      <label htmlFor={id} className="min-w-0">
+        <Trans>Email inbox</Trans>
+        {state.address ? (
+          <span className="block truncate text-xs text-muted-foreground">{state.address}</span>
+        ) : null}
+      </label>
+      <Switch
+        id={id}
+        aria-label={t`Email inbox`}
+        checked={Boolean(state.address)}
+        disabled={busy}
+        onCheckedChange={(checked) => void toggle(checked)}
+      />
+    </div>
+  );
+}
+
 function BudgetRow({ botId }: { botId: string }) {
   const { t, i18n } = useLingui();
   const rpc = useSpaceRpc();

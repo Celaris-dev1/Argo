@@ -459,6 +459,13 @@ export const appContract = {
     duplicate: oc.input(botId).output(BotSchema),
     /** Copy a bot whose owner published it and allowed copies into the caller's account. */
     copyPublished: oc.input(z.object({ statusId: z.string().min(6).max(32) })).output(BotSchema),
+    /** The bot's email address; `available` is false when the deployment has no inbox domain. */
+    inbox: oc
+      .input(botId)
+      .output(z.object({ available: z.boolean(), address: z.string().nullable() })),
+    setInbox: oc
+      .input(z.object({ botId: Id, enabled: z.boolean() }))
+      .output(z.object({ address: z.string().nullable() })),
     reorder: oc.input(ReorderBotsInput).output(z.object({ ok: z.literal(true) })),
     update: oc.input(UpdateBotInput).output(BotSchema),
     restoreInstructions: oc

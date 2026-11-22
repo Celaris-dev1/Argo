@@ -736,6 +736,7 @@ model Bot {
   statusPage        BotStatusPage?
   publishedSites    PublishedSite[]
   budget            BotBudget?
+  inbox             BotInbox?
   artifacts         Artifact[]
   tasks             Task[]
   runs              Run[]
@@ -2298,4 +2299,18 @@ model BotBudget {
 
   @@index([spaceId, userId])
   @@map("bot_budgets")
+}
+
+/// An email address that delivers mail to the bot as a task. Only exists while the owner has it on.
+model BotInbox {
+  botId     String   @id
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  /// Local part of the address, unguessable so strangers cannot mail the bot.
+  address   String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([spaceId, userId])
+  @@map("bot_inboxes")
 }

@@ -128,6 +128,7 @@ export interface RouterDeps {
     deploymentModelConfigured?: boolean;
     deploymentModelHostCredentials?: boolean;
     webOrigin: string;
+    inbox?: { domain: string; token: string };
     privacyPolicyUrl?: string;
     termsOfUse?: { url: string; version: string };
     screenProxySecret: string;
