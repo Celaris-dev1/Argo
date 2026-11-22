@@ -21,7 +21,7 @@ function setup(row: unknown) {
   const post = (body: unknown, token = "relay-token") =>
     app.request("/api/v1/inbox", {
       method: "POST",
-      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+      headers: { "x-inbox-token": token, "content-type": "application/json" },
       body: JSON.stringify(body),
     });
   return { post, sendUserMessage, findUnique };

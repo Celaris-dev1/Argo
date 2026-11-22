@@ -94,14 +94,17 @@ export async function setBotInbox(
   return `${address}@${domain}`;
 }
 
-/** Mail for a bot arrives from the relay as a task in its thread, fenced as untrusted content. */
+/**
+ * Mail for a bot arrives from the relay as a task in its thread, fenced as untrusted content. The
+ * relay's token rides in its own header so a gateway in front of the API can keep Authorization.
+ */
 export function mountBotInboxRoute(
   app: Hono,
   deps: Pick<WebhookDeps, "prisma" | "events" | "jobs">,
   inbox: { domain: string; token: string },
 ) {
   app.post("/api/v1/inbox", async (c) => {
-    if (!hasValidBearerToken(c.req.header("authorization"), inbox.token)) {
+    if (!hasValidBearerToken(`Bearer ${c.req.header("x-inbox-token") ?? ""}`, inbox.token)) {
       return c.json({ error: "Unauthorized" }, 401);
     }
     const raw = await readBoundedBody(c.req.raw, MAX_BYTES);
