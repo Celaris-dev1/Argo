@@ -5,18 +5,15 @@ import type { RunTrigger } from "@argo/contracts";
  * To announce a release, replace this entry: a new version is shown again to everyone.
  */
 export const RELEASE_NOTES = {
-  version: "2026-11-16",
+  version: "2026-11-22",
   /** Accounts created after this already met these features in onboarding. */
-  date: "2026-11-16T00:00:00Z",
+  date: "2026-11-22T00:00:00Z",
   highlights: [
+    "uncensored models you can pick, such as DeepSeek V4.1 Abliterated, GLM 5.3 Uncensored and Kimi K3.1 Pro",
+    "Inkling 2 Mini, a new reasoning model",
+    "a refreshed look across the site",
     "Deep Research: /Research gives a cited report you can share or download",
     "free GPT-6 Astra coding, 7M tokens a day on the free plan",
-    "bot templates such as Job hunter and Sales prospector",
-    "starter tasks on a new chat",
-    "a daily morning briefing",
-    "voice notes on Telegram and WhatsApp",
-    "a public status page for a bot",
-    "referrals: invite a friend and you both get bonus tokens",
   ],
   community: "https://discord.gg/m9uP9SVwD7",
 } as const;
