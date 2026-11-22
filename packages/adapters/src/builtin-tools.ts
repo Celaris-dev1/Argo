@@ -442,6 +442,16 @@ export const builtinAgentTools: ConnectorTool[] = [
     },
   },
   {
+    name: "publish_site",
+    description:
+      "Publish a folder of static files (index.html plus its CSS, JS, images and fonts) on this computer as a public website, and get its link. Publishing the same folder again updates the site at the same link. Only static files are served; build the site first and publish its output folder.",
+    inputSchema: {
+      type: "object",
+      properties: { path: { type: "string" } },
+      required: ["path"],
+    },
+  },
+  {
     name: "shell",
     description:
       "Run a command inside this bot's computer. cwd defaults to the bot's folder on a Team Computer and the workspace root on a Private Computer. Output can arrive while the command is still running; tell the user any one-time code or sign-in URL in that output. A command is stopped after 15 minutes, so on Linux or macOS start longer work, such as a coding agent CLI, as its own statement `nohup <command> < /dev/null > <log> 2>&1 &`, never after `&&`, and read the log to follow it.",

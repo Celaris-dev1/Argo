@@ -9,6 +9,8 @@ export const RELEASE_NOTES = {
   /** Accounts created after this already met these features in onboarding. */
   date: "2026-11-22T00:00:00Z",
   highlights: [
+    "publishing a website you build to a live link in one step",
+    "a public profile page for a bot",
     "uncensored models you can pick, such as DeepSeek V4.1 Abliterated, GLM 5.3 Uncensored and Kimi K3.1 Pro",
     "Inkling 2 Mini, a new reasoning model",
     "a refreshed look across the site",

@@ -25,12 +25,14 @@ import {
   userComputerObserve,
   userComputerShell,
 } from "./run-tools-user-computer.js";
+import { siteTools } from "./site-publishing.js";
 import { argumentGiven } from "./update-bot-patch.js";
 
 const TOOL_HANDLERS = new Map<string, ToolHandler>([
   ...Object.entries(computerTools),
   ...Object.entries(codingTools),
   ...Object.entries(fileTools),
+  ...Object.entries(siteTools),
   ...Object.entries(memoryTools),
   ...Object.entries(integrationTools),
   ...Object.entries(taskTools),

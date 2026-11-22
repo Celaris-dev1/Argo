@@ -514,6 +514,8 @@ services:
     environment:
       <<: *app-environment
       GRAPHILE_WORKER_CONCURRENCY:
+      # Links a bot hands out, such as a published site, start with this origin.
+      WEB_ORIGIN:
     volumes:
       - appdata:/data
     networks:

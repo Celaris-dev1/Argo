@@ -175,6 +175,7 @@ import { createMessagingReceipts } from "./messaging-receipts.js";
 import { mountMessagingWebhookRoutes } from "./messaging-webhook.js";
 import { monitoringRoutes } from "./monitoring.js";
 import { pluginSubmissionRoutes } from "./plugin-submissions.js";
+import { readPublishedSiteFile, SITE_HEADERS } from "./published-sites.js";
 import { sendReferralEmails, startReferralEmails } from "./referral-email.js";
 import { mountApiRequestBodyLimits } from "./request-body-limit.js";
 import { createRouter } from "./router.js";
@@ -900,6 +901,15 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     if (!status) return c.json({ error: "not found" }, 404);
     c.header("cache-control", "public, max-age=60");
     return c.json(status);
+  });
+  // A published site is public by design: its bot published these files and nothing more.
+  app.get("/api/v1/sites/:id", (c) => c.redirect(`/api/v1/sites/${c.req.param("id")}/`, 301));
+  app.get("/api/v1/sites/:id/*", async (c) => {
+    const id = c.req.param("id");
+    const path = c.req.path.slice(`/api/v1/sites/${id}/`.length);
+    const file = await readPublishedSiteFile(prisma, artifacts, id, path);
+    if (!file) return c.text("Not found", 404, { "x-content-type-options": "nosniff" });
+    return c.body(Buffer.from(file.bytes), 200, { ...SITE_HEADERS, "content-type": file.mimeType });
   });
   mountApiRequestBodyLimits(app, env.maxUploadSizeBytes);
   mountScreenTarget(app, prisma, env.screenProxySecret);

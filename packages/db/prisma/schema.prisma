@@ -730,6 +730,7 @@ model Bot {
   agentHome         AgentHome?
   browserProfile    BrowserProfile?
   statusPage        BotStatusPage?
+  publishedSites    PublishedSite[]
   artifacts         Artifact[]
   tasks             Task[]
   runs              Run[]
@@ -2258,4 +2259,23 @@ model CapabilityInstallSpace {
   @@id([installId, spaceId])
   @@index([spaceId, userId])
   @@map("capability_install_spaces")
+}
+
+/// A static site a bot published from its computer, served publicly and sandboxed.
+model PublishedSite {
+  id        String   @id
+  botId     String
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  /// The folder it was published from; publishing the same folder again replaces the site.
+  source    String
+  /// Site path to { key, mimeType, size } in artifact storage.
+  files     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([botId, source])
+  @@index([spaceId, userId])
+  @@map("published_sites")
 }
