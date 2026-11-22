@@ -54,6 +54,11 @@ msgstr ""
 msgid "{0, plural, one {# space} other {# spaces}}"
 msgstr ""
 
+#. placeholder {0}: status.data.completed
+#: src/pages/BotStatus.tsx
+msgid "{0, plural, one {# task finished} other {# tasks finished}}"
+msgstr ""
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -5395,6 +5400,10 @@ msgstr "共享"
 #: src/pages/KnowledgeSection.tsx
 msgid "Shared memory"
 msgstr "共用記憶"
+
+#: src/pages/BotStatus.tsx
+msgid "Shared results"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Show"

@@ -10,7 +10,7 @@ import {
 
 const actor = { userId: "u", spaceId: "s", email: "u@argo.test", isDeploymentOwner: false };
 
-function fake(bot: unknown, page: unknown = null, runs: unknown[] = []) {
+function fake(bot: unknown, page: unknown = null, runs: unknown[] = [], shares: unknown[] = []) {
   return {
     bot: { findFirst: vi.fn(async () => bot) },
     botStatusPage: {
@@ -18,7 +18,8 @@ function fake(bot: unknown, page: unknown = null, runs: unknown[] = []) {
       deleteMany: vi.fn(async () => ({ count: 1 })),
       findUnique: vi.fn(async () => page),
     },
-    run: { findMany: vi.fn(async () => runs) },
+    run: { findMany: vi.fn(async () => runs), count: vi.fn(async () => runs.length) },
+    runShare: { findMany: vi.fn(async () => shares) },
   };
 }
 
@@ -52,14 +53,32 @@ describe("bot status page", () => {
 
   it("shows the bot name and finished task titles, never results", async () => {
     const at = new Date("2026-11-16T10:00:00Z");
-    const client = fake(null, { bot: { id: "b", name: "Chief", archivedAt: null } }, [
-      { completedAt: at, task: { prompt: "Find flights\nmy card is 4111 1111 1111 1111" } },
-      { completedAt: at, task: null },
-    ]);
+    const client = fake(
+      null,
+      {
+        bot: {
+          id: "b",
+          name: "Chief",
+          description: " Researches ada@example.com leads ",
+          archivedAt: null,
+        },
+      },
+      [
+        { completedAt: at, task: { prompt: "Find flights\nmy card is 4111 1111 1111 1111" } },
+        { completedAt: at, task: null },
+      ],
+      [{ id: "share1", prompt: "Compare laptops\nbudget details", createdAt: at }],
+    );
     expect(await readPublicBotStatus(client as never, "abcdef1234")).toEqual({
       botName: "Chief",
+      description: "Researches [email] leads",
+      completed: 2,
+      shared: [{ id: "share1", title: "Compare laptops", at: at.toISOString() }],
       tasks: [{ title: "Find flights", at: at.toISOString() }],
     });
+    expect(client.runShare.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { run: { botId: "b" } } }),
+    );
   });
 
   it("hides revoked, archived and malformed links", async () => {

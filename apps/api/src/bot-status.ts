@@ -5,6 +5,8 @@ import { IsolationError, runAsSystem } from "@argo/db";
 import { redactForSharing } from "./run-shares.js";
 
 const RECENT_TASKS = 20;
+const SHARED_RESULTS = 6;
+const DESCRIPTION_MAX = 280;
 const TITLE_MAX = 80;
 const ID_ALPHABET = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -71,7 +73,10 @@ export async function unpublishBotStatus(
   });
 }
 
-/** Anyone with the link sees the bot's name and recent finished task titles; nothing else. */
+/**
+ * Anyone with the link sees the bot's name, its description, how many tasks it finished, recent
+ * finished task titles and the results its owner already shared publicly; nothing else.
+ */
 export async function readPublicBotStatus(
   prisma: PrismaClient,
   id: string,
@@ -80,17 +85,43 @@ export async function readPublicBotStatus(
   return runAsSystem("read a public bot status page", async () => {
     const page = await prisma.botStatusPage.findUnique({
       where: { id },
-      select: { bot: { select: { id: true, name: true, archivedAt: true } } },
+      select: {
+        bot: { select: { id: true, name: true, description: true, archivedAt: true } },
+      },
     });
     if (!page || page.bot.archivedAt) return null;
-    const runs = await prisma.run.findMany({
-      where: { botId: page.bot.id, status: "completed", completedAt: { not: null } },
-      orderBy: { completedAt: "desc" },
-      take: RECENT_TASKS,
-      select: { completedAt: true, task: { select: { prompt: true } } },
-    });
+    const finished = {
+      botId: page.bot.id,
+      status: "completed" as const,
+      completedAt: { not: null },
+    };
+    const [runs, completed, shares] = await Promise.all([
+      prisma.run.findMany({
+        where: finished,
+        orderBy: { completedAt: "desc" },
+        take: RECENT_TASKS,
+        select: { completedAt: true, task: { select: { prompt: true } } },
+      }),
+      prisma.run.count({ where: finished }),
+      prisma.runShare.findMany({
+        where: { run: { botId: page.bot.id } },
+        orderBy: { createdAt: "desc" },
+        take: SHARED_RESULTS,
+        select: { id: true, prompt: true, createdAt: true },
+      }),
+    ]);
+    const description = redactForSharing(page.bot.description.trim(), DESCRIPTION_MAX);
     return {
       botName: page.bot.name,
+      description,
+      completed,
+      shared: shares
+        .map((share) => ({
+          id: share.id,
+          title: taskTitle(share.prompt),
+          at: share.createdAt.toISOString(),
+        }))
+        .filter((share) => share.title),
       tasks: runs
         .map((run) => ({
           title: taskTitle(run.task?.prompt ?? ""),
