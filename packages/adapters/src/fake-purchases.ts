@@ -116,6 +116,10 @@ export function fakePurchasePrisma(fixture: {
   let clock = 0;
   const stamp = () => new Date(Date.UTC(2026, 0, 1) + ++clock);
   const purchase = {
+    // Sums every recorded purchase; the budget filters on status and month are tested on their own.
+    aggregate: async () => ({
+      _sum: { amount: purchases.reduce((total, row) => total + row.amount, 0) || null },
+    }),
     findUnique: async ({ where }: { where: Row }) =>
       purchases.find((row) => matches(row, where)) ?? null,
     findFirst: async ({ where }: { where: Row }) =>
@@ -187,11 +191,16 @@ export function fakePurchasePrisma(fixture: {
       },
     },
   };
+  const budgets: Row[] = [];
   const prisma = {
     ...tx,
+    botBudget: {
+      findUnique: async ({ where }: { where: Row }) =>
+        budgets.find((row) => matches(row, where)) ?? null,
+    },
     $transaction: async <T>(fn: (client: typeof tx) => Promise<T>) => fn(tx),
   } as unknown as PrismaClient;
-  return { prisma, purchases, runs, tasks, live };
+  return { prisma, purchases, runs, tasks, live, budgets };
 }
 
 export function fakeJobs() {

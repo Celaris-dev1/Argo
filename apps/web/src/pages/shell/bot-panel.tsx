@@ -747,6 +747,7 @@ export function BotSettings({
                 />
               </div>
               <StatusPageRow botId={bot.id} />
+              <BudgetRow botId={bot.id} />
             </SettingsGroup>
             <InstructionSettings key={bot.id} bot={bot} />
             <SettingsGroup label={t`How other bots see it`} plain>
@@ -949,6 +950,64 @@ function SettingsGroup({
 function humanizeTool(name: string) {
   const words = name.replaceAll("_", " ");
   return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** Owner-only monthly spend limit, shown once a wallet is connected. Empty means no limit. */
+function BudgetRow({ botId }: { botId: string }) {
+  const { t, i18n } = useLingui();
+  const rpc = useSpaceRpc();
+  const id = useId();
+  const [state, setState] = useState<{
+    limit: string;
+    currency: string;
+    spent: number;
+  } | null>(null);
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      const wallet = await rpc.paymentWallet.status();
+      if (wallet.status !== "connected") return;
+      const budget = await rpc.paymentWallet.botBudget({ botId });
+      if (!live) return;
+      setState({
+        limit: budget.monthlyLimit === null ? "" : String(budget.monthlyLimit / 100),
+        currency: budget.currency,
+        spent: budget.spentThisMonth,
+      });
+    })().catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [rpc, botId]);
+  if (!state) return null;
+  const money = (minor: number) =>
+    i18n.number(minor / 100, { style: "currency", currency: state.currency.toUpperCase() });
+  async function save(value: string) {
+    const amount = value.trim() === "" ? null : Math.round(Number(value) * 100);
+    if (amount !== null && (!Number.isFinite(amount) || amount < 0)) return;
+    await rpc.paymentWallet
+      .setBotBudget({ botId, monthlyLimit: amount, currency: state?.currency ?? "usd" })
+      .catch(() => undefined);
+  }
+  return (
+    <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+      <label htmlFor={id} className="min-w-0">
+        <Trans>Monthly spend limit</Trans>
+        <span className="block text-xs text-muted-foreground">
+          <Trans>{money(state.spent)} spent this month</Trans>
+        </span>
+      </label>
+      <Input
+        id={id}
+        inputMode="decimal"
+        className="w-28 text-right"
+        placeholder={t`No limit`}
+        value={state.limit}
+        onChange={(event) => setState({ ...state, limit: event.target.value })}
+        onBlur={(event) => void save(event.target.value)}
+      />
+    </div>
+  );
 }
 
 /** Owner-only switch for the bot's public page of recently finished task titles. */

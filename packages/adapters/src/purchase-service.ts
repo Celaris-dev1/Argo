@@ -18,6 +18,7 @@ import type { PurchaseCardField } from "@argo/contracts";
 import { PurchaseIdInput, PurchaseRequestInput } from "@argo/contracts";
 import type { Purchase } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { budgetRefusal } from "./bot-budget.js";
 import type { PaymentWalletDeps } from "./payment-wallets.js";
 import { withPaymentWalletCredential } from "./payment-wallets.js";
 import { deleteSecretBestEffort } from "./secret-store-factory.js";
@@ -236,6 +237,8 @@ export async function createPurchase(
     where: { operationKey: context.operationId },
   });
   if (existing) return purchaseView(ownedReplay(existing, context));
+  const overBudget = await budgetRefusal(deps.prisma, context.botId, request);
+  if (overBudget) return { error: overBudget };
   let snapshot: PurchaseSnapshot;
   try {
     // The idempotency key makes a replay after a crash reuse the same remote purchase.

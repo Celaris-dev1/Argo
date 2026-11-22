@@ -1305,6 +1305,26 @@ export const appContract = {
     /** Starts a sign-in the user finishes with the provider; `status` then reports it. */
     connect: oc.output(PaymentWalletStatusSchema),
     disconnect: oc.output(PaymentWalletStatusSchema),
+    /** A bot's monthly spend limit and this month's spend, in minor units; null when unlimited. */
+    botBudget: oc.input(z.object({ botId: Id })).output(
+      z.object({
+        monthlyLimit: z.number().int().nonnegative().nullable(),
+        currency: z.string(),
+        spentThisMonth: z.number().int().nonnegative(),
+      }),
+    ),
+    setBotBudget: oc
+      .input(
+        z.object({
+          botId: Id,
+          monthlyLimit: z.number().int().nonnegative().max(100_000_000).nullable(),
+          currency: z
+            .string()
+            .regex(/^[a-z]{3}$/)
+            .default("usd"),
+        }),
+      )
+      .output(z.object({ ok: z.literal(true) })),
   },
   voice: {
     catalog: oc.output(z.array(VoiceCatalogEntrySchema)),

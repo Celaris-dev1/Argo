@@ -141,6 +141,11 @@ msgstr "{0} MB"
 msgid "{0} rollup hours"
 msgstr "{0} rollup hours"
 
+#. placeholder {0}: money(state.spent)
+#: src/pages/shell/bot-panel.tsx
+msgid "{0} spent this month"
+msgstr "{0} spent this month"
+
 #. placeholder {0}: parts.amount
 #: src/components/ArtifactFileCard.tsx
 msgid "{0} TB"
@@ -3920,6 +3925,10 @@ msgstr "Monthly credits"
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr "Monthly credits expire at renewal. Top-ups do not expire."
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Monthly spend limit"
+msgstr "Monthly spend limit"
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4103,6 +4112,10 @@ msgstr "No authentication"
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "No bots match"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "No limit"
+msgstr "No limit"
 
 #: src/components/AskCard.tsx
 msgid "No longer active"

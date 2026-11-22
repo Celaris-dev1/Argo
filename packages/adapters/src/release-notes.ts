@@ -11,6 +11,7 @@ export const RELEASE_NOTES = {
   highlights: [
     "/Overnight: hand a bot a goal before bed and wake up to a report",
     "publishing a website you build to a live link in one step",
+    "a monthly spend limit for each bot that pays from your wallet",
     "a public profile page for a bot that visitors can copy if you allow it",
     "uncensored models you can pick, such as DeepSeek V4.1 Abliterated, GLM 5.3 Uncensored and Kimi K3.1 Pro",
     "Inkling 2 Mini, a new reasoning model",

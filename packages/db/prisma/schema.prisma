@@ -733,6 +733,7 @@ model Bot {
   browserProfile    BrowserProfile?
   statusPage        BotStatusPage?
   publishedSites    PublishedSite[]
+  budget            BotBudget?
   artifacts         Artifact[]
   tasks             Task[]
   runs              Run[]
@@ -2280,4 +2281,19 @@ model PublishedSite {
   @@unique([botId, source])
   @@index([spaceId, userId])
   @@map("published_sites")
+}
+
+/// The most a bot may spend from its owner's wallet in a calendar month (UTC), set by the owner.
+model BotBudget {
+  botId        String   @id
+  bot          Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId      String
+  userId       String
+  /// Minor units of `currency`, such as cents.
+  monthlyLimit Int
+  currency     String   @default("usd")
+  updatedAt    DateTime @updatedAt
+
+  @@index([spaceId, userId])
+  @@map("bot_budgets")
 }

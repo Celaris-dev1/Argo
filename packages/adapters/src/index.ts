@@ -12,6 +12,7 @@ export * from "./background-job-handlers.js";
 export * from "./billing-emulator.js";
 export * from "./boat-sandbox.js";
 export * from "./bot-avatar.js";
+export { botSpentThisMonth } from "./bot-budget.js";
 export * from "./bot-messages.js";
 export {
   forgetBotSecret,

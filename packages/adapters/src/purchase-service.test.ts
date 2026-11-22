@@ -104,6 +104,14 @@ describe("request_purchase", () => {
     expect(env.enqueued.map((job) => job.name)).toEqual(["purchase.poll"]);
   });
 
+  it("refuses a purchase over the bot's monthly budget before asking the wallet", async () => {
+    env.budgets.push({ botId: fixture.botId, monthlyLimit: 1000, currency: "usd" });
+    const result = await env.call("request_purchase", request);
+    expect(result).toEqual({ error: expect.stringMatching(/over this bot's monthly budget/) });
+    expect(env.wallet.created).toEqual([]);
+    expect(env.purchases).toEqual([]);
+  });
+
   it("returns the recorded purchase when the call replays", async () => {
     const first = await env.call("request_purchase", request);
     const second = await env.call("request_purchase", request);
