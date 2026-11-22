@@ -2359,6 +2359,10 @@ msgstr "スペースを作成"
 msgid "Create your Argo"
 msgstr "Argoを作成"
 
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr ""
+
 #: src/components/AskCard.tsx
 msgid "Created"
 msgstr "作成済み"
@@ -4675,6 +4679,10 @@ msgstr "参照のみ"
 msgid "Recent"
 msgstr "最近"
 
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
 msgstr ""
@@ -6536,6 +6544,10 @@ msgstr "仕事"
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "作業の指示"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr ""
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts

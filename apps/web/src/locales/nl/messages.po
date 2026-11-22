@@ -2359,6 +2359,10 @@ msgstr "Space aanmaken"
 msgid "Create your Argo"
 msgstr "Maak je Argo"
 
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr ""
+
 #: src/components/AskCard.tsx
 msgid "Created"
 msgstr "Aangemaakt"
@@ -4675,6 +4679,10 @@ msgstr "Alleen ophalen"
 msgid "Recent"
 msgstr "Recent"
 
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
 msgstr ""
@@ -6536,6 +6544,10 @@ msgstr ""
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "Werkinstructies"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr ""
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts

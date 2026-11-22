@@ -18,7 +18,12 @@ function fake(bot: unknown, page: unknown = null, runs: unknown[] = [], shares: 
       deleteMany: vi.fn(async () => ({ count: 1 })),
       findUnique: vi.fn(async () => page),
     },
-    run: { findMany: vi.fn(async () => runs), count: vi.fn(async () => runs.length) },
+    run: {
+      findMany: vi.fn(async () => runs),
+      count: vi.fn(async ({ where }: { where: { status: unknown } }) =>
+        typeof where.status === "string" ? runs.length : 1,
+      ),
+    },
     runShare: { findMany: vi.fn(async () => shares) },
   };
 }
@@ -60,6 +65,8 @@ describe("bot status page", () => {
           id: "b",
           name: "Chief",
           description: " Researches ada@example.com leads ",
+          color: "#7c3aed",
+          avatarSet: "organic",
           archivedAt: null,
         },
       },
@@ -71,6 +78,9 @@ describe("bot status page", () => {
     );
     expect(await readPublicBotStatus(client as never, "abcdef1234")).toEqual({
       botName: "Chief",
+      color: "#7c3aed",
+      avatarSet: "organic",
+      working: true,
       description: "Researches [email] leads",
       completed: 2,
       shared: [{ id: "share1", title: "Compare laptops", at: at.toISOString() }],

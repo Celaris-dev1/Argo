@@ -1,6 +1,6 @@
 import type { BotStatus } from "@argo/contracts";
 import { BotStatusSchema } from "@argo/contracts";
-import { Spinner } from "@argo/ui-web";
+import { BotAvatar, buttonVariants, Spinner } from "@argo/ui-web";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
@@ -20,8 +20,9 @@ export function BotStatusPage() {
     queryKey: ["bot-status", statusId],
     queryFn: () => loadStatus(statusId),
   });
+  const day = (at: string) => i18n.date(at, { month: "short", day: "numeric" });
   return (
-    <main className="mx-auto flex min-h-full max-w-2xl flex-col gap-6 px-4 py-10">
+    <main className="mx-auto flex min-h-full max-w-2xl flex-col gap-8 px-4 py-12">
       {status.isPending ? (
         <Spinner aria-label={t`Loading`} />
       ) : !status.data ? (
@@ -30,36 +31,54 @@ export function BotStatusPage() {
         </p>
       ) : (
         <>
-          <header className="flex flex-col gap-1">
-            <h1 className="text-xl font-semibold text-foreground">{status.data.botName}</h1>
-            {status.data.description ? (
-              <p className="text-[14px] text-foreground">{status.data.description}</p>
-            ) : null}
-            {status.data.completed > 0 ? (
-              <p className="text-[13px] text-muted-foreground">
-                <Plural
-                  value={status.data.completed}
-                  one="# task finished"
-                  other="# tasks finished"
-                />
+          <header className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:text-left">
+            <BotAvatar
+              color={status.data.color}
+              avatarSet={status.data.avatarSet}
+              identity={statusId}
+              status={status.data.working ? "running" : undefined}
+              size={88}
+            />
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <h1 className="text-2xl font-semibold text-foreground">{status.data.botName}</h1>
+              {status.data.description ? (
+                <p className="text-[15px] text-foreground">{status.data.description}</p>
+              ) : null}
+              <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground sm:justify-start">
+                {status.data.working ? (
+                  <span className="flex items-center gap-1.5 text-success">
+                    <span className="size-2 animate-pulse rounded-full bg-success" aria-hidden />
+                    <Trans>Working now</Trans>
+                  </span>
+                ) : null}
+                {status.data.completed > 0 ? (
+                  <span>
+                    <Plural
+                      value={status.data.completed}
+                      one="# task finished"
+                      other="# tasks finished"
+                    />
+                  </span>
+                ) : null}
               </p>
-            ) : null}
+            </div>
           </header>
+
           {status.data.shared.length > 0 ? (
-            <section className="flex flex-col gap-2">
+            <section className="flex flex-col gap-3">
               <h2 className="text-[14px] font-medium text-foreground">
                 <Trans>Shared results</Trans>
               </h2>
-              <ul className="divide-y divide-border rounded-xl border border-border text-[14px]">
+              <ul className="grid gap-3 sm:grid-cols-2">
                 {status.data.shared.map((share) => (
                   <li key={share.id}>
                     <Link
                       to={`/r/${encodeURIComponent(share.id)}`}
-                      className="flex justify-between gap-4 px-3 py-2 hover:bg-muted"
+                      className="flex h-full flex-col justify-between gap-3 rounded-xl border border-border bg-card p-4 text-[14px] transition-colors hover:bg-muted"
                     >
-                      <span className="text-foreground">{share.title}</span>
-                      <time className="shrink-0 text-muted-foreground" dateTime={share.at}>
-                        {i18n.date(share.at, { month: "short", day: "numeric" })}
+                      <span className="font-medium text-card-foreground">{share.title}</span>
+                      <time className="text-[12px] text-muted-foreground" dateTime={share.at}>
+                        {day(share.at)}
                       </time>
                     </Link>
                   </li>
@@ -67,19 +86,36 @@ export function BotStatusPage() {
               </ul>
             </section>
           ) : null}
-          <ol className="divide-y divide-border rounded-xl border border-border text-[14px]">
-            {status.data.tasks.map((task, index) => (
-              <li key={`${task.at}-${index}`} className="flex justify-between gap-4 px-3 py-2">
-                <span className="text-foreground">{task.title}</span>
-                <time className="shrink-0 text-muted-foreground" dateTime={task.at}>
-                  {i18n.date(task.at, { month: "short", day: "numeric" })}
-                </time>
-              </li>
-            ))}
-          </ol>
-          <Link to="/" className="text-[13px] text-muted-foreground hover:text-foreground">
-            <Trans>Made with Argo</Trans>
-          </Link>
+
+          {status.data.tasks.length > 0 ? (
+            <section className="flex flex-col gap-3">
+              <h2 className="text-[14px] font-medium text-foreground">
+                <Trans>Recent tasks</Trans>
+              </h2>
+              <ol className="divide-y divide-border rounded-xl border border-border bg-card text-[14px]">
+                {status.data.tasks.map((task, index) => (
+                  <li
+                    key={`${task.at}-${index}`}
+                    className="flex justify-between gap-4 px-4 py-2.5"
+                  >
+                    <span className="min-w-0 text-card-foreground">{task.title}</span>
+                    <time className="shrink-0 text-muted-foreground" dateTime={task.at}>
+                      {day(task.at)}
+                    </time>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+            <Link to="/" className="text-[13px] text-muted-foreground hover:text-foreground">
+              <Trans>Made with Argo</Trans>
+            </Link>
+            <Link to="/sign-up" className={buttonVariants({ size: "sm" })}>
+              <Trans>Create your bot</Trans>
+            </Link>
+          </footer>
         </>
       )}
     </main>

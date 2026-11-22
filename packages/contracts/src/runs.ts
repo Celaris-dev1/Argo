@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { BotAvatarSetSchema } from "./bot-avatar.js";
 import { Id, IsoDate, RunStatus } from "./ids.js";
 
 /** The computer provider refused a request at its own rate limit; the run tells the user to wait. */
@@ -139,6 +140,10 @@ export const RunShareLinkSchema = z.object({ url: z.string() });
 /** A bot's public status page: its name and the titles of recently finished tasks, nothing else. */
 export const BotStatusSchema = z.object({
   botName: z.string(),
+  /** The bot's avatar: a color or an image value, and its avatar style. */
+  color: z.string().default(""),
+  avatarSet: BotAvatarSetSchema.catch("organic"),
+  working: z.boolean().default(false),
   description: z.string().default(""),
   completed: z.number().int().nonnegative().default(0),
   tasks: z.array(z.object({ title: z.string(), at: z.string() })),

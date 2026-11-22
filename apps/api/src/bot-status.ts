@@ -1,5 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Actor, BotStatus } from "@argo/contracts";
+import { BotAvatarSetSchema } from "@argo/contracts";
+import { WORKING_RUN_STATUSES } from "@argo/core";
 import type { PrismaClient } from "@argo/db";
 import { IsolationError, runAsSystem } from "@argo/db";
 import { redactForSharing } from "./run-shares.js";
@@ -86,7 +88,16 @@ export async function readPublicBotStatus(
     const page = await prisma.botStatusPage.findUnique({
       where: { id },
       select: {
-        bot: { select: { id: true, name: true, description: true, archivedAt: true } },
+        bot: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            color: true,
+            avatarSet: true,
+            archivedAt: true,
+          },
+        },
       },
     });
     if (!page || page.bot.archivedAt) return null;
@@ -95,7 +106,7 @@ export async function readPublicBotStatus(
       status: "completed" as const,
       completedAt: { not: null },
     };
-    const [runs, completed, shares] = await Promise.all([
+    const [runs, completed, shares, active] = await Promise.all([
       prisma.run.findMany({
         where: finished,
         orderBy: { completedAt: "desc" },
@@ -109,10 +120,16 @@ export async function readPublicBotStatus(
         take: SHARED_RESULTS,
         select: { id: true, prompt: true, createdAt: true },
       }),
+      prisma.run.count({
+        where: { botId: page.bot.id, status: { in: [...WORKING_RUN_STATUSES] } },
+      }),
     ]);
     const description = redactForSharing(page.bot.description.trim(), DESCRIPTION_MAX);
     return {
       botName: page.bot.name,
+      color: page.bot.color,
+      avatarSet: BotAvatarSetSchema.catch("organic").parse(page.bot.avatarSet),
+      working: active > 0,
       description,
       completed,
       shared: shares

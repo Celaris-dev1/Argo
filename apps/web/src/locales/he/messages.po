@@ -2359,6 +2359,10 @@ msgstr "יצירת מרחב"
 msgid "Create your Argo"
 msgstr "יצירת Argo משלך"
 
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr ""
+
 #: src/components/AskCard.tsx
 msgid "Created"
 msgstr "נוצר"
@@ -4675,6 +4679,10 @@ msgstr "שליפה בלבד"
 msgid "Recent"
 msgstr "אחרונים"
 
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
 msgstr ""
@@ -6536,6 +6544,10 @@ msgstr ""
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "הוראות עבודה"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr ""
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts
