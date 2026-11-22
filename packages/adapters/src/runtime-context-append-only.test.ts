@@ -7,7 +7,7 @@ import {
   estimateContextTokens,
   providerContextPrefix,
 } from "./context-selection.js";
-import { createRuntimeContextPolicy, rebuildPaysOff } from "./runtime-context.js";
+import { cacheWriteToRead, createRuntimeContextPolicy, rebuildPaysOff } from "./runtime-context.js";
 
 const model = {
   id: "synthetic-model",
@@ -459,6 +459,36 @@ describe("append-only run transcript boundaries", () => {
     const fresh = { tokens: 16_000, images: 0 };
     expect(rebuildPaysOff(kept, fresh, 32_000, 3)).toBe(true);
     expect(rebuildPaysOff(kept, fresh, 31_996, 3)).toBe(false);
+  });
+
+  it("rebuilds sooner when the connection declares cheap cache writes", () => {
+    // stale 20,000; 2 × 5 × fresh 40,000 × growth 1,000 = 20,000²
+    const fresh = { tokens: 40_000, images: 0 };
+    const kept = { tokens: 60_000, images: 0 };
+    expect(rebuildPaysOff(kept, fresh, 56_000, 3)).toBe(false);
+    expect(rebuildPaysOff(kept, fresh, 56_000, 3, 5)).toBe(true);
+    expect(rebuildPaysOff(kept, fresh, 55_996, 3, 5)).toBe(false);
+  });
+
+  it("derives the write/read ratio only from usable declared prices", () => {
+    const base = { scope: "connection" } as const;
+    expect(cacheWriteToRead(undefined)).toBe(12.5);
+    expect(cacheWriteToRead({ ...base, inputCostPerMillion: 0.12 })).toBe(12.5);
+    expect(
+      cacheWriteToRead({ ...base, inputCostPerMillion: 0.12, readCostPerMillion: 0.025 }),
+    ).toBe(4.8);
+    expect(
+      cacheWriteToRead({
+        ...base,
+        writeCostPerMillion: 3.75,
+        inputCostPerMillion: 3,
+        readCostPerMillion: 0.3,
+      }),
+    ).toBe(12.5);
+    expect(cacheWriteToRead({ ...base, inputCostPerMillion: 0.01, readCostPerMillion: 0.02 })).toBe(
+      12.5,
+    );
+    expect(cacheWriteToRead({ ...base, inputCostPerMillion: 1, readCostPerMillion: 0 })).toBe(12.5);
   });
 
   it("rebuilds once sixteen stale images could be dropped, not at fifteen", () => {
