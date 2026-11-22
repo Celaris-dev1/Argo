@@ -1018,6 +1018,8 @@ function StatusPageRow({ botId }: { botId: string }) {
   const copyId = useId();
   const [url, setUrl] = useState<string | null>(null);
   const [allowCopy, setAllowCopy] = useState(false);
+  const [allowHire, setAllowHire] = useState(false);
+  const hireId = useId();
   const [busy, setBusy] = useState(true);
   useEffect(() => {
     let live = true;
@@ -1027,6 +1029,7 @@ function StatusPageRow({ botId }: { botId: string }) {
         if (!live) return;
         setUrl(result.url);
         setAllowCopy(result.allowCopy);
+        setAllowHire(result.allowHire);
       })
       .catch(() => undefined)
       .finally(() => live && setBusy(false));
@@ -1045,16 +1048,18 @@ function StatusPageRow({ botId }: { botId: string }) {
         await rpc.runs.unpublishStatus({ botId });
         setUrl(null);
         setAllowCopy(false);
+        setAllowHire(false);
       }
     } finally {
       setBusy(false);
     }
   }
-  async function toggleCopy(on: boolean) {
+  async function setAccess(access: { allowCopy?: boolean; allowHire?: boolean }) {
     setBusy(true);
     try {
-      await rpc.runs.setStatusCopy({ botId, allowCopy: on });
-      setAllowCopy(on);
+      await rpc.runs.setStatusCopy({ botId, ...access });
+      if (access.allowCopy !== undefined) setAllowCopy(access.allowCopy);
+      if (access.allowHire !== undefined) setAllowHire(access.allowHire);
     } finally {
       setBusy(false);
     }
@@ -1093,7 +1098,21 @@ function StatusPageRow({ botId }: { botId: string }) {
             aria-label={t`Let visitors copy this bot`}
             checked={allowCopy}
             disabled={busy}
-            onCheckedChange={(checked) => void toggleCopy(checked)}
+            onCheckedChange={(checked) => void setAccess({ allowCopy: checked })}
+          />
+        </div>
+      ) : null}
+      {url ? (
+        <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+          <label htmlFor={hireId}>
+            <Trans>Let other bots hire this bot</Trans>
+          </label>
+          <Switch
+            id={hireId}
+            aria-label={t`Let other bots hire this bot`}
+            checked={allowHire}
+            disabled={busy}
+            onCheckedChange={(checked) => void setAccess({ allowHire: checked })}
           />
         </div>
       ) : null}

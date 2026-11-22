@@ -290,10 +290,14 @@ export function contentRoutes(ctx: RouterContext) {
         return {
           url: page ? statusUrl(deps.env.webOrigin, page.id) : null,
           allowCopy: page?.allowCopy ?? false,
+          allowHire: page?.allowHire ?? false,
         };
       }),
       setStatusCopy: authed.runs.setStatusCopy.handler(async ({ context, input }) => {
-        await setBotStatusCopy(deps.prisma, context.actor, input.botId, input.allowCopy);
+        await setBotStatusCopy(deps.prisma, context.actor, input.botId, {
+          allowCopy: input.allowCopy,
+          allowHire: input.allowHire,
+        });
         return { ok: true as const };
       }),
       publishStatus: authed.runs.publishStatus.handler(async ({ context, input }) => ({

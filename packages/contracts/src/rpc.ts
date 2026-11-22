@@ -1290,11 +1290,21 @@ export const appContract = {
     share: oc.input(z.object({ runId: Id })).output(RunShareLinkSchema),
     unshare: oc.input(z.object({ runId: Id })).output(z.object({ ok: z.literal(true) })),
     /** The bot's public status link, or null while it is not published. */
-    statusPage: oc
-      .input(z.object({ botId: Id }))
-      .output(z.object({ url: z.string().nullable(), allowCopy: z.boolean().default(false) })),
+    statusPage: oc.input(z.object({ botId: Id })).output(
+      z.object({
+        url: z.string().nullable(),
+        allowCopy: z.boolean().default(false),
+        allowHire: z.boolean().default(false),
+      }),
+    ),
     setStatusCopy: oc
-      .input(z.object({ botId: Id, allowCopy: z.boolean() }))
+      .input(
+        z.object({
+          botId: Id,
+          allowCopy: z.boolean().optional(),
+          allowHire: z.boolean().optional(),
+        }),
+      )
       .output(z.object({ ok: z.literal(true) })),
     publishStatus: oc.input(z.object({ botId: Id })).output(RunShareLinkSchema),
     unpublishStatus: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),

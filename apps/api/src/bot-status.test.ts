@@ -106,13 +106,15 @@ describe("bot status page", () => {
 
   it("lets only the owner of a published page allow copies", async () => {
     await expect(
-      setBotStatusCopy(fake({ id: "b", statusPage: null }) as never, actor, "b", true),
+      setBotStatusCopy(fake({ id: "b", statusPage: null }) as never, actor, "b", {
+        allowCopy: true,
+      }),
     ).rejects.toBeInstanceOf(IsolationError);
     const owned = fake({ id: "b", statusPage: { id: "abcdef1234", allowCopy: false } });
-    await setBotStatusCopy(owned as never, actor, "b", true);
+    await setBotStatusCopy(owned as never, actor, "b", { allowHire: true });
     expect(owned.botStatusPage.updateMany).toHaveBeenCalledWith({
       where: { botId: "b", spaceId: "s", userId: "u" },
-      data: { allowCopy: true },
+      data: { allowHire: true },
     });
   });
 

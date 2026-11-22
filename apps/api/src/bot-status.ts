@@ -36,7 +36,7 @@ export function taskTitle(prompt: string): string {
 async function ownBot(prisma: PrismaClient, actor: Actor, botId: string) {
   const bot = await prisma.bot.findFirst({
     where: { id: botId, spaceId: actor.spaceId, userId: actor.userId, archivedAt: null },
-    select: { id: true, statusPage: { select: { id: true, allowCopy: true } } },
+    select: { id: true, statusPage: { select: { id: true, allowCopy: true, allowHire: true } } },
   });
   if (!bot) throw new IsolationError();
   return bot;
@@ -46,22 +46,22 @@ export async function readBotStatusLink(
   prisma: PrismaClient,
   actor: Actor,
   botId: string,
-): Promise<{ id: string; allowCopy: boolean } | null> {
+): Promise<{ id: string; allowCopy: boolean; allowHire: boolean } | null> {
   return (await ownBot(prisma, actor, botId)).statusPage ?? null;
 }
 
-/** Lets visitors of the owner's published page copy the bot, or stops them. */
+/** Lets visitors of the owner's published page copy or hire the bot, or stops them. */
 export async function setBotStatusCopy(
   prisma: PrismaClient,
   actor: Actor,
   botId: string,
-  allowCopy: boolean,
+  access: { allowCopy?: boolean; allowHire?: boolean },
 ): Promise<void> {
   const bot = await ownBot(prisma, actor, botId);
   if (!bot.statusPage) throw new IsolationError();
   await prisma.botStatusPage.updateMany({
     where: { botId, spaceId: actor.spaceId, userId: actor.userId },
-    data: { allowCopy },
+    data: access,
   });
 }
 

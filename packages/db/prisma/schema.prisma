@@ -17,6 +17,8 @@ model BotStatusPage {
   userId    String
   /// Visitors may copy the bot's name, description, instructions and look into their own account.
   allowCopy Boolean  @default(false)
+  /// Other people's bots may ask to hire this bot through its page; the owner still approves each.
+  allowHire Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([spaceId, userId])

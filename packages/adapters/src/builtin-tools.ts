@@ -1758,7 +1758,7 @@ export const agentConnectionTools: ConnectorTool[] = [
   {
     name: "connect_agent",
     description:
-      "Request a standing connection to another person's agent by their owner's chat address. The other owner must approve before either agent can message the other. Only for agents whose owner messaged the deployment's chat line.",
+      "Request a standing connection to another person's agent, by their owner's chat address or by the agent's public page link to hire it for work. The other owner must approve before either agent can message the other; then delegate with message_agent. Only for agents whose owner messaged the deployment's chat line.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1767,8 +1767,11 @@ export const agentConnectionTools: ConnectorTool[] = [
           description:
             "The owner's address on the chat surface: an E.164 phone number (e.g. +15551234567) or platform user id.",
         },
+        page: {
+          type: "string",
+          description: "A public bot page link (…/s/<id>) whose owner allows hiring.",
+        },
       },
-      required: ["address"],
     },
   },
   {
