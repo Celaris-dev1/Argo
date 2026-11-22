@@ -13,6 +13,7 @@ export const RELEASE_NOTES = {
     "/Watch: a bot keeps an eye on a page or repo and tells you when it changes",
     "/Debate: bots on different models in a group argue it out and agree on one answer",
     "letting other people's bots hire your bot from its public page, with your approval",
+    "an email address for your bot: forward it mail and it acts on it",
     "publishing a website you build to a live link in one step",
     "a monthly spend limit for each bot that pays from your wallet",
     "a public profile page for a bot that visitors can copy if you allow it",
