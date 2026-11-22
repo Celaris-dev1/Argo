@@ -5,11 +5,14 @@ import type { RunTrigger } from "@argo/contracts";
  * To announce a release, replace this entry: a new version is shown again to everyone.
  */
 export const RELEASE_NOTES = {
-  version: "2026-11-22",
+  version: "2026-11-22.2",
   /** Accounts created after this already met these features in onboarding. */
   date: "2026-11-22T00:00:00Z",
   highlights: [
     "/Overnight: hand a bot a goal before bed and wake up to a report",
+    "/Watch: a bot keeps an eye on a page or repo and tells you when it changes",
+    "/Debate: bots on different models in a group argue it out and agree on one answer",
+    "letting other people's bots hire your bot from its public page, with your approval",
     "publishing a website you build to a live link in one step",
     "a monthly spend limit for each bot that pays from your wallet",
     "a public profile page for a bot that visitors can copy if you allow it",
