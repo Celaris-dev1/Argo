@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/celaris-dev1/argo?labelColor=black&style=for-the-badge&color=2563EB)](https://github.com/celaris-dev1/argo/stargazers)
 [![argoai.top](https://img.shields.io/badge/Try%20Argo-argoai.top-ff7a2f?labelColor=black&style=for-the-badge)](https://argoai.top)
-[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?labelColor=black&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/BTva8yKHA)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?labelColor=black&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/m9uP9SVwD7)
 
 ![Argo — AI teammates you actually own](./docs/readme-hero.png)
 
@@ -16,7 +16,7 @@ and computer provider, or run the complete stack locally.
 It is an open source, self-hosted alternative to Grok Bot, Meta Muse, OpenAI Dots, Instinct,
 OpenClaw, Hermes Agent, and Claude Duet.
 
-Argo is in beta. Try the hosted version, or read guides on running a free, uncensored AI agent, at [argoai.top](https://argoai.top).
+Argo is in beta. The hosted version at [argoai.top](https://argoai.top) is free forever on Scout, uncensored models included: 25M tokens a day, plus 100M a day on other models.
 
 Run it yourself with Docker:
 
