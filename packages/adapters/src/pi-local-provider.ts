@@ -76,7 +76,10 @@ function localModel(id: string): Model<"openai-completions"> {
     input: inputModalities(localVisionModelIds().has(id)),
     // Runs on the operator's own hardware, so there is nothing to bill.
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-    contextWindow: tokenLimit("ARGO_LOCAL_CONTEXT_WINDOW", DEFAULT_CONTEXT_WINDOW),
+    contextWindow: tokenLimit(
+      "ARGO_LOCAL_CONTEXT_WINDOW",
+      DEFAULT_CONTEXT_WINDOW,
+    ),
     maxTokens: tokenLimit("ARGO_LOCAL_MAX_TOKENS", DEFAULT_MAX_TOKENS),
   };
 }
@@ -100,6 +103,18 @@ export function localProvider(): Provider | undefined {
     models: ids.map(localModel),
     api: openAICompletionsApi(),
   });
+}
+
+/** The deployment endpoint meters free usage per member; other providers never see the member id. */
+export const MEMBER_HEADER = "x-argo-member";
+
+export function memberHeaders(
+  provider: string,
+  userId: string | undefined,
+  headers: Record<string, string | null> | undefined,
+): Record<string, string | null> | undefined {
+  if (provider !== LOCAL_PROVIDER_ID || !userId) return headers;
+  return { ...headers, [MEMBER_HEADER]: userId };
 }
 
 export function registerLocalProvider(models: MutableModels): MutableModels {

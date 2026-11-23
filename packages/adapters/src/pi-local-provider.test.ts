@@ -4,6 +4,7 @@ import {
   LOCAL_PROVIDER_ID,
   localBaseUrl,
   localProvider,
+  memberHeaders,
   registerLocalProvider,
 } from "./pi-local-provider.js";
 
@@ -48,13 +49,21 @@ describe("local model provider", () => {
     setModels("qwen3:4b, llama3.1:8b");
     const provider = localProvider();
     expect(provider?.id).toBe(LOCAL_PROVIDER_ID);
-    expect(provider?.getModels().map((model) => model.id)).toEqual(["qwen3:4b", "llama3.1:8b"]);
+    expect(provider?.getModels().map((model) => model.id)).toEqual([
+      "qwen3:4b",
+      "llama3.1:8b",
+    ]);
   });
 
   it("bills nothing, because the model runs on the operator's own hardware", () => {
     setModels("qwen3:4b");
     const model = localProvider()?.getModels()[0];
-    expect(model?.cost).toEqual({ input: 0, output: 0, cacheRead: 0, cacheWrite: 0 });
+    expect(model?.cost).toEqual({
+      input: 0,
+      output: 0,
+      cacheRead: 0,
+      cacheWrite: 0,
+    });
   });
 
   it("defaults to the Ollama endpoint and honours an override", () => {
@@ -64,11 +73,17 @@ describe("local model provider", () => {
     process.env.ARGO_LOCAL_MODELS_URL = "http://127.0.0.1:1234/v1";
     setModels("some-local-model");
     expect(localBaseUrl()).toBe("http://127.0.0.1:1234/v1");
-    expect(localProvider()?.getModels()[0]?.baseUrl).toBe("http://127.0.0.1:1234/v1");
+    expect(localProvider()?.getModels()[0]?.baseUrl).toBe(
+      "http://127.0.0.1:1234/v1",
+    );
   });
 
   it("rejects an invalid or non-HTTP endpoint", () => {
-    for (const bad of ["not-a-url", "file:///tmp/model.sock", "ftp://127.0.0.1/models"]) {
+    for (const bad of [
+      "not-a-url",
+      "file:///tmp/model.sock",
+      "ftp://127.0.0.1/models",
+    ]) {
       process.env.ARGO_LOCAL_MODELS_URL = bad;
       expect(() => localBaseUrl(), `endpoint "${bad}"`).toThrow(
         /ARGO_LOCAL_MODELS_URL must be an absolute HTTP\(S\) URL/,
@@ -104,13 +119,17 @@ describe("local model provider", () => {
     delete process.env.ARGO_LOCAL_CONTEXT_WINDOW;
 
     process.env.ARGO_LOCAL_MAX_TOKENS = "-1";
-    expect(() => localProvider()).toThrow(/ARGO_LOCAL_MAX_TOKENS must be a positive integer/);
+    expect(() => localProvider()).toThrow(
+      /ARGO_LOCAL_MAX_TOKENS must be a positive integer/,
+    );
   });
 
   it("registers onto a Models collection only when configured", () => {
     setModels(undefined);
     const bare = registerLocalProvider(builtinModels());
-    expect(bare.getProviders().some((p) => p.id === LOCAL_PROVIDER_ID)).toBe(false);
+    expect(bare.getProviders().some((p) => p.id === LOCAL_PROVIDER_ID)).toBe(
+      false,
+    );
 
     setModels("qwen3:4b");
     const withLocal = registerLocalProvider(builtinModels());
@@ -129,5 +148,16 @@ describe("local model provider", () => {
       apiKey: "sk-test-placeholder",
       baseUrl: "https://models.example.test/v1",
     });
+  });
+});
+
+describe("memberHeaders", () => {
+  it("adds the member id only for the deployment endpoint", () => {
+    expect(memberHeaders("local", "user-1", { a: "b" })).toEqual({
+      a: "b",
+      "x-argo-member": "user-1",
+    });
+    expect(memberHeaders("openrouter", "user-1", undefined)).toBeUndefined();
+    expect(memberHeaders("local", undefined, undefined)).toBeUndefined();
   });
 });
