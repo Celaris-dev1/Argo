@@ -58,6 +58,7 @@ RUN find apps/mobile apps/desktop apps/www -mindepth 1 -maxdepth 1 ! -name packa
 RUN cd node_modules/.pnpm \
   && rm -rf @biomejs+* @turbo+* turbo@* hermes-* react-native@* @react-native+* expo* metro* \
     @typescript+typescript-linux-* @prisma+studio-core@* mermaid@* lucide-react@* \
+    *-musl@* *linuxmusl* prettier@* typescript@* @types+* @expo+* @prisma+dev@* @electric-sql+pglite* \
   && find . -name '*.map' -type f -delete \
   && find /app/node_modules /app/apps /app/packages -xtype l -delete 2>/dev/null; true
 
