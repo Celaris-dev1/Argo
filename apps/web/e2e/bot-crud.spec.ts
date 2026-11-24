@@ -39,6 +39,8 @@ test("bot creation, editing, and deletion persist", async ({ page }, testInfo) =
   await expect(dialog.getByTestId("create-bot-error")).toBeVisible();
   expect(createFailed).toBe(true);
   await page.unroute("**/rpc/bots/create");
+  // The form goes back to the kind picker, which holds Cancel.
+  await dialog.getByRole("button", { name: "Back", exact: true }).click();
   await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(dialog).toBeHidden();
   await expect(page.getByTestId("side-panel")).toHaveAttribute("data-panel", "closed");
