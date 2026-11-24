@@ -18,7 +18,6 @@ import {
 } from "@argo/db";
 import { ORPCError } from "@orpc/server";
 import { assertNameFreeWhereAvailable, lockOwner } from "./availability.js";
-import { grantMcpServerToExistingBots } from "./mcp-grant.js";
 
 export type PluginInstallDeps = {
   prisma: PrismaClient;
@@ -220,7 +219,6 @@ async function addServerRows(
         userId: install.userId,
       })),
     });
-    await grantMcpServerToExistingBots(tx, { userId: install.userId }, row.id);
   }
 }
 
