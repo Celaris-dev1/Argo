@@ -178,7 +178,10 @@ export async function captureScreenshot(page: Page, testInfo: TestInfo, name: st
 export async function openNewBot(page: Page) {
   await page.getByTestId("create-menu-trigger").click();
   await page.getByTestId("create-new-bot").click();
-  await expect(page.getByTestId("create-bot-dialog")).toBeVisible();
+  const dialog = page.getByTestId("create-bot-dialog");
+  await expect(dialog).toBeVisible();
+  // The dialog opens on the kind picker; the custom kind is the plain bot form.
+  await dialog.getByTestId("bot-kind-custom").click();
 }
 
 export async function openNewGroup(page: Page) {

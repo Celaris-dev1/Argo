@@ -389,6 +389,9 @@ test("sign-in, spawn, and stop work in the shell", async ({ page }, testInfo) =>
   // until then, and Tab would skip it.
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
   await composer.press("Tab");
+  // The model chip sits between the message box and Send.
+  await expect(page.getByTestId("composer-model-button")).toBeFocused();
+  await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(

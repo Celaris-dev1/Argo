@@ -76,7 +76,7 @@ test("A change asks without an approval model, and approvals settings shape what
   await settings.getByTestId("settings-nav-confirmations").click();
   await expect(settings.getByRole("heading", { name: "Approvals", exact: true })).toBeVisible();
   const mode = settings.getByTestId("approval-mode");
-  await expect(mode.getByRole("button", { name: "Auto", exact: true })).toHaveAttribute(
+  await expect(mode.getByRole("button", { name: "Ask", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
