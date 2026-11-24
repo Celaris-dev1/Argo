@@ -160,6 +160,7 @@ describeIntegration("run executor lifecycle", () => {
   it("recreates the approval pause when an intended effect was interrupted before the card", async () => {
     const prompt = "write this to the destination crm as a note";
     const seeded = await seedRun("interrupted-before-approval", prompt);
+    await rpc(seeded.cookie, "autoReview/set", { mode: "ask" });
     const args = { collection: "notes", title: "Argo result", body: prompt };
     const executionId = approvalEffectKey(seeded.run.id, "destination.write", args);
     const effect = await db.externalEffect.create({

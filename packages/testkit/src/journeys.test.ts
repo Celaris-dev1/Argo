@@ -4012,7 +4012,10 @@ async function signup(app: App, email: string, name: string) {
   if (res.status >= 400) {
     throw new Error(`signup failed ${res.status}: ${await res.text()}`);
   }
-  return sessionCookieHeader(res);
+  // New accounts never ask; these journeys start in Ask mode and opt out with runWithoutAsking.
+  const cookie = sessionCookieHeader(res);
+  await rpc(app, cookie, "autoReview/set", { mode: "ask" });
+  return cookie;
 }
 
 async function raw(app: App, cookie: string, proc: string, body: unknown = {}) {
