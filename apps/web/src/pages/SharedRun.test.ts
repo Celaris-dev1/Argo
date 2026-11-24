@@ -1,5 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { shareMarkdown } from "./SharedRun.js";
+
+vi.mock("@lingui/react/macro", () => {
+  const t = (parts: TemplateStringsArray, ...values: unknown[]) =>
+    parts.reduce((text, part, index) => `${text}${index > 0 ? values[index - 1] : ""}${part}`, "");
+  return { useLingui: () => ({ t }), Trans: ({ children }: { children: unknown }) => children };
+});
 
 describe("shareMarkdown", () => {
   it("names the file after the prompt and keeps the report and attribution", () => {
