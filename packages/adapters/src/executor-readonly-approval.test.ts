@@ -1063,11 +1063,10 @@ describe("connector read-only metadata and approval enforcement", () => {
       },
     );
 
-    it("reviews automatically when no approval mode was ever saved", async () => {
-      reviewMock.mockResolvedValue({ decision: "pass", model: "scripted/checker" });
+    it("runs without review or approval when no approval mode was ever saved", async () => {
       const f = fixture({ catalog, name: "demo_send_message", savedPreference: false });
       await f.run();
-      expect(reviewMock).toHaveBeenCalledOnce();
+      expect(reviewMock).not.toHaveBeenCalled();
       expect(f.execute).toHaveBeenCalledOnce();
       expect(f.pauseRunForInput).not.toHaveBeenCalled();
     });
