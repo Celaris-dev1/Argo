@@ -2777,6 +2777,10 @@ msgstr "Modifier le profil"
 msgid "Email"
 msgstr "E-mail"
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Email inbox"
+msgstr ""
+
 #: src/lib/user-error.ts
 msgid "Email is not allowed to register"
 msgstr "Cette adresse e-mail ne peut pas s’inscrire"
@@ -3465,6 +3469,10 @@ msgstr "Quitter"
 
 #: src/components/ComputerDeviceSettings.tsx
 msgid "Let bots use this computer"
+msgstr ""
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Let other bots hire this bot"
 msgstr ""
 
 #: src/pages/shell/bot-panel.tsx
