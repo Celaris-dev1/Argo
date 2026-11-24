@@ -91,6 +91,8 @@ describeIntegration("reusable credential lifecycle", () => {
           })),
         });
         if (requireApproval) {
+          // New accounts never ask; a require-approval rule applies in Ask mode.
+          await rpc(seeded.cookie, "autoReview/set", { mode: "ask" });
           await db.userActionApprovalRule.create({
             data: {
               userId: seeded.me.userId,
