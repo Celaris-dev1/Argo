@@ -213,6 +213,14 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
     }
   }
 
+  // `?start=sso` (the marketing site's main button) skips this page straight to single sign-on.
+  const autoSso = useRef(false);
+  useEffect(() => {
+    if (autoSso.current || !reset?.sso || searchParams.get("start") !== "sso") return;
+    autoSso.current = true;
+    void signInWithSso();
+  });
+
   if (!sent && !reset && !capabilityError) {
     return <div className="h-full bg-background" />;
   }

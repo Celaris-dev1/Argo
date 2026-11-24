@@ -86,10 +86,10 @@ afterEach(async () => {
   vi.restoreAllMocks();
   delete window.argoDesktop;
 });
-async function render(mode: "in" | "up" | "forgot" = "in") {
+async function render(mode: "in" | "up" | "forgot" = "in", path = "/") {
   await act(async () =>
     root.render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[path]}>
         <AuthPage mode={mode} />
       </MemoryRouter>,
     ),
@@ -186,6 +186,21 @@ it("selects a non-redirecting SSO request on desktop", async () => {
   expect(authClient.signIn.social).toHaveBeenCalledWith(
     expect.objectContaining({ provider: "oidc", disableRedirect: true }),
   );
+});
+
+it("starts single sign-on right away from the site's main button", async () => {
+  vi.mocked(fetchAuthCapabilities).mockResolvedValue(capabilities);
+  await render("up", "/sign-up?start=sso");
+  expect(authClient.signIn.social).toHaveBeenCalledTimes(1);
+  expect(authClient.signIn.social).toHaveBeenCalledWith(
+    expect.objectContaining({ provider: "oidc" }),
+  );
+});
+
+it("waits for a click without the start flag", async () => {
+  vi.mocked(fetchAuthCapabilities).mockResolvedValue(capabilities);
+  await render("up");
+  expect(authClient.signIn.social).not.toHaveBeenCalled();
 });
 
 it("keeps SSO available for retry while an authorization request is pending", async () => {
