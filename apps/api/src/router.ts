@@ -33,6 +33,7 @@ import type { Auth } from "@argo/auth";
 import type { NavLink } from "@argo/contracts";
 import type { BoardEvents, PrismaClient, ThreadEvents } from "@argo/db";
 import type { BillingService } from "./billing.js";
+import type { HostedVoice } from "./env.js";
 import { accountRoutes } from "./routes/account.js";
 import { availabilityRoutes } from "./routes/availability.js";
 import { boardsRoutes } from "./routes/boards.js";
@@ -139,6 +140,7 @@ export interface RouterDeps {
     desktopHostChoiceEnabled?: boolean;
     mcpStdioEnabled?: boolean;
     mcpStdioAllowedCommands?: string[];
+    hostedVoice?: HostedVoice;
   };
 }
 

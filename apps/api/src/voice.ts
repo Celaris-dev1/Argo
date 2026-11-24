@@ -41,6 +41,7 @@ import {
 import { getLogger } from "@argo/logging";
 import { ORPCError } from "@orpc/server";
 import type { Context, Hono } from "hono";
+import type { HostedVoice } from "./env.js";
 import { readBoundedBody } from "./http-body.js";
 import { withSerializableRetry } from "./serializable-retry.js";
 import type { SpeechSummarizer } from "./speech-summary.js";
@@ -49,7 +50,7 @@ export interface VoiceDeps {
   prisma: PrismaClient;
   secrets: SecretStore;
   /** The instance flag (`MCP_ALLOW_PRIVATE_ENDPOINT`). */
-  env?: { mcpAllowPrivateEndpoint?: boolean };
+  env?: { mcpAllowPrivateEndpoint?: boolean; hostedVoice?: HostedVoice };
   /** Set only when `VOICE_SUMMARY_MIN_CHARS` turns spoken summaries on. */
   speechSummary?: { summarize: SpeechSummarizer; minChars: number };
 }
@@ -88,7 +89,19 @@ export function catalogEntry(provider: string) {
   return voiceCatalogEntry(provider);
 }
 
-export function toVoiceStatus(cred: { provider: string; voiceId: string } | null): VoiceStatus {
+export function toVoiceStatus(
+  cred: { provider: string; voiceId: string } | null,
+  hosted?: HostedVoice,
+): VoiceStatus {
+  if (!cred && hosted) {
+    return {
+      configured: false,
+      ready: true,
+      transcribe: false,
+      provider: hosted.provider,
+      voiceId: hosted.voiceId,
+    };
+  }
   const entry = cred ? catalogEntry(cred.provider) : undefined;
   return {
     configured: Boolean(cred),
@@ -248,10 +261,43 @@ export async function resolveVoiceTarget(
     botVoiceId = bot.voiceId;
   }
   const loaded = await loadDefaultVoiceCredential(deps, actor, input.scope);
-  if (!loaded) throw new NoVoiceConfigured("key");
+  if (!loaded) {
+    const hosted = deps.env?.hostedVoice;
+    if (!hosted) throw new NoVoiceConfigured("key");
+    // Voice ids belong to one provider, so the hosted voice ignores ones saved for others.
+    return {
+      cred: { provider: hosted.provider, speechModel: null as string | null },
+      apiKey: hosted.apiKey,
+      voiceId: hosted.voiceId,
+      hosted,
+    };
+  }
   const voiceId = input.voiceId || botVoiceId || loaded.cred.voiceId;
   if (!voiceId) throw new NoVoiceConfigured("voice");
-  return { ...loaded, voiceId };
+  return { ...loaded, voiceId, hosted: undefined };
+}
+
+const hostedUse = new Map<string, number>();
+
+/**
+ * Counts hosted-voice characters per account per UTC day. Kept in memory: the cap only bounds
+ * spend on the instance's key, and a restart or a second instance at most raises it a little.
+ */
+export function chargeHostedVoice(
+  hosted: HostedVoice,
+  userId: string,
+  chars: number,
+  now = new Date(),
+) {
+  const key = `${now.toISOString().slice(0, 10)}:${userId}`;
+  const used = hostedUse.get(key) ?? 0;
+  if (used + chars > hosted.dailyChars) {
+    throw new ORPCError("TOO_MANY_REQUESTS", {
+      message: "Today's free voice is used up. Add your own voice key in Voice settings.",
+    });
+  }
+  if (hostedUse.size > 50_000) hostedUse.clear();
+  hostedUse.set(key, used + chars);
 }
 
 export async function persistVoiceCredential(
@@ -526,6 +572,7 @@ export async function synthesizeVoice(
   if (text.length > MAX_SPEAK_CHARS) {
     throw new ORPCError("BAD_REQUEST", { message: "That utterance is too long to speak." });
   }
+  if (target.hosted) chargeHostedVoice(target.hosted, actor.userId, text.length);
   const provider = await voiceProviderFor(deps, actor, target.cred.provider);
   return provider.synthesize(
     {
