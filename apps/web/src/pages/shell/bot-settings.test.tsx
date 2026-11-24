@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../lib/rpc", () => {
   const rpc = {
+    bots: { inbox: vi.fn(async () => ({ available: false, address: null })), setInbox: vi.fn() },
     voice: { voices: vi.fn(async () => []) },
     models: {
       credentials: vi.fn(async () => []),
