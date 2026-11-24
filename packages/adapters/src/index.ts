@@ -32,6 +32,7 @@ export * from "./builtin-skills.js";
 export * from "./builtin-tools.js";
 export { settleCallRequest } from "./call-request.js";
 export * from "./cartesia-voice.js";
+export * from "./mistral-voice.js";
 export * from "./chat-sdk-surface.js";
 export * from "./child-bots.js";
 export * from "./cloud-agent-emulator.js";
