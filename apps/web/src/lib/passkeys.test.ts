@@ -54,7 +54,9 @@ describe("passkeysSupported", () => {
     await expect(passkeysSupported("app.argo.example", mac(["app.argo.example"]))).resolves.toBe(
       true,
     );
-    await expect(passkeysSupported("App.Argo.example", mac(["app.argo.example"]))).resolves.toBe(true);
+    await expect(passkeysSupported("App.Argo.example", mac(["app.argo.example"]))).resolves.toBe(
+      true,
+    );
     await expect(passkeysSupported("app.argo.example", mac([]))).resolves.toBe(false);
     await expect(passkeysSupported("app.argo.example", mac())).resolves.toBe(false);
     await expect(passkeysSupported("app.argo.example", mac(new Error("ipc")))).resolves.toBe(false);
