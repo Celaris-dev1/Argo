@@ -210,7 +210,11 @@ export function savedCompatibleEndpointMatches(
   savedBaseUrl: string | undefined,
 ): boolean {
   try {
-    return Boolean(savedBaseUrl) && normalizeOpenAiCompatibleBaseUrl(baseUrl) === savedBaseUrl;
+    return (
+      Boolean(savedBaseUrl) &&
+      normalizeOpenAiCompatibleBaseUrl(baseUrl) ===
+        normalizeOpenAiCompatibleBaseUrl(savedBaseUrl as string)
+    );
   } catch {
     return false;
   }

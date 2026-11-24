@@ -41,6 +41,11 @@ async function render(onCreate: (input: CreateBotDialogInput) => Promise<void>) 
   await act(async () => {
     root.render(<CreateBotDialog onCancel={() => undefined} onCreate={onCreate} />);
   });
+  // The dialog opens on the kind picker; these tests cover the custom bot form behind it.
+  await act(async () => {
+    // A rerender keeps the kind already picked.
+    document.querySelector<HTMLButtonElement>('[data-testid="bot-kind-custom"]')?.click();
+  });
 }
 
 function button(name: string) {

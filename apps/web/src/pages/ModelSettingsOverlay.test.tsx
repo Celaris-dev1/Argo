@@ -366,6 +366,21 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+/** Presets after Ollama Cloud, offered whenever nothing is connected to them. */
+const OTHER_PRESETS = [
+  "OpenRouter",
+  "Venice",
+  "Featherless",
+  "NanoGPT",
+  "Together AI",
+  "DeepInfra",
+  "Ollama (lite stack)",
+  "Ollama (this machine)",
+  "llama.cpp (this machine)",
+  "LM Studio (this machine)",
+  "KoboldCpp (this machine)",
+];
+
 it("reopens on cached models without a spinner and refreshes them behind it", async () => {
   models.credentials.mockResolvedValue([deepseekCredential]);
   const queryClient = testQueryClient();
@@ -877,7 +892,12 @@ it("lists not-connected providers by name alone", async () => {
   const view = await renderSettings();
   try {
     await openPicker("Change Main model");
-    expect(pickerOptions()).toEqual(["DeepSeek", "OpenAI-compatible", "Ollama Cloud"]);
+    expect(pickerOptions()).toEqual([
+      "DeepSeek",
+      "OpenAI-compatible",
+      "Ollama Cloud",
+      ...OTHER_PRESETS,
+    ]);
     expect(document.querySelectorAll("[cmdk-group-heading]")).toHaveLength(0);
   } finally {
     await view.unmount();
@@ -1063,7 +1083,7 @@ it("opens the Ollama preset with a required key and saves a compatible connectio
       [...view.container.querySelectorAll("button")].filter((row) => row.textContent === "API key"),
     ).toHaveLength(0);
     const key = view.container.querySelector(
-      'input[placeholder="Ollama API key"]',
+      'input[placeholder="Required API key"]',
     ) as HTMLInputElement;
     expect(key.required).toBe(true);
     await typeInto(key, "fake-fixture-key");
@@ -1101,7 +1121,10 @@ it("offers a saved Ollama connection's models without the Ollama preset", async 
   const view = await renderSettings(false);
   try {
     await openPicker("Change Main model");
-    expect(pickerOptions()).toEqual(["fixture-model"]);
+    expect(pickerOptions()).toEqual([
+      "fixture-model",
+      ...OTHER_PRESETS.filter((name) => name !== "Ollama Cloud"),
+    ]);
   } finally {
     await view.unmount();
   }
@@ -1122,7 +1145,7 @@ it("keeps the Ollama preset to connect beside a saved local connection", async (
   const view = await renderSettings(false);
   try {
     await openPicker("Add fallback");
-    expect(pickerOptions()).toEqual(["fixture-model", "Ollama Cloud"]);
+    expect(pickerOptions()).toEqual(["fixture-model", "Ollama Cloud", ...OTHER_PRESETS]);
     await choose("Ollama Cloud");
     expect(baseUrlField(view.container).value).toBe("https://ollama.com/v1");
   } finally {
