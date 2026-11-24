@@ -453,7 +453,7 @@ describe("graphical computer spec", () => {
     expect(isRegistryQualifiedImage("localhost/argo/computer:local")).toBe(true);
     expect(isRegistryQualifiedImage("docker.io/argo/computer:edge")).toBe(true);
     expect(isRegistryQualifiedImage("Registry/argo/computer:edge")).toBe(true);
-    expect(isRegistryQualifiedImage("argo/computer:edge")).toBe(true);
+    expect(isRegistryQualifiedImage("argO/computer:edge")).toBe(true);
     expect(isRegistryQualifiedImage("argo/computer:local")).toBe(false);
     expect(isRegistryQualifiedImage("argo/computer@sha256:0123")).toBe(false);
     expect(isRegistryQualifiedImage("computer:local")).toBe(false);
@@ -2195,7 +2195,9 @@ describe("computer home storage", () => {
         path.resolve(import.meta.dirname, "../../computer/start.sh"),
         "utf8",
       );
-      const loop = start.match(/while true; do[\s\S]*?done >\/tmp\/argo\/control\.log 2>&1 &/)?.[0];
+      const loop = start.match(
+        /while true; do\s*\/usr\/local\/bin\/argo-computer-control[\s\S]*?done >\/tmp\/argo\/control\.log 2>&1 &/,
+      )?.[0];
       expect(loop).toBeDefined();
       const result = spawnSync(
         "bash",

@@ -50,6 +50,7 @@ export const COMPUTER_IMAGE_CONTEXT_FILES = [
   "fluxbox.apps",
   "fluxbox.menu",
   "argo-local-bin.sh",
+  "argo-captcha",
 ] as const;
 
 /**
