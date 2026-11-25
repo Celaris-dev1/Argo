@@ -1,6 +1,7 @@
+import { newInboxAddress } from "@argo/db";
 import { Hono } from "hono";
 import { describe, expect, it, vi } from "vitest";
-import { inboxLocalPart, mountBotInboxRoute, newInboxAddress } from "./bot-inbox.js";
+import { inboxLocalPart, mountBotInboxRoute } from "./bot-inbox.js";
 
 const inbox = { domain: "bots.example.test", token: "relay-token" };
 

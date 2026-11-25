@@ -1,8 +1,7 @@
-import { randomBytes } from "node:crypto";
 import type { Actor } from "@argo/contracts";
 import { hasValidBearerToken } from "@argo/core";
 import type { PrismaClient } from "@argo/db";
-import { IsolationError } from "@argo/db";
+import { IsolationError, newInboxAddress } from "@argo/db";
 import type { Hono } from "hono";
 import { readBoundedBody } from "./http-body.js";
 import type { WebhookDeps } from "./webhook-inbound.js";
@@ -36,21 +35,6 @@ export function inboxLocalPart(address: string, domain: string): string | null {
   const match = /<?([^<>\s@]+)@([^<>\s@]+)>?\s*$/.exec(address.trim());
   if (!match || match[2]?.toLowerCase() !== domain.toLowerCase()) return null;
   return match[1]?.toLowerCase() ?? null;
-}
-
-/** A readable, unguessable local part: the bot's name plus 10 random characters. */
-export function newInboxAddress(botName: string): string {
-  const slug = botName
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 20);
-  const random = randomBytes(8)
-    .toString("base64url")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
-  return `${slug || "bot"}-${random.slice(0, 10)}`;
 }
 
 async function ownBot(prisma: PrismaClient, actor: Actor, botId: string) {

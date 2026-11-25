@@ -110,6 +110,21 @@ describePostgres("deleteBotSection (PostgreSQL)", () => {
     expect(chatGroup.archivedAt).toBeNull();
   });
 
+  it("gives every new bot its own email address", async () => {
+    const repos = createRepos(prisma);
+    const actor = actorFor(owner);
+    const [first, second] = await runAsTenant(owner, async () => [
+      await repos.createBot(actor, botInput("Mail Bot")),
+      await repos.createBot(actor, botInput("Mail Bot")),
+    ]);
+    const inboxes = await asSystem(prisma).botInbox.findMany({
+      where: { botId: { in: [first.id, second.id] } },
+    });
+    expect(inboxes).toHaveLength(2);
+    for (const inbox of inboxes) expect(inbox.address).toMatch(/^mail-bot-[a-z0-9]{10}$/);
+    expect(inboxes[0]?.address).not.toBe(inboxes[1]?.address);
+  });
+
   it("treats another user's section in the same space as not found", async () => {
     const system = asSystem(prisma);
     const neighborSection = await system.botSection.create({
