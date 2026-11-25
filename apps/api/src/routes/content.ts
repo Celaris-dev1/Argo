@@ -15,6 +15,13 @@ import {
   listArtifactVersions,
   listSpaceArtifacts,
 } from "../artifacts.js";
+import {
+  publishBotStatus,
+  readBotStatusLink,
+  setBotStatusCopy,
+  statusUrl,
+  unpublishBotStatus,
+} from "../bot-status.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
 import { shareRun, shareUrl, unshareRun } from "../run-shares.js";
 import { listRunActions, listSpaceRuns } from "../runs.js";
@@ -276,6 +283,31 @@ export function contentRoutes(ctx: RouterContext) {
       }),
       unshare: authed.runs.unshare.handler(async ({ context, input }) => {
         await unshareRun(deps.prisma, context.actor, input.runId);
+        return { ok: true as const };
+      }),
+      statusPage: authed.runs.statusPage.handler(async ({ context, input }) => {
+        const page = await readBotStatusLink(deps.prisma, context.actor, input.botId);
+        return {
+          url: page ? statusUrl(deps.env.webOrigin, page.id) : null,
+          allowCopy: page?.allowCopy ?? false,
+          allowHire: page?.allowHire ?? false,
+        };
+      }),
+      setStatusCopy: authed.runs.setStatusCopy.handler(async ({ context, input }) => {
+        await setBotStatusCopy(deps.prisma, context.actor, input.botId, {
+          allowCopy: input.allowCopy,
+          allowHire: input.allowHire,
+        });
+        return { ok: true as const };
+      }),
+      publishStatus: authed.runs.publishStatus.handler(async ({ context, input }) => ({
+        url: statusUrl(
+          deps.env.webOrigin,
+          await publishBotStatus(deps.prisma, context.actor, input.botId),
+        ),
+      })),
+      unpublishStatus: authed.runs.unpublishStatus.handler(async ({ context, input }) => {
+        await unpublishBotStatus(deps.prisma, context.actor, input.botId);
         return { ok: true as const };
       }),
     },

@@ -1,6 +1,6 @@
-import { t } from "@lingui/core/macro";
 import { isLocalhostOrLoopbackIp } from "@argo/contracts";
 import { WUYING_SCREEN_PATH } from "@argo/contracts/content-security-policy";
+import { t } from "@lingui/core/macro";
 import { errorText } from "./user-error";
 
 export interface ComputerScreenResult {

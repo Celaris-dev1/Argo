@@ -1,7 +1,7 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { AgentImportSetupItem, AgentImportSetupState, MessageBlock } from "@argo/contracts";
 import { isRetiredImportSetup } from "@argo/core";
 import { Button } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BuiCard, SuccessPop } from "../../components/ai/primitives";

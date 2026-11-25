@@ -12,6 +12,28 @@ async function loadShare(id: string): Promise<RunShare | null> {
   return RunShareSchema.parse(await response.json());
 }
 
+/** The shared page as a Markdown file, named after its prompt. */
+export function shareMarkdown(share: RunShare): { name: string; text: string } {
+  const slug =
+    share.prompt
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60) || "report";
+  return {
+    name: `${slug}.md`,
+    text: `# ${share.prompt}\n\n${share.result}\n\n---\nMade with Argo · https://argoai.top\n`,
+  };
+}
+
+function download(share: RunShare) {
+  const { name, text } = shareMarkdown(share);
+  const url = URL.createObjectURL(new Blob([text], { type: "text/markdown" }));
+  const link = Object.assign(document.createElement("a"), { href: url, download: name });
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 /** A run its owner chose to publish: what was asked, what the bot did, and the result. */
 export function SharedRunPage() {
   const { t } = useLingui();
@@ -44,9 +66,20 @@ export function SharedRunPage() {
           <article className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">
             {share.data.result}
           </article>
+          <div className="flex gap-2 print:hidden">
+            <Button variant="outline" size="sm" onClick={() => share.data && download(share.data)}>
+              <Trans>Download</Trans>
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Trans>Print</Trans>
+            </Button>
+          </div>
+          <p className="text-[13px] text-muted-foreground">
+            <Trans>Made with Argo</Trans>
+          </p>
         </>
       )}
-      <footer className="flex flex-wrap gap-2 border-t border-border pt-6">
+      <footer className="flex flex-wrap gap-2 border-t border-border pt-6 print:hidden">
         <Button render={<Link to="/sign-up" />}>
           <Trans>Get your own bot</Trans>
         </Button>

@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { filterModelCatalog } from "@argo/core";
 import {
   Command,
@@ -11,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { TextOnlyMark } from "../../components/TextOnlyMark";

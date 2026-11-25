@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
+import type { AgentRunRequest, AgentRuntimeEvent } from "@argo/adapter-kit";
 import type { AssistantMessage, Context, Model } from "@earendil-works/pi-ai";
 import { AssistantMessageEventStream } from "@earendil-works/pi-ai/utils/event-stream";
-import type { AgentRunRequest, AgentRuntimeEvent } from "@argo/adapter-kit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { providerContextPrefix } from "./context-selection.js";
 
@@ -16,7 +16,10 @@ vi.mock("@earendil-works/pi-ai/providers/all", () => ({
     streamSimple: (...args: unknown[]) => providerState.stream(...args),
   }),
 }));
-vi.mock("./pi-local-provider.js", () => ({ registerLocalProvider: (models: unknown) => models }));
+vi.mock("./pi-local-provider.js", () => ({
+  registerLocalProvider: (models: unknown) => models,
+  memberHeaders: (_provider: unknown, _userId: unknown, headers: unknown) => headers,
+}));
 vi.mock("./pi-openai-compatible-provider.js", () => ({
   OPENAI_COMPATIBLE_PROVIDER_ID: "openai-compatible",
   registerOpenAiCompatibleCatalog: (models: unknown) => models,

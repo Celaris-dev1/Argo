@@ -85,8 +85,9 @@ describe("mobile appearance", () => {
   });
 
   it("notifies subscribers when the OS scheme flips under System preference", async () => {
-    const { resolveMobileAppearance, setAppearancePreference, subscribeAppearance } =
-      await import("./appearance");
+    const { resolveMobileAppearance, setAppearancePreference, subscribeAppearance } = await import(
+      "./appearance"
+    );
     await setAppearancePreference("system");
     const listener = vi.fn();
     subscribeAppearance(listener);

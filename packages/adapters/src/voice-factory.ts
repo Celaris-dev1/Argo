@@ -9,6 +9,7 @@ import {
   MacOsVoiceProvider,
   macOsSayAvailable,
 } from "./macos-voice.js";
+import { MistralVoiceProvider } from "./mistral-voice.js";
 import { openAiCompatAllowPublicHosts } from "./openai-compatible-url.js";
 import {
   OPENAI_COMPATIBLE_VOICE_PROVIDER_ID,
@@ -41,6 +42,12 @@ export const VOICE_CATALOG = [
     name: "Fish Audio",
     description: "Voice models, cloning, and expressive speech with optional transcription.",
     transcribe: true,
+  },
+  {
+    id: "mistral",
+    name: "Mistral",
+    description: "Voxtral voices in several languages and moods.",
+    transcribe: false,
   },
   {
     id: OPENAI_COMPATIBLE_VOICE_PROVIDER_ID,
@@ -100,6 +107,8 @@ export function createVoiceProvider(
       return new CartesiaVoiceProvider();
     case "fish-audio":
       return new FishAudioVoiceProvider();
+    case "mistral":
+      return new MistralVoiceProvider();
     case OPENAI_COMPATIBLE_VOICE_PROVIDER_ID:
       return new OpenAiCompatibleVoiceProvider({
         allowPrivateEndpoint: options.allowPrivateEndpoint,
@@ -114,7 +123,7 @@ export function createVoiceProvider(
       break;
   }
   throw new Error(
-    `Unknown voice provider "${kind}". Use elevenlabs | openai | cartesia | fish-audio | openai-compatible.`,
+    `Unknown voice provider "${kind}". Use elevenlabs | openai | cartesia | fish-audio | mistral | openai-compatible.`,
   );
 }
 

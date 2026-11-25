@@ -41,7 +41,15 @@ watch can't be combined with a schedule.
 
 ### Webhook
 
-Gives you a URL and key. Any service that can send a POST request can start the routine.
+Gives you a URL and key. Any service that can send a POST request can start the routine. Send
+the key as `Authorization: Bearer <key>`, or as the password in the URL
+(`https://inbox:<key>@your-host/api/v1/bots/<bot>/webhook`) for services that only take a URL.
+JSON and form posts both work.
+
+**Email a bot.** Point an inbound-email service (Postmark, SendGrid Inbound Parse, Mailgun
+routes, or a Cloudflare Email Worker) at that URL. Forwarded emails, such as invoices or
+newsletters, then arrive as tasks with their sender, subject and text. Attachments are not
+passed on.
 
 ### Git event
 

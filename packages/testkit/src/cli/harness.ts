@@ -79,6 +79,9 @@ async function main() {
     process.env.SANDBOX_PROVIDER = sandboxProvider;
     process.env.AGENT_RUNTIME = agentRuntime;
     process.env.ARGO_LIVE_MODEL_CATALOG = "off";
+    // Learning runs a background model call after busy runs, which scripted model fixtures
+    // would see as an unexpected extra request.
+    process.env.ARGO_SKILL_LEARNING ??= "off";
     if (!integration) {
       process.env.TICKET_BOARD_ENABLED = "true";
       process.env.PHONE_CALLS_ENABLED = "true";
@@ -170,11 +173,7 @@ async function main() {
       },
       { createApp },
       { drainUnscopedDatabaseAccess, runAsSystem },
-    ] = await Promise.all([
-      import("@argo/adapters"),
-      import("@argo/api/app"),
-      import("@argo/db"),
-    ]);
+    ] = await Promise.all([import("@argo/adapters"), import("@argo/api/app"), import("@argo/db")]);
     const { serve } = await import("@hono/node-server");
     const thirdParties = new ThirdPartyConnectorEmulator();
     const marketplace = new PluginMarketplaceFixture(thirdParties.fetch);

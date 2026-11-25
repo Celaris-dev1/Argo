@@ -356,12 +356,7 @@ describe("graphical computer spec", () => {
       expect(() => resolveComputerMounts(value)).toThrow(/must not contain \.\./);
 
     const protectedPaths = ["/opt/argo/data", "/home/op/.docker/run/docker.sock", undefined];
-    for (const source of [
-      "/opt/argo/data",
-      "/opt/argo/data/homes/bot",
-      "/opt/argo",
-      "/home/op",
-    ])
+    for (const source of ["/opt/argo/data", "/opt/argo/data/homes/bot", "/opt/argo", "/home/op"])
       expect(() => resolveComputerMounts(`${source}:/mnt/x`, protectedPaths)).toThrow(
         /protected host path/,
       );
@@ -458,7 +453,7 @@ describe("graphical computer spec", () => {
     expect(isRegistryQualifiedImage("localhost/argo/computer:local")).toBe(true);
     expect(isRegistryQualifiedImage("docker.io/argo/computer:edge")).toBe(true);
     expect(isRegistryQualifiedImage("Registry/argo/computer:edge")).toBe(true);
-    expect(isRegistryQualifiedImage("argo/computer:edge")).toBe(true);
+    expect(isRegistryQualifiedImage("argO/computer:edge")).toBe(true);
     expect(isRegistryQualifiedImage("argo/computer:local")).toBe(false);
     expect(isRegistryQualifiedImage("argo/computer@sha256:0123")).toBe(false);
     expect(isRegistryQualifiedImage("computer:local")).toBe(false);
@@ -1920,11 +1915,7 @@ describe("graphical computer spec", () => {
 });
 
 describe("computer resource limits", () => {
-  const KEYS = [
-    "ARGO_COMPUTER_MEMORY",
-    "ARGO_COMPUTER_CPUS",
-    "ARGO_COMPUTER_PIDS_LIMIT",
-  ] as const;
+  const KEYS = ["ARGO_COMPUTER_MEMORY", "ARGO_COMPUTER_CPUS", "ARGO_COMPUTER_PIDS_LIMIT"] as const;
   const saved = new Map<string, string | undefined>();
 
   beforeEach(() => {
@@ -2205,7 +2196,7 @@ describe("computer home storage", () => {
         "utf8",
       );
       const loop = start.match(
-        /while true; do[\s\S]*?done >\/tmp\/argo\/control\.log 2>&1 &/,
+        /while true; do\s*\/usr\/local\/bin\/argo-computer-control[\s\S]*?done >\/tmp\/argo\/control\.log 2>&1 &/,
       )?.[0];
       expect(loop).toBeDefined();
       const result = spawnSync(

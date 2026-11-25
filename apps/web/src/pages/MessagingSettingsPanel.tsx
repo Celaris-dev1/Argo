@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { MessagingChannelMembership, MessagingInstallationsStatus } from "@argo/contracts";
 import { isRetryableError, messagingConnectOptions } from "@argo/core";
 import { fetchFresh, writeSaved } from "@argo/core/query";
@@ -11,6 +10,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDownIcon, PlusIcon } from "lucide-react";
 import type { ReactNode } from "react";

@@ -40,7 +40,9 @@ import { ORPCError } from "@orpc/server";
 import type { AgentImportServices } from "../agent-import.js";
 import { agentImportSetupState, createImportedBot, previewAgentImport } from "../agent-import.js";
 import { deleteAgentSecret, listAgentSecrets, putAgentSecret } from "../agent-secrets.js";
+import { readBotInbox, setBotInbox } from "../bot-inbox.js";
 import { changedBotSettings } from "../bot-setting-analytics.js";
+import { readCopyableBot } from "../bot-status.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
 import { offerFirstApps } from "../onboarding.js";
 import type { RouterDeps } from "../router.js";
@@ -387,6 +389,47 @@ export function botsRoutes(ctx: RouterContext) {
           });
         }
         return duplicate;
+      }),
+      inbox: authed.bots.inbox.handler(async ({ context, input }) => {
+        const domain = deps.env.inbox?.domain;
+        if (!domain) return { available: false, address: null };
+        return {
+          available: true,
+          address: await readBotInbox(deps.prisma, context.actor, input.botId, domain),
+        };
+      }),
+      setInbox: authed.bots.setInbox.handler(async ({ context, input }) => {
+        const domain = deps.env.inbox?.domain;
+        if (!domain) throw new ORPCError("NOT_FOUND");
+        return {
+          address: await setBotInbox(
+            deps.prisma,
+            context.actor,
+            input.botId,
+            input.enabled,
+            domain,
+          ),
+        };
+      }),
+      copyPublished: authed.bots.copyPublished.handler(async ({ context, input }) => {
+        const source = await readCopyableBot(deps.prisma, input.statusId);
+        if (!source) throw new IsolationError();
+        const bot = await repos
+          .createBot(context.actor, {
+            name: source.name,
+            description: source.description,
+            instructions: source.instructions,
+            notifyOnFinish: true,
+            color: source.color,
+            avatarSet: resolveBotAvatarSet(source.avatarSet),
+          })
+          .catch((error: unknown) => {
+            throw mapSpaceLifecycleError(error);
+          });
+        await enqueueBotIntroRun(deps, context.actor, bot).catch((error) => {
+          getLogger().error("bot intro run enqueue", error);
+        });
+        return bot;
       }),
       reorder: authed.bots.reorder.handler(async ({ context, input }) => {
         await repos.reorderBots(context.actor, input.botIds);

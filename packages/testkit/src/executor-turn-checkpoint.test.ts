@@ -91,6 +91,10 @@ function fixture(
             }
           : undefined,
       spaceSettingOverride: { findUnique: async () => null },
+      // Ask mode: these runs exercise approval pauses, and new accounts never ask.
+      userActionAutoReviewPreference: {
+        findUnique: async () => ({ enabled: false, skipApprovals: false }),
+      },
       userActionApprovalRule: {
         findMany: async () => [
           {

@@ -1,9 +1,9 @@
-import { ORPCError } from "@orpc/server";
 import type { CodexLiveCatalog, parseModelSecret } from "@argo/adapters";
 import { findConnectedModelCredential, validateConnectedModelChoice } from "@argo/adapters";
 import type { Actor } from "@argo/contracts";
 import { OPENAI_COMPATIBLE_PROVIDER_ID, usableModelId } from "@argo/contracts";
 import { modelRoleTarget, runAsSystem } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import type { RouterDeps } from "./router.js";
 
 /**

@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   BotSecretMetadata,
   LoginFieldInput,
@@ -16,6 +15,7 @@ import {
 import { fetchFresh, writeSaved } from "@argo/core/query";
 import { Button, Input, NativeSelect, NativeSelectOption } from "@argo/ui-web";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@argo/ui-web/components/ui/tooltip";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Eye, EyeOff, Plus, RotateCcw, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";

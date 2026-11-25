@@ -398,6 +398,7 @@ vi.mock("@earendil-works/pi-ai/providers/all", () => ({
 
 vi.mock("./pi-local-provider.js", () => ({
   registerLocalProvider: (models: unknown) => models,
+  memberHeaders: (_provider: unknown, _userId: unknown, headers: unknown) => headers,
 }));
 
 vi.mock("./pi-openai-compatible-provider.js", () => ({

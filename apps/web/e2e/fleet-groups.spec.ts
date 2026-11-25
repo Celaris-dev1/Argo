@@ -1,11 +1,19 @@
 import { expect, test } from "@playwright/test";
-import { activeBotId, captureScreenshot, completeOnboarding, rpc, signup } from "./helpers";
+import {
+  activeBotId,
+  askBeforeActing,
+  captureScreenshot,
+  completeOnboarding,
+  rpc,
+  signup,
+} from "./helpers";
 
 test("a group a bot creates after approval appears in the sidebar without a reload", async ({
   page,
 }, testInfo) => {
   await signup(page, `bot-management-groups-${Date.now()}@argo.test`, "password12", "Bot Groups");
   await completeOnboarding(page);
+  await askBeforeActing(page);
   await page.waitForURL(/\/app\/[^/]+$/);
   const chiefId = activeBotId(page);
   await rpc(page, "bots/update", { botId: chiefId, fleetManagement: true });
@@ -52,13 +60,9 @@ test(
   "model approvals use catalog labels and fit wide and narrow chats",
   { tag: "@nightly" },
   async ({ page }, testInfo) => {
-    await signup(
-      page,
-      `bot-management-model-${Date.now()}@argo.test`,
-      "password12",
-      "Bot Models",
-    );
+    await signup(page, `bot-management-model-${Date.now()}@argo.test`, "password12", "Bot Models");
     await completeOnboarding(page);
+    await askBeforeActing(page);
     await page.waitForURL(/\/app\/[^/]+$/);
     const chiefId = activeBotId(page);
     await rpc(page, "bots/update", { botId: chiefId, fleetManagement: true });

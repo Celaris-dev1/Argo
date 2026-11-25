@@ -1,6 +1,6 @@
+import { CONNECTION_LABEL_MAX_LENGTH } from "@argo/contracts";
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import { CONNECTION_LABEL_MAX_LENGTH } from "@argo/contracts";
 import {
   activeBotId,
   captureScreenshot,
@@ -388,8 +388,13 @@ test("sign-in, spawn, and stop work in the shell", async ({ page }, testInfo) =>
   // Stop can arrive over the live stream before the first send returns; Send stays disabled
   // until then, and Tab would skip it.
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
+  // Optional chips (model, Coding) sit between the message box and Send; Tab still reaches it.
+  const send = page.getByRole("button", { name: "Send", exact: true });
   await composer.press("Tab");
-  await expect(page.getByRole("button", { name: "Send", exact: true })).toBeFocused();
+  for (let i = 0; i < 3 && !(await send.evaluate((el) => el === document.activeElement)); i++) {
+    await page.keyboard.press("Tab");
+  }
+  await expect(send).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(
     page.getByTestId("transcript").getByText("Use the newer report and keep the answer short."),

@@ -890,7 +890,9 @@ describe("a message from the person while the bot works", () => {
         { type: "done", text: "" },
       ],
     });
-    expect(sentTexts(messages)).toEqual(["Reply one."]);
+    // The second message doesn't restart the budget, but a message from the person still gets
+    // its answer.
+    expect(sentTexts(messages)).toEqual(["Reply one.", "Reply two."]);
   });
 
   it("starts the interim-message budget again after it", async () => {

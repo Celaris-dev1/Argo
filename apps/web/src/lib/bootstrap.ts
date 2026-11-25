@@ -30,10 +30,7 @@ let primedBootstrap: {
   seed?: AppBootstrap;
 } | null = null;
 
-const initialTarget = initialBootstrapTarget(
-  window.location.pathname,
-  Boolean(window.argoDesktop),
-);
+const initialTarget = initialBootstrapTarget(window.location.pathname, Boolean(window.argoDesktop));
 if (initialTarget) {
   const { botId } = initialTarget;
   const promise = requestBootstrap(botId);

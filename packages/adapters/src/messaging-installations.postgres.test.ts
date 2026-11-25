@@ -1,13 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Actor } from "@argo/contracts";
 import type { PrismaClient } from "@argo/db";
-import {
-  asSystem,
-  createDb,
-  provisionMessagingIdentity,
-  runAsSystem,
-  runAsTenant,
-} from "@argo/db";
+import { asSystem, createDb, provisionMessagingIdentity, runAsSystem, runAsTenant } from "@argo/db";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { MessagingInstallations } from "./messaging-installations.js";
 import { EncryptedSecretStore } from "./secrets.js";

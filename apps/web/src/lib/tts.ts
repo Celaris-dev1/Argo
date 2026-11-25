@@ -1,4 +1,3 @@
-import { t } from "@lingui/core/macro";
 import type { SettingsScope } from "@argo/contracts";
 import {
   readVoiceAudio,
@@ -7,6 +6,7 @@ import {
   VOICE_RESPONSE_TIMEOUT_MS,
   withAbort,
 } from "@argo/core";
+import { t } from "@lingui/core/macro";
 import { rpc, selectedSpaceId, withSpaceHeaders } from "./rpc.js";
 import { errorText, voiceAccountErrorText } from "./user-error.js";
 

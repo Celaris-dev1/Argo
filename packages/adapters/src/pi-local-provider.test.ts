@@ -4,6 +4,7 @@ import {
   LOCAL_PROVIDER_ID,
   localBaseUrl,
   localProvider,
+  memberHeaders,
   registerLocalProvider,
 } from "./pi-local-provider.js";
 
@@ -54,7 +55,12 @@ describe("local model provider", () => {
   it("bills nothing, because the model runs on the operator's own hardware", () => {
     setModels("qwen3:4b");
     const model = localProvider()?.getModels()[0];
-    expect(model?.cost).toEqual({ input: 0, output: 0, cacheRead: 0, cacheWrite: 0 });
+    expect(model?.cost).toEqual({
+      input: 0,
+      output: 0,
+      cacheRead: 0,
+      cacheWrite: 0,
+    });
   });
 
   it("defaults to the Ollama endpoint and honours an override", () => {
@@ -129,5 +135,16 @@ describe("local model provider", () => {
       apiKey: "sk-test-placeholder",
       baseUrl: "https://models.example.test/v1",
     });
+  });
+});
+
+describe("memberHeaders", () => {
+  it("adds the member id only for the deployment endpoint", () => {
+    expect(memberHeaders("local", "user-1", { a: "b" })).toEqual({
+      a: "b",
+      "x-argo-member": "user-1",
+    });
+    expect(memberHeaders("openrouter", "user-1", undefined)).toBeUndefined();
+    expect(memberHeaders("local", undefined, undefined)).toBeUndefined();
   });
 });

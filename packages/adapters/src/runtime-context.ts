@@ -1,8 +1,13 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { Api, Context, Message, Model } from "@earendil-works/pi-ai";
-import type { AdapterContext, AgentRunRequest, AgentUsage } from "@argo/adapter-kit";
+import type {
+  AdapterContext,
+  AgentRunRequest,
+  AgentUsage,
+  CacheCapabilities,
+} from "@argo/adapter-kit";
 import { DEFAULT_CONTEXT_STRATEGY } from "@argo/adapter-kit";
 import { getLogger } from "@argo/logging";
+import type { Api, Context, Message, Model } from "@earendil-works/pi-ai";
 import { imagePartCount, normalizedImageLimit, pruneForRebuild } from "./context-pruning.js";
 import type { CacheRequest, ContextBudget } from "./context-selection.js";
 import {
@@ -44,6 +49,14 @@ const REBUILD_MIN_SAVED_TOKENS = 16_384;
 const REBUILD_MAX_STALE_IMAGES = 16;
 /** A rebuild forced by the model's window leaves this share of it free for the next calls. */
 const REBUILD_HEADROOM = 0.25;
+const DEFAULT_CACHE_WRITE_TO_READ = 12.5;
+/** Write/read cache price ratio from connection-declared prices; a write costs at least the input. */
+export function cacheWriteToRead(capabilities: CacheCapabilities | undefined): number {
+  const read = capabilities?.readCostPerMillion;
+  const write = capabilities?.writeCostPerMillion ?? capabilities?.inputCostPerMillion;
+  if (!read || !write || write < read) return DEFAULT_CACHE_WRITE_TO_READ;
+  return write / read;
+}
 export interface Size {
   tokens: number;
   images: number;
@@ -51,21 +64,23 @@ export interface Size {
 /**
  * Whether dropping an appended transcript's stale content is worth breaking the cache. A rebuild
  * writes about the rebuilt size to the cache once; stale content is read again on every call.
- * With cache writes at about 1.25 and reads at about 0.1 times the input price, rebuilding every
- * k calls costs least once stale content reaches about 5 × √(rebuilt size × growth per call), so
- * a run that adds a lot per call rebuilds rarely. `appends` counts calls appended since the
- * transcript was last rebuilt at `rebuiltTokens`.
+ * Rebuilding every k calls costs least once stale² reaches 2 × write/read × rebuilt size × growth
+ * per call, so a run that adds a lot per call rebuilds rarely. `writeToRead` is the cache write
+ * price over the read price; it defaults to about 1.25 / 0.1 when the connection declares neither.
+ * `appends` counts calls appended since the transcript was last rebuilt at `rebuiltTokens`.
  */
 export function rebuildPaysOff(
   kept: Size,
   fresh: Size,
   rebuiltTokens: number,
   appends: number,
+  writeToRead = DEFAULT_CACHE_WRITE_TO_READ,
 ): boolean {
   const stale = kept.tokens - fresh.tokens;
   const growth = (kept.tokens - rebuiltTokens) / (appends + 1);
   return (
-    (stale >= REBUILD_MIN_SAVED_TOKENS && stale * stale >= 25 * fresh.tokens * growth) ||
+    (stale >= REBUILD_MIN_SAVED_TOKENS &&
+      stale * stale >= 2 * writeToRead * fresh.tokens * growth) ||
     kept.images - fresh.images >= REBUILD_MAX_STALE_IMAGES
   );
 }
@@ -123,6 +138,7 @@ export function createRuntimeContextPolicy(
   } = {},
 ) {
   const cache = options.cacheTracker ?? sharedCacheTracker;
+  const writeToRead = cacheWriteToRead(request.model.cacheCapabilities);
   const accountScope = createHash("sha256")
     .update(accountSalt)
     .update(
@@ -648,7 +664,7 @@ export function createRuntimeContextPolicy(
           append =
             overTokens(kept) ||
             overImages(kept) ||
-            !rebuildPaysOff(kept, fresh, previous.rebuiltTokens, previous.appends);
+            !rebuildPaysOff(kept, fresh, previous.rebuiltTokens, previous.appends, writeToRead);
       }
       if (previous && appended && append) {
         const projection = [

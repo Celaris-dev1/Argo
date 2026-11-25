@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { ChatModelChoice } from "@argo/core";
 import { groupModelChoices, MODEL_SEARCH_THRESHOLD } from "@argo/core";
 import {
@@ -14,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDownIcon } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { TextOnlyMark } from "../../components/TextOnlyMark";

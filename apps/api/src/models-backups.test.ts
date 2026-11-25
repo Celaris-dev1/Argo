@@ -1,8 +1,8 @@
-import { RPCHandler } from "@orpc/server/fetch";
 import * as adapters from "@argo/adapters";
 import { listPiCatalog, serializeModelSecret } from "@argo/adapters";
 import type { Actor } from "@argo/contracts";
 import type { PrismaClient } from "@argo/db";
+import { RPCHandler } from "@orpc/server/fetch";
 import { describe, expect, it, vi } from "vitest";
 import type { RouterDeps } from "./router.js";
 import { createRouter } from "./router.js";

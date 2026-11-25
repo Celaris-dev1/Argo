@@ -287,7 +287,7 @@ export function accountRoutes(ctx: RouterContext) {
       ),
       status: authed.voice.status.handler(async ({ context, input }) => {
         const cred = await findDefaultVoiceCredential(deps.prisma, context.actor, input?.scope);
-        return toVoiceStatus(cred);
+        return toVoiceStatus(cred, deps.env?.hostedVoice);
       }),
       credentials: authed.voice.credentials.handler(async ({ context, input }) => {
         const target = await voicePreferenceTarget(deps.prisma, context.actor, input?.scope);

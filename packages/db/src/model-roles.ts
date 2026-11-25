@@ -1,9 +1,4 @@
-import type {
-  ModelRole,
-  ModelRoleChoice,
-  ModelRoleSettings,
-  SettingsScope,
-} from "@argo/contracts";
+import type { ModelRole, ModelRoleChoice, ModelRoleSettings, SettingsScope } from "@argo/contracts";
 import {
   backupChoiceKey,
   canonicalPiProviderId,

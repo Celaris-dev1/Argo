@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { Bot, NavLink } from "@argo/contracts";
 import { accountDisplay } from "@argo/core";
 import {
@@ -9,6 +8,7 @@ import {
   InputGroupInput,
   Sidebar,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Search, SlidersHorizontal } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";

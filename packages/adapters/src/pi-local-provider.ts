@@ -102,6 +102,18 @@ export function localProvider(): Provider | undefined {
   });
 }
 
+/** The deployment endpoint meters free usage per member; other providers never see the member id. */
+export const MEMBER_HEADER = "x-argo-member";
+
+export function memberHeaders(
+  provider: string,
+  userId: string | undefined,
+  headers: Record<string, string | null> | undefined,
+): Record<string, string | null> | undefined {
+  if (provider !== LOCAL_PROVIDER_ID || !userId) return headers;
+  return { ...headers, [MEMBER_HEADER]: userId };
+}
+
 export function registerLocalProvider(models: MutableModels): MutableModels {
   const provider = localProvider();
   if (provider) models.setProvider(provider);

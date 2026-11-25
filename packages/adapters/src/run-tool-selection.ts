@@ -25,6 +25,7 @@ export const READ_ONLY_AGENT_TOOLS = new Set([
   "skill_read",
   "web_search",
   "web_fetch",
+  "deep_research",
   "browser_snapshot",
   "list_secrets",
   "cloud_agent_status",

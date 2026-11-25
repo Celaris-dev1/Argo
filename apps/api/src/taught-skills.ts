@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { ORPCError } from "@orpc/server";
 import type { AgentHomeStore, JobPublisher, SandboxProvider } from "@argo/adapter-kit";
 import {
   createAdapterContext,
@@ -41,6 +40,7 @@ import {
 import type { createRepos, PrismaClient, ThreadEvents } from "@argo/db";
 import { clearEndedRunState, expireComputerExecutionLeases, IsolationError } from "@argo/db";
 import { getLogger } from "@argo/logging";
+import { ORPCError } from "@orpc/server";
 
 export interface TaughtSkillsDeps {
   prisma: PrismaClient;

@@ -133,9 +133,7 @@ describe("resolveUpdaterConfig", () => {
   });
 
   it("refuses an image name it would not be willing to hand to compose", () => {
-    expect(() => resolveUpdaterConfig({ ...base, ARGO_IMAGE: "Bad Name" })).toThrow(
-      /ARGO_IMAGE/,
-    );
+    expect(() => resolveUpdaterConfig({ ...base, ARGO_IMAGE: "Bad Name" })).toThrow(/ARGO_IMAGE/);
     expect(resolveUpdaterConfig({ ...base, ARGO_IMAGE: "ghcr.io/me/app" }).image).toBe(
       "ghcr.io/me/app",
     );

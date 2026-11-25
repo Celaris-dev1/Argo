@@ -1,5 +1,5 @@
-import { DecryptCommand, EncryptCommand, KMSClient } from "@aws-sdk/client-kms";
 import type { KeyProvider, KeyWrapContext, WrappedDataKey } from "@argo/adapter-kit";
+import { DecryptCommand, EncryptCommand, KMSClient } from "@aws-sdk/client-kms";
 
 export interface AwsKmsKeyProviderConfig {
   /** Key ARN, not an alias, which can be repointed without stored keys noticing. */

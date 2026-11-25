@@ -1,14 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type {
-  AdapterContext,
-  BackgroundJobPayloads,
-  CloudAgentSnapshot,
-} from "@argo/adapter-kit";
-import {
-  CloudAgentRequestRejected,
-  CloudAgentRetryLater,
-  runContinueJob,
-} from "@argo/adapter-kit";
+import type { AdapterContext, BackgroundJobPayloads, CloudAgentSnapshot } from "@argo/adapter-kit";
+import { CloudAgentRequestRejected, CloudAgentRetryLater, runContinueJob } from "@argo/adapter-kit";
 import type { MessageBlock } from "@argo/contracts";
 import { cloudAgentHttpsUrl } from "@argo/core";
 import type { CloudAgent } from "@argo/db";

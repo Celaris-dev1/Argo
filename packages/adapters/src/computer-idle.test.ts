@@ -1,7 +1,6 @@
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { FetchError } from "@boatdev/sdk";
 import type { AgentHomeStore, JobPublisher, SandboxProvider } from "@argo/adapter-kit";
 import {
   SandboxDamagedError,
@@ -12,6 +11,7 @@ import {
 } from "@argo/adapter-kit";
 import type { PrismaClient, ThreadEvents } from "@argo/db";
 import { createLogger, createTestSink, installLogger } from "@argo/logging";
+import { FetchError } from "@boatdev/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { boatError, FakeBoatApi, fakeBoatProvider } from "./boat-sandbox.test-support.js";
 import {

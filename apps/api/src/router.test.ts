@@ -1288,9 +1288,10 @@ describe("MCP prepared credential updates", () => {
       ],
     ]);
     const prisma = {
+      bot: { findMany: vi.fn(async () => []) },
       mcpServer: {
         findMany: vi.fn(async () => []),
-        findFirst: async () => ({ ...server }),
+        findFirst: async () => ({ availableIn: [], ...server }),
         update: async ({
           data,
         }: {
@@ -1419,9 +1420,10 @@ describe("MCP pre-registered OAuth client", () => {
       };
     }
     const prisma = {
+      bot: { findMany: vi.fn(async () => []) },
       mcpServer: {
         findMany: vi.fn(async () => []),
-        findFirst: vi.fn(async () => (server ? { ...server } : null)),
+        findFirst: vi.fn(async () => (server ? { availableIn: [], ...server } : null)),
         update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
           const { revision: _revision, ...rest } = data;
           server = { ...server, ...rest, revision: Number(server?.revision) + 1 };
@@ -1940,12 +1942,16 @@ describe("MCP loopback endpoints", () => {
       updatedAt: new Date(0),
     }));
     const prisma = {
+      bot: { findMany: vi.fn(async () => []) },
       mcpServer: {
         findMany: vi.fn(async () => []),
         create,
-        findFirst: vi
-          .fn()
-          .mockResolvedValue({ id: "server-1", endpoint: LOOPBACK, secretId: null }),
+        findFirst: vi.fn().mockResolvedValue({
+          id: "server-1",
+          endpoint: LOOPBACK,
+          secretId: null,
+          availableIn: [],
+        }),
       },
       mcpServerSpace: { findMany: vi.fn(async () => []) },
       mcpOAuthSession: {
@@ -2095,10 +2101,11 @@ describe("MCP server health", () => {
           : (server as Row)[key] === value,
       );
     const prisma = {
+      bot: { findMany: vi.fn(async () => []) },
       mcpServer: {
         findMany: vi.fn(async () => []),
         findFirst: vi.fn(async ({ where }: { where: Row }) =>
-          matches(where) ? { ...server } : null,
+          matches(where) ? { availableIn: [], ...server } : null,
         ),
         create: vi.fn(async ({ data }: { data: Row }) => {
           server = baseRow({ ...data, id: "server-1" });

@@ -1,7 +1,7 @@
-import { Type } from "@earendil-works/pi-ai";
 import type { ConnectorTool } from "@argo/adapter-kit";
 import { BOT_INSTRUCTIONS_MAX_LENGTH, ThinkingLevelSchema } from "@argo/contracts";
 import { getLogger } from "@argo/logging";
+import { Type } from "@earendil-works/pi-ai";
 import {
   normalizeOpenAiToolParameters,
   openAiToolParametersNeedNormalization,

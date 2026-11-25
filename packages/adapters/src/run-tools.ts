@@ -1,12 +1,12 @@
 import type { AgentToolExecutionObserver } from "@argo/adapter-kit";
 import { toolResultTaintsRun } from "@argo/core";
+import { codingTools } from "./coding-mode.js";
 import { IMAGE_RETURNING_COMPUTER_TOOLS, MODEL_CANNOT_SEE_MESSAGE } from "./model-vision.js";
 import type { RunContext } from "./run-context.js";
 import type { ToolHandler } from "./run-tool-gate.js";
 import { auditToolCall, gateToolCall } from "./run-tool-gate.js";
 import { prepareToolRequest, resolveToolRequest } from "./run-tool-request.js";
 import { PAGE_BROWSER_TOOL_NAMES } from "./run-tool-selection.js";
-import { codingTools } from "./coding-mode.js";
 import { computerTools, pageBrowserTool } from "./run-tools-computer.js";
 import { fileTools } from "./run-tools-files.js";
 import { fleetTools } from "./run-tools-fleet.js";
@@ -14,6 +14,7 @@ import { cloudAgentTool, connectorTool, integrationTools } from "./run-tools-int
 import { memoryTools } from "./run-tools-memory.js";
 import { messagingTools } from "./run-tools-messaging.js";
 import { purchaseTools } from "./run-tools-purchases.js";
+import { researchTools } from "./run-tools-research.js";
 import { secretTools } from "./run-tools-secrets.js";
 import { taskTools } from "./run-tools-tasks.js";
 import {
@@ -24,12 +25,14 @@ import {
   userComputerObserve,
   userComputerShell,
 } from "./run-tools-user-computer.js";
+import { siteTools } from "./site-publishing.js";
 import { argumentGiven } from "./update-bot-patch.js";
 
 const TOOL_HANDLERS = new Map<string, ToolHandler>([
   ...Object.entries(computerTools),
   ...Object.entries(codingTools),
   ...Object.entries(fileTools),
+  ...Object.entries(siteTools),
   ...Object.entries(memoryTools),
   ...Object.entries(integrationTools),
   ...Object.entries(taskTools),
@@ -40,6 +43,7 @@ const TOOL_HANDLERS = new Map<string, ToolHandler>([
   [USER_COMPUTER_OBSERVE_TOOL, userComputerObserve],
   [USER_COMPUTER_ACT_TOOL, userComputerAct],
   ...Object.entries(purchaseTools),
+  ...Object.entries(researchTools),
   ...[...PAGE_BROWSER_TOOL_NAMES].map((name) => [name, pageBrowserTool] as const),
 ]);
 

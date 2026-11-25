@@ -1,6 +1,6 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { ArgoDesktopDevice, UserDeviceSummary } from "@argo/contracts";
 import { Button, Label, Switch } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useId, useState } from "react";
 import { desktopBridge } from "../lib/desktop";

@@ -3,6 +3,7 @@ import { RunHistoryWriteError } from "@argo/db";
 import { describe, expect, it, vi } from "vitest";
 import {
   connectAgent,
+  hirePageId,
   messageConnectedAgent,
   prepareAgentConnectionResponse,
   respondAgentConnection,
@@ -303,6 +304,44 @@ describe("connectAgent", () => {
     expect(result).toEqual({ ok: false, error: "connection changed; try again" });
     expect(deps.outboundRows).toHaveLength(0);
     expect(deps.prisma.agentConnection.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("hiring a bot by its public page", () => {
+  function withPage(allowHire: boolean) {
+    const deps = createDeps();
+    Object.assign(deps.prisma, {
+      botStatusPage: {
+        findUnique: vi.fn(async ({ where }: { where: { id: string } }) =>
+          where.id === "page2abc" ? { botId: "bot-2", allowHire } : null,
+        ),
+      },
+    });
+    return deps;
+  }
+
+  it("reads the page id from a link or a bare id and rejects anything else", () => {
+    expect(hirePageId("https://argo.example/s/page2abc?x=1")).toBe("page2abc");
+    expect(hirePageId(" page2abc ")).toBe("page2abc");
+    expect(hirePageId("https://argo.example/s/../etc")).toBe("");
+  });
+
+  it("asks the owner to approve when the page allows hiring", async () => {
+    const deps = withPage(true);
+    const result = await connectAgent(deps, run, sender, {
+      page: "https://argo.example/s/page2abc",
+    });
+    expect(result).toEqual({ ok: true, status: "pending" });
+    expect(deps.outboundRows).toEqual([expect.objectContaining({ identityId: "mi-2" })]);
+  });
+
+  it("answers like an unknown address when the owner has not opened hiring", async () => {
+    const deps = withPage(false);
+    expect(await connectAgent(deps, run, sender, { page: "page2abc" })).toEqual({
+      ok: false,
+      error: "no agent can be reached at that address",
+    });
+    expect(deps.outboundRows).toHaveLength(0);
   });
 });
 

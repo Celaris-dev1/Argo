@@ -440,11 +440,7 @@ describe("LocalStackController", () => {
 
     const state = await stack.start();
     expect(state).toMatchObject({ phase: "ready", message: null, imageTag: "v1.2.3" });
-    expect(state.output).toEqual([
-      "app Pulled",
-      "computer Pulled",
-      "Container argo-web-1 Started",
-    ]);
+    expect(state.output).toEqual(["app Pulled", "computer Pulled", "Container argo-web-1 Started"]);
     expect(phases).toEqual([
       "checking-docker",
       "checking-docker",

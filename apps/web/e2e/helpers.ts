@@ -1,6 +1,6 @@
+import { signupRequiresEmailVerification } from "@argo/core";
 import type { Locator, Page, TestInfo } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import { signupRequiresEmailVerification } from "@argo/core";
 
 export function isRealSandboxProvider(provider = process.env.SANDBOX_PROVIDER) {
   return (
@@ -30,6 +30,11 @@ export async function rpc<T>(page: Page, procedure: string, body: unknown): Prom
     throw new Error(`${procedure} ${response.status()}: ${parsed.error?.message ?? "failed"}`);
   }
   return parsed.json as T;
+}
+
+/** New accounts run without asking; tests of approval cards opt back into asking. */
+export async function askBeforeActing(page: Page) {
+  await rpc(page, "autoReview/set", { scope: "account", mode: "ask" });
 }
 
 export async function completeOnboarding(page: Page, testInfo?: TestInfo) {
@@ -173,7 +178,10 @@ export async function captureScreenshot(page: Page, testInfo: TestInfo, name: st
 export async function openNewBot(page: Page) {
   await page.getByTestId("create-menu-trigger").click();
   await page.getByTestId("create-new-bot").click();
-  await expect(page.getByTestId("create-bot-dialog")).toBeVisible();
+  const dialog = page.getByTestId("create-bot-dialog");
+  await expect(dialog).toBeVisible();
+  // The dialog opens on the kind picker; the custom kind is the plain bot form.
+  await dialog.getByTestId("bot-kind-custom").click();
 }
 
 export async function openNewGroup(page: Page) {

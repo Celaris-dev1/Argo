@@ -42,7 +42,8 @@ export async function connectApp(
   if (entry.connected)
     return {
       status: "connected",
-      message: "This app is already connected. Its tools are available in this chat and in chats that were already open.",
+      message:
+        "This app is already connected. Its tools are available in this chat and in chats that were already open.",
     };
   const block = appConnectCard(entry);
   const committed = await deps.prisma.$transaction(async (tx) => {

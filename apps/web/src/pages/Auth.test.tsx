@@ -86,10 +86,10 @@ afterEach(async () => {
   vi.restoreAllMocks();
   delete window.argoDesktop;
 });
-async function render(mode: "in" | "up" | "forgot" = "in") {
+async function render(mode: "in" | "up" | "forgot" = "in", path = "/") {
   await act(async () =>
     root.render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[path]}>
         <AuthPage mode={mode} />
       </MemoryRouter>,
     ),
@@ -142,25 +142,25 @@ it("retries failed capabilities without exposing a password form", async () => {
   expect(fetchAuthCapabilities).toHaveBeenCalledTimes(2);
   expect(host.textContent).toContain("Continue with Example");
 });
-it.each(["in", "up"] as const)("puts quiet SSO below the primary action on %s", async (mode) => {
+it.each(["in", "up"] as const)("leads with SSO above the password form on %s", async (mode) => {
   vi.mocked(fetchAuthCapabilities).mockResolvedValue({ ...capabilities, passwordAuth: true });
   await render(mode);
   const email = host.querySelector('input[name="email"]')!;
   const password = host.querySelector('input[type="password"]')!;
   const submit = host.querySelector('button[type="submit"]')!;
-  const sso = [...host.querySelectorAll("button")].find(
+  const sso = [...host.querySelectorAll("button")].filter(
     (button) => button.textContent === "Continue with Example",
-  )!;
+  );
+  expect(sso).toHaveLength(1);
   for (const [first, second] of [
+    [sso[0]!, email],
     [email, password],
     [password, submit],
-    [submit, sso],
   ] as const) {
     expect(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   }
-  expect(submit.getAttribute("data-variant")).toBe("default");
-  expect(sso.dataset.variant).toBe("link");
-  expect(sso.dataset.size).toBe("sm");
+  expect(sso[0]!.dataset.variant).toBe("default");
+  expect(submit.getAttribute("data-variant")).toBe("outline");
 });
 
 it("hides SSO in password recovery", async () => {
@@ -186,6 +186,21 @@ it("selects a non-redirecting SSO request on desktop", async () => {
   expect(authClient.signIn.social).toHaveBeenCalledWith(
     expect.objectContaining({ provider: "oidc", disableRedirect: true }),
   );
+});
+
+it("starts single sign-on right away from the site's main button", async () => {
+  vi.mocked(fetchAuthCapabilities).mockResolvedValue(capabilities);
+  await render("up", "/sign-up?start=sso");
+  expect(authClient.signIn.social).toHaveBeenCalledTimes(1);
+  expect(authClient.signIn.social).toHaveBeenCalledWith(
+    expect.objectContaining({ provider: "oidc" }),
+  );
+});
+
+it("waits for a click without the start flag", async () => {
+  vi.mocked(fetchAuthCapabilities).mockResolvedValue(capabilities);
+  await render("up");
+  expect(authClient.signIn.social).not.toHaveBeenCalled();
 });
 
 it("keeps SSO available for retry while an authorization request is pending", async () => {

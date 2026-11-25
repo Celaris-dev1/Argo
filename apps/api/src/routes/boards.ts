@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import { commentTicket, createTicket, updateTicket } from "@argo/adapters";
 import type { BoardEvent } from "@argo/contracts";
 import { parseTicketRef } from "@argo/contracts";
@@ -14,6 +13,7 @@ import {
   toTicketCommentDto,
   toTicketDto,
 } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import type { RouterContext } from "./context.js";
 import { HEARTBEAT_MS, SESSION_RECHECK_MS } from "./shared.js";
 

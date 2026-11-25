@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 import {
   activeBotId,
+  askBeforeActing,
   captureScreenshot,
   completeOnboarding,
   openUserSettings,
@@ -15,6 +16,7 @@ test("A change asks without an approval model, and approvals settings shape what
   const stamp = Date.now();
   await signup(page, `action-approvals-${stamp}@argo.test`, "password12", "Approval UI");
   await completeOnboarding(page, testInfo);
+  await askBeforeActing(page);
 
   await requestDestinationWrite(page, "write this to the destination crm as a note");
   const allowOnce = page.getByRole("button", { name: "Allow once", exact: true });
@@ -74,7 +76,7 @@ test("A change asks without an approval model, and approvals settings shape what
   await settings.getByTestId("settings-nav-confirmations").click();
   await expect(settings.getByRole("heading", { name: "Approvals", exact: true })).toBeVisible();
   const mode = settings.getByTestId("approval-mode");
-  await expect(mode.getByRole("button", { name: "Auto", exact: true })).toHaveAttribute(
+  await expect(mode.getByRole("button", { name: "Ask", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );

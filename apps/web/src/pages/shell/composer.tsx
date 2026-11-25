@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { AgentSkillCatalogEntry, ThreadMessage } from "@argo/contracts";
 import type { ComposerMention, ComposerMentionRange, SlashActionId } from "@argo/core";
 import {
@@ -18,6 +17,7 @@ import {
   updateComposerMentionBindings,
 } from "@argo/core";
 import { Button } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowUp, Box, ChevronDown, Paperclip, Plus, Settings, Square, X } from "lucide-react";
 import type { ClipboardEvent, DragEvent, RefObject } from "react";
 import { memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";

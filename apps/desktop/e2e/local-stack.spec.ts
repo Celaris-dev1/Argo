@@ -131,8 +131,7 @@ async function launch(mode: FakeDockerMode | "missing") {
     cwd: path.resolve(import.meta.dirname, ".."),
     env: {
       ...env,
-      ARGO_DOCKER_BINARY:
-        mode === "missing" ? "/nonexistent/docker" : await writeFakeDocker(mode),
+      ARGO_DOCKER_BINARY: mode === "missing" ? "/nonexistent/docker" : await writeFakeDocker(mode),
       ARGO_LOCAL_WEB_URL: serverUrl,
       ARGO_IMAGE_TAG: IMAGE_TAG,
     },

@@ -1,13 +1,7 @@
+import type { Bot, ComputerReleaseReason, ComputerStatus, Run, TaughtSkill } from "@argo/contracts";
+import { BotAvatar, Button } from "@argo/ui-web";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import type {
-  Bot,
-  ComputerReleaseReason,
-  ComputerStatus,
-  Run,
-  TaughtSkill,
-} from "@argo/contracts";
-import { BotAvatar, Button } from "@argo/ui-web";
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { ComputerMaintenanceActions } from "../../components/ComputerMaintenanceActions";

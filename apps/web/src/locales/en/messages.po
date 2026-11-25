@@ -53,6 +53,11 @@ msgstr "{0, plural, one {# skill} other {# skills}}"
 msgid "{0, plural, one {# space} other {# spaces}}"
 msgstr "{0, plural, one {# space} other {# spaces}}"
 
+#. placeholder {0}: status.data.completed
+#: src/pages/BotStatus.tsx
+msgid "{0, plural, one {# task finished} other {# tasks finished}}"
+msgstr "{0, plural, one {# task finished} other {# tasks finished}}"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -135,6 +140,11 @@ msgstr "{0} MB"
 #: src/pages/ExternalConversationSettings.tsx
 msgid "{0} rollup hours"
 msgstr "{0} rollup hours"
+
+#. placeholder {0}: money(state.spent)
+#: src/pages/shell/bot-panel.tsx
+msgid "{0} spent this month"
+msgstr "{0} spent this month"
 
 #. placeholder {0}: parts.amount
 #: src/components/ArtifactFileCard.tsx
@@ -1766,6 +1776,14 @@ msgstr "Copy prompt"
 msgid "Copy rows"
 msgstr "Copy rows"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr "Copy this bot"
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr "Copying"
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "Cost"
@@ -2039,6 +2057,7 @@ msgstr "Could not load this chat."
 msgid "Could not load this file."
 msgstr "Could not load this file."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr "Could not load this page."
@@ -2352,6 +2371,10 @@ msgstr "Create space"
 #: src/pages/Auth.tsx
 msgid "Create your Argo"
 msgstr "Create your Argo"
+
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr "Create your bot"
 
 #: src/components/AskCard.tsx
 msgid "Created"
@@ -2695,6 +2718,7 @@ msgstr "Downgrade at renewal"
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "Download"
 
@@ -2752,6 +2776,10 @@ msgstr "Edit Profile"
 #: src/pages/Auth.tsx
 msgid "Email"
 msgstr "Email"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Email inbox"
+msgstr "Email inbox"
 
 #: src/lib/user-error.ts
 msgid "Email is not allowed to register"
@@ -3443,6 +3471,14 @@ msgstr "Leave"
 msgid "Let bots use this computer"
 msgstr "Let bots use this computer"
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let other bots hire this bot"
+msgstr "Let other bots hire this bot"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr "Let visitors copy this bot"
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "Lets bots save and recall facts by meaning, alongside MEMORY.md."
@@ -3506,6 +3542,7 @@ msgid "Load web images automatically"
 msgstr "Load web images automatically"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr "Loading"
@@ -3583,6 +3620,11 @@ msgstr "Low"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
+
+#: src/pages/BotStatus.tsx
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr "Made with Argo"
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -3891,6 +3933,10 @@ msgstr "Monthly credits"
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr "Monthly credits expire at renewal. Top-ups do not expire."
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Monthly spend limit"
+msgstr "Monthly spend limit"
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4074,6 +4120,10 @@ msgstr "No authentication"
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "No bots match"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "No limit"
+msgstr "No limit"
 
 #: src/components/AskCard.tsx
 msgid "No longer active"
@@ -4299,6 +4349,10 @@ msgstr "Open {name}"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "Open <0>{0}</0> and enter this code:"
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr "Open Argo"
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -4575,6 +4629,10 @@ msgstr "Previous page"
 msgid "Previous settings sections"
 msgstr "Previous settings sections"
 
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr "Print"
+
 #: src/pages/Board.tsx
 msgid "Priority"
 msgstr "Priority"
@@ -4608,6 +4666,10 @@ msgstr "Provider"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "Providers"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr "Public status page"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -4653,6 +4715,10 @@ msgstr "Recall only"
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "Recent"
+
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr "Recent tasks"
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5379,6 +5445,10 @@ msgstr "Shared"
 msgid "Shared memory"
 msgstr "Shared memory"
 
+#: src/pages/BotStatus.tsx
+msgid "Shared results"
+msgstr "Shared results"
+
 #: src/components/VaultSettings.tsx
 msgid "Show"
 msgstr "Show"
@@ -5887,6 +5957,10 @@ msgstr "This backup could not be read."
 msgid "This bot"
 msgstr "This bot"
 
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr "This bot can no longer be copied."
+
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."
 msgstr "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."
@@ -5940,6 +6014,7 @@ msgstr "This file is not valid UTF-8 text."
 msgid "This import was already used. Choose the files again."
 msgstr "This import was already used. Choose the files again."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr "This link is no longer shared."
@@ -6510,6 +6585,10 @@ msgstr "Work"
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "Working instructions"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr "Working now"
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts

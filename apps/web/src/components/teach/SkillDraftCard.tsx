@@ -1,7 +1,7 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { SkillPlaybook } from "@argo/contracts";
 import { formatSkillRunPrompt } from "@argo/core";
 import { Button, Input, Label, Textarea } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect, useId, useRef, useState } from "react";
 import { rpc } from "../../lib/rpc";
 import { errorText } from "../../lib/user-error";

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  ARGO_CLOUD_URL,
   DEFAULT_LOCAL_WEB_URL,
   desktopStackImageTag,
   isArgoHealth,
@@ -10,7 +11,6 @@ import {
   parseSetupInput,
   parseStoredSetup,
   probeFailureMessage,
-  ARGO_CLOUD_URL,
   readProbeJson,
   resolveStartupTarget,
   safeExternalUrl,

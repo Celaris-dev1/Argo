@@ -156,7 +156,7 @@ describe("DaytonaSandboxProvider", () => {
       "'env' '-u' 'FAILED' '--' 'echo' 'hello'",
       "/home/daytona/argo-home",
       { FAKE_TOKEN: "fake-secret" },
-      300,
+      900,
     );
 
     const binary = Uint8Array.from([0, 255, 1, 128]);
@@ -205,13 +205,13 @@ describe("DaytonaSandboxProvider", () => {
       expect.stringContaining("mousemove 10 20 mousedown 1"),
       undefined,
       undefined,
-      300,
+      900,
     );
     expect(fixture.executeCommand).toHaveBeenCalledWith(
       expect.stringContaining("mousemove 30 40 mouseup 1"),
       undefined,
       undefined,
-      300,
+      900,
     );
     const [screen, interactiveScreen] = await Promise.all([
       provider.connectScreen(computer, { view: "stream", interactive: false }, context),

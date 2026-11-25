@@ -11,8 +11,8 @@ import {
   findConnectedModelCredential,
   hiddenCatalogModel,
   kickModelCredentialRefresh,
-  listAvailablePiCatalog,
   LOCAL_PROVIDER_ID,
+  listAvailablePiCatalog,
   McpOAuthBroker,
   modelCredentialAuthKindsForSpace,
   offeredCatalog,
@@ -190,16 +190,16 @@ export function createRouterContext(deps: RouterDeps) {
       entry.provider === operatorProvider
         ? { ...entry, managed: true }
         : entry.provider === auth.managedProvider
-        ? {
-            ...entry,
-            managed: true,
-            billing:
-              auth.secretIdByModel[entry.provider]?.[entry.id] ||
-              auth.secretIdByProvider[entry.provider]
-                ? entry.billing
-                : "Uses Argo credits",
-          }
-        : entry,
+          ? {
+              ...entry,
+              managed: true,
+              billing:
+                auth.secretIdByModel[entry.provider]?.[entry.id] ||
+                auth.secretIdByProvider[entry.provider]
+                  ? entry.billing
+                  : "Uses Argo credits",
+            }
+          : entry,
     );
   };
 

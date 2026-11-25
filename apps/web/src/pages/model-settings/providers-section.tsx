@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { MAX_MODEL_CONNECTION_LABEL } from "@argo/contracts";
 import {
   Button,
@@ -13,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronRight, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useId, useRef, useState } from "react";

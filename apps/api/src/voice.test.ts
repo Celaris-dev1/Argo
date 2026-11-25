@@ -8,6 +8,7 @@ import { Hono } from "hono";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { VoiceDeps } from "./voice.js";
 import {
+  chargeHostedVoice,
   disconnectVoiceCredential,
   fishSpeechModelValue,
   MAX_SPEAK_REQUEST_BYTES,
@@ -1020,4 +1021,29 @@ it.each([
       },
     ),
   ).rejects.toThrow(/blocked metadata or link-local/);
+});
+
+describe("hosted voice", () => {
+  const hosted = { provider: "mistral", apiKey: "k", voiceId: "gb_jane_neutral", dailyChars: 10 };
+
+  it("is ready for accounts without their own key", () => {
+    expect(toVoiceStatus(null, hosted)).toEqual({
+      configured: false,
+      ready: true,
+      transcribe: false,
+      provider: "mistral",
+      voiceId: "gb_jane_neutral",
+    });
+    expect(toVoiceStatus({ provider: "cartesia", voiceId: "katie" }, hosted).provider).toBe(
+      "cartesia",
+    );
+  });
+
+  it("caps characters per account per day", () => {
+    const day = new Date("2026-01-01T10:00:00Z");
+    chargeHostedVoice(hosted, "cap-a", 6, day);
+    expect(() => chargeHostedVoice(hosted, "cap-a", 5, day)).toThrow(/used up/);
+    chargeHostedVoice(hosted, "cap-b", 10, day);
+    chargeHostedVoice(hosted, "cap-a", 10, new Date("2026-01-02T00:00:00Z"));
+  });
 });

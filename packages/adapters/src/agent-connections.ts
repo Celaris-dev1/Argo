@@ -53,14 +53,36 @@ export function connectAgent(...args: Parameters<typeof requestConnection>): Pro
   );
 }
 
+/** The page id from a public bot page link (`…/s/<id>`) or a bare id. */
+export function hirePageId(page: string): string {
+  const trimmed = page.trim();
+  const match = /\/s\/([^/?#\s]+)/.exec(trimmed);
+  const id = match ? decodeURIComponent(match[1] ?? "") : trimmed;
+  return /^[\w-]{1,128}$/.test(id) ? id : "";
+}
+
+/**
+ * The chat identity behind a published bot page whose owner opened it to hiring. Hiring rides the
+ * same connection the owner approves by YES/NO, so it only finds the bot; it never connects one.
+ */
+async function hireableIdentity(prisma: AgentConnectionDeps["prisma"], pageId: string) {
+  const page = await prisma.botStatusPage.findUnique({
+    where: { id: pageId },
+    select: { botId: true, allowHire: true },
+  });
+  if (!page?.allowHire) return null;
+  return prisma.messagingIdentity.findUnique({ where: { botId: page.botId } });
+}
+
 async function requestConnection(
   deps: AgentConnectionDeps,
   _run: ConnectionRun,
   sender: { id: string; name: string },
-  input: { address?: string },
+  input: { address?: string; page?: string },
 ): Promise<Result> {
   const address = input.address?.trim();
-  if (!address) return { ok: false, error: "address is required" };
+  const pageId = input.page ? hirePageId(input.page) : "";
+  if (!address && !pageId) return { ok: false, error: "address or page is required" };
   const requesterIdentity = await deps.prisma.messagingIdentity.findUnique({
     where: { botId: sender.id },
   });
@@ -72,9 +94,11 @@ async function requestConnection(
   // Scoped to the requester's own platform: addresses are only unique per
   // provider, and a cross-provider match could route the invite to a
   // different person who happens to share the address string.
-  const targetIdentity = await deps.prisma.messagingIdentity.findUnique({
-    where: { provider_address: { provider: requesterIdentity.provider, address } },
-  });
+  const targetIdentity = address
+    ? await deps.prisma.messagingIdentity.findUnique({
+        where: { provider_address: { provider: requesterIdentity.provider, address } },
+      })
+    : await hireableIdentity(deps.prisma, pageId);
   // One generic answer for unknown and unavailable addresses: the tool is
   // reachable by every bot on the deployment, so it must not enumerate
   // which addresses are registered.

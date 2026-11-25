@@ -1,14 +1,3 @@
-import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import { Agent } from "@earendil-works/pi-agent-core";
-import type {
-  Api,
-  AssistantMessage,
-  Context,
-  JsonValue,
-  Message,
-  Model,
-} from "@earendil-works/pi-ai";
-import { validateToolArguments } from "@earendil-works/pi-ai";
 import type {
   AdapterContext,
   AgentRunRequest,
@@ -26,10 +15,22 @@ import {
   modelFallbackFailure,
 } from "@argo/core";
 import { getLogger } from "@argo/logging";
+import type { AgentToolResult } from "@earendil-works/pi-agent-core";
+import { Agent } from "@earendil-works/pi-agent-core";
+import type {
+  Api,
+  AssistantMessage,
+  Context,
+  JsonValue,
+  Message,
+  Model,
+} from "@earendil-works/pi-ai";
+import { validateToolArguments } from "@earendil-works/pi-ai";
 import { uncertainEffectResult } from "./approval-effect.js";
 import { automated, withAutomatedLabels } from "./automated-messages.js";
 import { withCloudflareAuth } from "./cloudflare-ai-gateway.js";
 import { estimatePiImageTokens } from "./pi-image-context.js";
+import { memberHeaders } from "./pi-local-provider.js";
 import {
   assistantText,
   messageHasToolCall,
@@ -345,7 +346,10 @@ export class PiAgentRuntime implements AgentRuntime {
         let sentContext: { context: Context; sourceLength: number } | undefined;
         const prepareContext = (ctx: Context, m: Model<Api>) => {
           const prepared = contextPolicy.prepareContext(ctx, m);
-          sentContext = { context: prepared, sourceLength: ctx.messages.length };
+          sentContext = {
+            context: prepared,
+            sourceLength: ctx.messages.length,
+          };
           return prepared;
         };
         const usageHooks = {
@@ -445,7 +449,15 @@ export class PiAgentRuntime implements AgentRuntime {
             fallbackAwareModelStream(
               fallbackState,
               ctx,
-              withAutomatedLabels({ ...options, fetch: this.modelFetch ?? options?.fetch }),
+              withAutomatedLabels({
+                ...options,
+                headers: memberHeaders(
+                  activeStreamTarget.config.provider,
+                  context?.userId,
+                  options?.headers,
+                ),
+                fetch: this.modelFetch ?? options?.fetch,
+              }),
             ),
           getApiKey: hasBackups
             ? async () => activeStreamTarget.credentials?.accessToken ?? activeStreamTarget.apiKey

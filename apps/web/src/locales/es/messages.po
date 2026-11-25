@@ -53,6 +53,11 @@ msgstr "{0, plural, one {# habilidad} other {# habilidades}}"
 msgid "{0, plural, one {# space} other {# spaces}}"
 msgstr "{0, plural, one {# espacio} other {# espacios}}"
 
+#. placeholder {0}: status.data.completed
+#: src/pages/BotStatus.tsx
+msgid "{0, plural, one {# task finished} other {# tasks finished}}"
+msgstr ""
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -135,6 +140,11 @@ msgstr "{0} MB"
 #: src/pages/ExternalConversationSettings.tsx
 msgid "{0} rollup hours"
 msgstr "Horas de agrupación de {0}"
+
+#. placeholder {0}: money(state.spent)
+#: src/pages/shell/bot-panel.tsx
+msgid "{0} spent this month"
+msgstr ""
 
 #. placeholder {0}: parts.amount
 #: src/components/ArtifactFileCard.tsx
@@ -1766,6 +1776,14 @@ msgstr "Copiar prompt"
 msgid "Copy rows"
 msgstr "Copiar filas"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "Coste"
@@ -2039,6 +2057,7 @@ msgstr "No se pudo cargar este chat."
 msgid "Could not load this file."
 msgstr "No se pudo cargar este archivo."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -2352,6 +2371,10 @@ msgstr "Crear space"
 #: src/pages/Auth.tsx
 msgid "Create your Argo"
 msgstr "Crea tu Argo"
+
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr ""
 
 #: src/components/AskCard.tsx
 msgid "Created"
@@ -2695,6 +2718,7 @@ msgstr "Reducir al renovar"
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "Descargar"
 
@@ -2752,6 +2776,10 @@ msgstr "Editar perfil"
 #: src/pages/Auth.tsx
 msgid "Email"
 msgstr "Correo"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Email inbox"
+msgstr ""
 
 #: src/lib/user-error.ts
 msgid "Email is not allowed to register"
@@ -3443,6 +3471,14 @@ msgstr "Salir"
 msgid "Let bots use this computer"
 msgstr "Permitir que los bots usen esta computadora"
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let other bots hire this bot"
+msgstr ""
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "Permite a los bots guardar y recordar datos por significado, además de MEMORY.md."
@@ -3506,6 +3542,7 @@ msgid "Load web images automatically"
 msgstr "Cargar imágenes web automáticamente"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3583,6 +3620,11 @@ msgstr "Bajo"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "Letras minúsculas, números, guiones y guiones bajos; debe empezar con una letra."
+
+#: src/pages/BotStatus.tsx
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -3891,6 +3933,10 @@ msgstr "Créditos mensuales"
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr "Los créditos mensuales vencen al renovar. Las recargas no vencen."
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Monthly spend limit"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4074,6 +4120,10 @@ msgstr "Sin autenticación"
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "Ningún bot coincide"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "No limit"
+msgstr ""
 
 #: src/components/AskCard.tsx
 msgid "No longer active"
@@ -4299,6 +4349,10 @@ msgstr "Abrir {name}"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "Abre <0>{0}</0> e introduce este código:"
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -4575,6 +4629,10 @@ msgstr "Página anterior"
 msgid "Previous settings sections"
 msgstr "Secciones de configuración anteriores"
 
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr ""
+
 #: src/pages/Board.tsx
 msgid "Priority"
 msgstr "Prioridad"
@@ -4608,6 +4666,10 @@ msgstr "Proveedor"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "Proveedores"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -4653,6 +4715,10 @@ msgstr "Solo recordar"
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "Recientes"
+
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5379,6 +5445,10 @@ msgstr "Compartido"
 msgid "Shared memory"
 msgstr "Memoria compartida"
 
+#: src/pages/BotStatus.tsx
+msgid "Shared results"
+msgstr ""
+
 #: src/components/VaultSettings.tsx
 msgid "Show"
 msgstr "Mostrar"
@@ -5887,6 +5957,10 @@ msgstr "No se pudo leer esta copia de seguridad."
 msgid "This bot"
 msgstr "Este bot"
 
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
+
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."
 msgstr "Este bot se ejecuta en esta computadora, no en un escritorio Linux. El shell y los archivos usan tu carpeta de inicio."
@@ -5940,6 +6014,7 @@ msgstr "Este archivo no es texto UTF-8 válido."
 msgid "This import was already used. Choose the files again."
 msgstr "Esta importación ya se usó. Vuelve a elegir los archivos."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""
@@ -6510,6 +6585,10 @@ msgstr "Trabajo"
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "Instrucciones de trabajo"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr ""
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts

@@ -39,6 +39,8 @@ export interface AppEnv {
   authSecret: string;
   authUrl: string;
   webOrigin: string;
+  /** Domain whose mail reaches bots' inboxes, and the token its mail relay sends; both or neither. */
+  inbox?: { domain: string; token: string };
   /** `<TEAM_ID>.<bundle id>` of iOS apps that may use this domain's passkeys. */
   passkeyAppleAppIds: string[];
   /** SHA-256 signing certificate fingerprints of Android apps that may use this domain's passkeys. */
@@ -73,6 +75,8 @@ export interface AppEnv {
   maxAttachmentsPerMessage: number;
   /** Bot replies longer than this are read aloud as a summary; unset reads every reply in full. */
   voiceSummaryMinChars: number | undefined;
+  /** A voice the instance pays for, used by accounts that have not added their own key. */
+  hostedVoice: HostedVoice | undefined;
   sandboxSupervisorUrl: string;
   sandboxSupervisorToken: string | undefined;
   screenProxySecret: string;
@@ -224,6 +228,10 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     authSecret,
     authUrl: source.BETTER_AUTH_URL ?? source.WEB_ORIGIN ?? "http://127.0.0.1:5173",
     webOrigin: source.WEB_ORIGIN ?? "http://127.0.0.1:5173",
+    inbox:
+      source.INBOX_DOMAIN && source.INBOX_RELAY_TOKEN
+        ? { domain: source.INBOX_DOMAIN, token: source.INBOX_RELAY_TOKEN }
+        : undefined,
     passkeyAppleAppIds: list(source.PASSKEY_APPLE_APP_IDS),
     passkeyAndroidCertFingerprints: androidCertFingerprints(source.PASSKEY_ANDROID_CERT_SHA256),
     privacyPolicyUrl: optional(source.PRIVACY_POLICY_URL),
@@ -249,6 +257,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     maxUploadSizeBytes: uploadSizeFromEnv(source),
     maxAttachmentsPerMessage: attachmentCountFromEnv(source),
     voiceSummaryMinChars: voiceSummaryMinCharsFromEnv(source.VOICE_SUMMARY_MIN_CHARS),
+    hostedVoice: hostedVoiceFromEnv(source),
     sandboxSupervisorUrl: source.SANDBOX_SUPERVISOR_URL ?? "http://127.0.0.1:7091",
     sandboxSupervisorToken:
       sandboxProvider === "docker" ? resolveSupervisorToken(source) : undefined,
@@ -348,6 +357,27 @@ function browserMonitoringFromEnv(source: NodeJS.ProcessEnv): AppEnv["browserMon
     release: optional(source.SENTRY_RELEASE) ?? (sha === "unknown" ? undefined : sha),
     pseudonymSecret: monitoringPseudonymSecret(source),
   };
+}
+
+export interface HostedVoice {
+  provider: string;
+  apiKey: string;
+  voiceId: string;
+  /** Characters each account may speak a day on the hosted voice. */
+  dailyChars: number;
+}
+
+function hostedVoiceFromEnv(source: Record<string, string | undefined>): HostedVoice | undefined {
+  const provider = source.VOICE_HOSTED_PROVIDER?.trim();
+  const apiKey = source.VOICE_HOSTED_API_KEY?.trim();
+  const voiceId = source.VOICE_HOSTED_VOICE_ID?.trim();
+  if (!provider || !apiKey || !voiceId) return undefined;
+  const raw = source.VOICE_HOSTED_DAILY_CHARS?.trim() || "20000";
+  const dailyChars = Number(raw);
+  if (!/^\d+$/.test(raw) || !Number.isSafeInteger(dailyChars) || dailyChars === 0) {
+    throw new Error("VOICE_HOSTED_DAILY_CHARS must be a positive whole number of characters");
+  }
+  return { provider, apiKey, voiceId, dailyChars };
 }
 
 function voiceSummaryMinCharsFromEnv(value: string | undefined): number | undefined {

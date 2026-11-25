@@ -1,4 +1,3 @@
-import { MenuView } from "@expo/ui/community/menu";
 import type {
   CapabilityInstall,
   Connection,
@@ -27,6 +26,7 @@ import {
   newClientId,
   OTHER_PLUGINS,
 } from "@argo/core";
+import { MenuView } from "@expo/ui/community/menu";
 import type { NativeStackNavigationOptions } from "expo-router";
 import { useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";

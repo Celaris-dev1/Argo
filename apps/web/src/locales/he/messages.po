@@ -53,6 +53,11 @@ msgstr ""
 msgid "{0, plural, one {# space} other {# spaces}}"
 msgstr ""
 
+#. placeholder {0}: status.data.completed
+#: src/pages/BotStatus.tsx
+msgid "{0, plural, one {# task finished} other {# tasks finished}}"
+msgstr ""
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -135,6 +140,11 @@ msgstr "{0} MB"
 #: src/pages/ExternalConversationSettings.tsx
 msgid "{0} rollup hours"
 msgstr "שעות סיכום של {0}"
+
+#. placeholder {0}: money(state.spent)
+#: src/pages/shell/bot-panel.tsx
+msgid "{0} spent this month"
+msgstr ""
 
 #. placeholder {0}: parts.amount
 #: src/components/ArtifactFileCard.tsx
@@ -1766,6 +1776,14 @@ msgstr "העתקת ההנחיה"
 msgid "Copy rows"
 msgstr "העתקת שורות"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "עלות"
@@ -2039,6 +2057,7 @@ msgstr "לא ניתן לטעון את הצ׳אט הזה."
 msgid "Could not load this file."
 msgstr "לא ניתן לטעון את הקובץ הזה."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -2352,6 +2371,10 @@ msgstr "יצירת מרחב"
 #: src/pages/Auth.tsx
 msgid "Create your Argo"
 msgstr "יצירת Argo משלך"
+
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr ""
 
 #: src/components/AskCard.tsx
 msgid "Created"
@@ -2695,6 +2718,7 @@ msgstr ""
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "הורדה"
 
@@ -2752,6 +2776,10 @@ msgstr "עריכת פרופיל"
 #: src/pages/Auth.tsx
 msgid "Email"
 msgstr "אימייל"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Email inbox"
+msgstr ""
 
 #: src/lib/user-error.ts
 msgid "Email is not allowed to register"
@@ -3443,6 +3471,14 @@ msgstr "יציאה"
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let other bots hire this bot"
+msgstr ""
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "מאפשר לבוטים לשמור ולשלוף עובדות לפי משמעות, לצד MEMORY.md."
@@ -3506,6 +3542,7 @@ msgid "Load web images automatically"
 msgstr "טעינה אוטומטית של תמונות מהרשת"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3583,6 +3620,11 @@ msgstr "נמוך"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "אותיות לטיניות קטנות, ספרות, מקפים וקווים תחתונים, ובהתחלה אות."
+
+#: src/pages/BotStatus.tsx
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -3891,6 +3933,10 @@ msgstr ""
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Monthly spend limit"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4074,6 +4120,10 @@ msgstr "ללא אימות"
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "אין בוטים תואמים"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "No limit"
+msgstr ""
 
 #: src/components/AskCard.tsx
 msgid "No longer active"
@@ -4299,6 +4349,10 @@ msgstr "פתיחת {name}"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "יש לפתוח את <0>{0}</0> ולהזין את הקוד הזה:"
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -4575,6 +4629,10 @@ msgstr "העמוד הקודם"
 msgid "Previous settings sections"
 msgstr ""
 
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr ""
+
 #: src/pages/Board.tsx
 msgid "Priority"
 msgstr "עדיפות"
@@ -4608,6 +4666,10 @@ msgstr "ספק"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "ספקים"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -4653,6 +4715,10 @@ msgstr "שליפה בלבד"
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "אחרונים"
+
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5379,6 +5445,10 @@ msgstr "משותף"
 msgid "Shared memory"
 msgstr "זיכרון משותף"
 
+#: src/pages/BotStatus.tsx
+msgid "Shared results"
+msgstr ""
+
 #: src/components/VaultSettings.tsx
 msgid "Show"
 msgstr "הצגה"
@@ -5887,6 +5957,10 @@ msgstr "לא ניתן לקרוא את הגיבוי הזה."
 msgid "This bot"
 msgstr "הבוט הזה"
 
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
+
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."
 msgstr "הבוט הזה פועל על המחשב הזה, לא על שולחן עבודה של Linux. המעטפת והקבצים משתמשים בתיקיית הבית."
@@ -5940,6 +6014,7 @@ msgstr "הקובץ אינו טקסט UTF-8 תקין."
 msgid "This import was already used. Choose the files again."
 msgstr "הייבוא הזה כבר נוצל. יש לבחור את הקבצים שוב."
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""
@@ -6510,6 +6585,10 @@ msgstr ""
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "הוראות עבודה"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr ""
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts

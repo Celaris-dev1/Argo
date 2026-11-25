@@ -1,4 +1,3 @@
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import type { BillingStatus } from "@argo/contracts";
 import {
   Button,
@@ -9,6 +8,7 @@ import {
   DialogTitle,
   Input,
 } from "@argo/ui-web";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Check, Copy } from "lucide-react";
 import { useCopyText } from "../lib/copy-text";
 

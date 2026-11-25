@@ -456,9 +456,7 @@ export class StripeBillingProvider implements BillingProvider {
       });
     }
     for (const invoice of invoices) {
-      const amount = creditAmount(
-        invoice.parent?.subscription_details?.metadata.argo_credit_cents,
-      );
+      const amount = creditAmount(invoice.parent?.subscription_details?.metadata.argo_credit_cents);
       if (
         !amount ||
         invoice.currency !== "usd" ||

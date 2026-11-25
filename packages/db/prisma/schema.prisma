@@ -8,6 +8,23 @@ datasource db {
 }
 
 /// A public, read-only snapshot of one finished run that its owner chose to share.
+/// A bot's opt-in public page listing its recently finished tasks; deleting the row revokes the link.
+model BotStatusPage {
+  id        String   @id
+  botId     String   @unique
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  /// Visitors may copy the bot's name, description, instructions and look into their own account.
+  allowCopy Boolean  @default(false)
+  /// Other people's bots may ask to hire this bot through its page; the owner still approves each.
+  allowHire Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([spaceId, userId])
+  @@map("bot_status_pages")
+}
+
 model RunShare {
   id        String   @id
   runId     String   @unique
@@ -65,6 +82,8 @@ model User {
   /// IANA timezone such as "Pacific/Auckland". Null until set; bots then get UTC only.
   timezone                    String?
   marketingEmailOptOutAt      DateTime?
+  /// Release whose "what's new" note a bot last passed on; see release-notes.ts.
+  announcedRelease            String?
   sessions                    Session[]
   accounts                    Account[]
   passkeys                    Passkey[]
@@ -714,6 +733,10 @@ model Bot {
   memoryDocuments   MemoryDocument[]
   agentHome         AgentHome?
   browserProfile    BrowserProfile?
+  statusPage        BotStatusPage?
+  publishedSites    PublishedSite[]
+  budget            BotBudget?
+  inbox             BotInbox?
   artifacts         Artifact[]
   tasks             Task[]
   runs              Run[]
@@ -2242,4 +2265,52 @@ model CapabilityInstallSpace {
   @@id([installId, spaceId])
   @@index([spaceId, userId])
   @@map("capability_install_spaces")
+}
+
+/// A static site a bot published from its computer, served publicly and sandboxed.
+model PublishedSite {
+  id        String   @id
+  botId     String
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  /// The folder it was published from; publishing the same folder again replaces the site.
+  source    String
+  /// Site path to { key, mimeType, size } in artifact storage.
+  files     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([botId, source])
+  @@index([spaceId, userId])
+  @@map("published_sites")
+}
+
+/// The most a bot may spend from its owner's wallet in a calendar month (UTC), set by the owner.
+model BotBudget {
+  botId        String   @id
+  bot          Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId      String
+  userId       String
+  /// Minor units of `currency`, such as cents.
+  monthlyLimit Int
+  currency     String   @default("usd")
+  updatedAt    DateTime @updatedAt
+
+  @@index([spaceId, userId])
+  @@map("bot_budgets")
+}
+
+/// An email address that delivers mail to the bot as a task. Only exists while the owner has it on.
+model BotInbox {
+  botId     String   @id
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  spaceId   String
+  userId    String
+  /// Local part of the address, unguessable so strangers cannot mail the bot.
+  address   String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([spaceId, userId])
+  @@map("bot_inboxes")
 }

@@ -12,6 +12,7 @@ import {
   OPENAI_COMPATIBLE_PROVIDER_ID,
 } from "@argo/contracts";
 import { MISSING_MODEL_RUN_ERROR } from "@argo/core";
+import { getLogger } from "@argo/logging";
 import { cloudflareProviderEnv } from "./cloudflare-ai-gateway.js";
 import { resolveDeploymentModel } from "./deployment-model.js";
 import type { ExecutorDeps } from "./executor-deps.js";
@@ -25,6 +26,7 @@ import {
   enabledOpenAiCompatibleModelIds,
   findConnectedModelCredential,
   hasHostedModelCredits,
+  isCatalogModelChoice,
   PINNED_PROVIDER_NOT_CONNECTED,
   UnavailableModelForAuthError,
   validateConnectedModelChoice,
@@ -494,6 +496,17 @@ export async function resolveConnectedRunModel(
   };
 }
 
+function logRetiredOverride(
+  botId: string | undefined,
+  model: { modelProvider: string | null; modelId: string | null },
+) {
+  getLogger().warn("run.model_override_unavailable", {
+    "bot.id": botId,
+    "model.provider": model.modelProvider,
+    "model.id": model.modelId,
+  });
+}
+
 export async function resolveRunModel(
   deps: ExecutorDeps,
   scope: {
@@ -531,22 +544,31 @@ export async function resolveRunModel(
   const deploymentProvider = deps.deploymentModelConfigured
     ? resolveDeploymentModel().provider
     : undefined;
-  const selected = selectConfiguredModel({
-    override,
-    overrideCredential,
-    main,
-    // The operator's own model server needs no member connection, like a funded provider.
-    hostedProvider:
-      (await modelCreditBillingEnabled(deps)) || deploymentProvider === LOCAL_PROVIDER_ID
-        ? (deploymentProvider ?? resolveDeploymentModel().provider)
-        : undefined,
-    defaults: {
-      settings,
-      deployment: deps.deploymentModelConfigured ? resolveDeploymentModel() : null,
-    },
-  });
-  const { credential, thinkingLevel } = selected;
-  let { provider, id } = selected;
+  const hostedProvider =
+    (await modelCreditBillingEnabled(deps)) || deploymentProvider === LOCAL_PROVIDER_ID
+      ? (deploymentProvider ?? resolveDeploymentModel().provider)
+      : undefined;
+  const choose = (withOverride: boolean) =>
+    selectConfiguredModel({
+      override: withOverride ? override : null,
+      overrideCredential: withOverride ? overrideCredential : null,
+      main,
+      // The operator's own model server needs no member connection, like a funded provider.
+      hostedProvider,
+      defaults: {
+        settings,
+        deployment: deps.deploymentModelConfigured ? resolveDeploymentModel() : null,
+      },
+    });
+  // A model the deployment's own server stopped offering follows the default instead.
+  const retiredHostedOverride =
+    hasOverride &&
+    !overrideCredential &&
+    override!.modelProvider === hostedProvider &&
+    !isCatalogModelChoice(override!.modelProvider!, override!.modelId!);
+  if (retiredHostedOverride) logRetiredOverride(scope.botId, override!);
+  const selected = choose(!retiredHostedOverride);
+  let { provider, id, credential, thinkingLevel } = selected;
   if (!provider || !id) {
     const runtimeFallback = runtimeFallbackModel(deps.runtime);
     provider ??= runtimeFallback?.provider;
@@ -554,14 +576,34 @@ export async function resolveRunModel(
   }
   if (!provider || !id) throw new Error(MISSING_MODEL_RUN_ERROR);
   // The key is resolved for the provider that won above, not before it is known.
-  const resolved = await resolveModelKey(
-    deps,
-    scope.userId,
-    scope.spaceId,
-    credential,
-    provider,
-    id,
-  );
+  let resolved: Awaited<ReturnType<typeof resolveModelKey>>;
+  try {
+    resolved = await resolveModelKey(deps, scope.userId, scope.spaceId, credential, provider, id);
+  } catch (error) {
+    // A bot's saved model that its connection no longer offers follows the default instead.
+    const usedOverride =
+      Boolean(override?.modelProvider && override.modelId) &&
+      provider === override?.modelProvider &&
+      id === override?.modelId;
+    if (!(error instanceof UnavailableModelForAuthError) || !usedOverride) throw error;
+    const fallback = choose(false);
+    const fallbackProvider = fallback.provider;
+    const fallbackId = fallback.id;
+    if (!fallbackProvider || !fallbackId) throw error;
+    logRetiredOverride(scope.botId, override!);
+    provider = fallbackProvider;
+    id = fallbackId;
+    credential = fallback.credential;
+    thinkingLevel = fallback.thinkingLevel;
+    resolved = await resolveModelKey(
+      deps,
+      scope.userId,
+      scope.spaceId,
+      credential,
+      fallbackProvider,
+      fallbackId,
+    );
+  }
   return {
     provider,
     id,

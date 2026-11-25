@@ -172,7 +172,8 @@ export const fileTools: ToolHandlers = {
     const matches = current.split(oldText).length - 1;
     if (matches === 0) {
       return call.finish({
-        error: "old_string was not found. Read the file and copy the exact text, including indentation.",
+        error:
+          "old_string was not found. Read the file and copy the exact text, including indentation.",
         path: filePath,
       });
     }
@@ -182,7 +183,10 @@ export const fileTools: ToolHandlers = {
         path: filePath,
       });
     }
-    const next = args.replace_all === true ? current.replaceAll(oldText, newText) : current.replace(oldText, newText);
+    const next =
+      args.replace_all === true
+        ? current.replaceAll(oldText, newText)
+        : current.replace(oldText, newText);
     const content = new TextEncoder().encode(next);
     ctx.computer.checkpoint.markDirty();
     try {

@@ -1,5 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth";
 import {

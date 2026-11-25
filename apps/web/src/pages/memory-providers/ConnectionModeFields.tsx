@@ -1,5 +1,5 @@
-import { Trans } from "@lingui/react/macro";
 import { Field, FieldLabel, Input, Toggle } from "@argo/ui-web";
+import { Trans } from "@lingui/react/macro";
 import { useId } from "react";
 
 export type ConnectionMode = "cloud" | "local";

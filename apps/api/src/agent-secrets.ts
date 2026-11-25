@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import type { SecretStore } from "@argo/adapter-kit";
 import {
   forgetBotSecret,
@@ -15,6 +14,7 @@ import {
   commandVariableProblem,
 } from "@argo/contracts";
 import type { PrismaClient } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import { mapBotSecretInputError } from "./routes/bots.js";
 
 type AgentSecretDeps = {

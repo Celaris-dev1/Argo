@@ -1,6 +1,6 @@
-import { I18nProvider } from "@lingui/react";
 import type { Bot, Me, ModelCatalogEntry } from "@argo/contracts";
 import { defaultCronPreset } from "@argo/core";
+import { I18nProvider } from "@lingui/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -251,8 +251,7 @@ const subscriptionCatalog: ModelCatalogEntry[] = [
     providerName: "OpenAI Codex",
     id: "gpt-6.1-sol",
     label: "GPT-6.1 Sol",
-    billing:
-      "Sign in with ChatGPT Plus or Pro. Uses your OpenAI subscription. Argo does not pay.",
+    billing: "Sign in with ChatGPT Plus or Pro. Uses your OpenAI subscription. Argo does not pay.",
     auth: "oauth",
     oauthLabel: "Sign in with ChatGPT",
     authHint: "ChatGPT Plus/Pro",

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import type { TransactionalEmail } from "@argo/adapter-kit";
 import { parsePluginSource, previewPluginInstall } from "@argo/adapters";
 import {
@@ -15,6 +14,7 @@ import type {
 import { PLUGIN_SUBMISSIONS_PATH, PluginSubmissionInputSchema } from "@argo/contracts";
 import { pluginCategory } from "@argo/core";
 import type { PluginSubmission as PluginSubmissionRow, PrismaClient } from "@argo/db";
+import { ORPCError } from "@orpc/server";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { readBoundedBody } from "./http-body.js";

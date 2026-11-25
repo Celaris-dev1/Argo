@@ -4,9 +4,9 @@ import { stopOnShutdownSignals } from "@argo/core/node/shutdown-signals";
 
 loadRootEnv();
 
-import { serve } from "@hono/node-server";
 import { SERVICE_NAMES } from "@argo/logging";
 import { createRootLogger } from "@argo/logging/axiom";
+import { serve } from "@hono/node-server";
 import { createApp } from "./app.js";
 import { loadEnv } from "./env.js";
 

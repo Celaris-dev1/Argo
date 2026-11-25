@@ -52,6 +52,15 @@ RUN ARGO_ALLOW_DEV_SECRETS=1 pnpm --filter @argo/web build
 # pnpm still sees a valid workspace) and build caches.
 RUN find apps/mobile apps/desktop apps/www -mindepth 1 -maxdepth 1 ! -name package.json -exec rm -rf {} + \
   && rm -rf node_modules/.cache apps/*/node_modules/.cache apps/web/node_modules/.vite .turbo
+# The API and worker run esbuild bundles and the web app serves its built dist, so linters, the
+# task runner, the native-mobile toolchain, Prisma Studio and frontend-only libraries never load
+# at runtime. Dropping them and dependency source maps keeps app hosts' disks from filling.
+RUN cd node_modules/.pnpm \
+  && rm -rf @biomejs+* @turbo+* turbo@* hermes-* react-native@* @react-native+* expo* metro* \
+    @typescript+typescript-linux-* @prisma+studio-core@* mermaid@* lucide-react@* \
+    *-musl@* *linuxmusl* prettier@* typescript@* @types+* @expo+* @prisma+dev@* @electric-sql+pglite* \
+  && find . -name '*.map' -type f -delete \
+  && find /app/node_modules /app/apps /app/packages -xtype l -delete 2>/dev/null; true
 
 # Runtime: the slim base drops ~800 MB of compilers and headers the full node image carries.
 FROM node:24.22.1-bookworm-slim AS runtime

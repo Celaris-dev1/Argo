@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
+import type { Bot, BotAvatarSet } from "@argo/contracts";
 import { i18n } from "@lingui/core";
 import { ORPCError } from "@orpc/client";
-import type { Bot, BotAvatarSet } from "@argo/contracts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps, ReactNode } from "react";
 import { act } from "react";
@@ -12,13 +12,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../lib/rpc", () => {
   const rpc = {
-    bots: { get: vi.fn(), update: vi.fn(), restoreInstructions: vi.fn() },
+    bots: {
+      get: vi.fn(),
+      update: vi.fn(),
+      restoreInstructions: vi.fn(),
+      inbox: vi.fn().mockResolvedValue({ available: false, address: null }),
+      setInbox: vi.fn(),
+    },
     voice: { voices: vi.fn().mockResolvedValue([]) },
     models: {
       credentials: vi.fn().mockResolvedValue([]),
       list: vi.fn().mockResolvedValue([]),
     },
     me: vi.fn().mockResolvedValue(null),
+    runs: {
+      statusPage: vi.fn().mockResolvedValue({ url: null }),
+      publishStatus: vi.fn().mockResolvedValue({ url: "https://argo.test/s/abcdef" }),
+      unpublishStatus: vi.fn().mockResolvedValue({ ok: true }),
+    },
   };
   return {
     rpc,

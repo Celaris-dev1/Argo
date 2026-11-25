@@ -136,7 +136,10 @@ export const messagingTools: ToolHandlers = {
       deps,
       { ...run, sourceMessageId: run.sourceMessageId },
       { id: bot.id, name: bot.name },
-      { address: args.address ? String(args.address) : undefined },
+      {
+        address: args.address ? String(args.address) : undefined,
+        page: args.page ? String(args.page) : undefined,
+      },
     );
     if (!result.ok) return call.finish({ error: result.error });
     return call.finish(result);

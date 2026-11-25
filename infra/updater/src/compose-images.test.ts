@@ -37,7 +37,7 @@ const publishWorkflow = parse(readFileSync(publishWorkflowFile, "utf8")) as {
 };
 
 const appServices = ["api", "worker", "web", "supervisor", "migrate"] as const;
-const FIRST_PARTY_IMAGE = /ghcr\.io\/elie222\/argo\/([a-z0-9][a-z0-9._-]*)/g;
+const FIRST_PARTY_IMAGE = /ghcr\.io\/elie222\/rakazo\/([a-z0-9][a-z0-9._-]*)/g;
 
 function firstPartyImageNames(value: unknown): string[] {
   if (typeof value !== "string") return [];

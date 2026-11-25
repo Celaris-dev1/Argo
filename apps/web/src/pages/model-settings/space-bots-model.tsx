@@ -1,4 +1,3 @@
-import { Plural, Trans } from "@lingui/react/macro";
 import type { Bot } from "@argo/contracts";
 import {
   AlertDialog,
@@ -11,6 +10,7 @@ import {
   AlertDialogTitle,
   Button,
 } from "@argo/ui-web";
+import { Plural, Trans } from "@lingui/react/macro";
 import { useCallback, useEffect, useState } from "react";
 import { useSpaceRpc } from "../../lib/space-rpc";
 

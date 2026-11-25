@@ -1,11 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { AccountSecurity, UsageSummary } from "@argo/contracts";
-import {
-  accountDisplay,
-  displayName,
-  MAX_PASSWORD_LENGTH,
-  MIN_PASSWORD_LENGTH,
-} from "@argo/core";
+import { accountDisplay, displayName, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "@argo/core";
 import {
   Button,
   Field,
@@ -28,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@argo/ui-web/components/ui/table";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { RefObject } from "react";
 import { useId, useRef, useState, useSyncExternalStore } from "react";
 import { AccountAccess } from "../components/AccountAccess";

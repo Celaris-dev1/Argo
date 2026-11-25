@@ -442,6 +442,16 @@ export const builtinAgentTools: ConnectorTool[] = [
     },
   },
   {
+    name: "publish_site",
+    description:
+      "Publish a folder of static files (index.html plus its CSS, JS, images and fonts) on this computer as a public website, and get its link. Publishing the same folder again updates the site at the same link. Only static files are served; build the site first and publish its output folder.",
+    inputSchema: {
+      type: "object",
+      properties: { path: { type: "string" } },
+      required: ["path"],
+    },
+  },
+  {
     name: "shell",
     description:
       "Run a command inside this bot's computer. cwd defaults to the bot's folder on a Team Computer and the workspace root on a Private Computer. Output can arrive while the command is still running; tell the user any one-time code or sign-in URL in that output. A command is stopped after 15 minutes, so on Linux or macOS start longer work, such as a coding agent CLI, as its own statement `nohup <command> < /dev/null > <log> 2>&1 &`, never after `&&`, and read the log to follow it.",
@@ -457,7 +467,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "code",
     description:
-      "Coding mode. For a long stretch of work the model does alone, with little or no input from the user. Hand the software task to OpenCode (or Kilo) and leave it. It edits the repo and runs commands without asking permission or the user. It keeps going for hours. If it reports it is still working, call code again with continue and do not message the user. prompt is the task. cwd is optional. model is optional, as provider/model.",
+      "Coding mode. For a long stretch of work the model does alone, with little or no input from the user. Hand the software task to OpenCode (or Kilo) and leave it. It edits the repo and runs commands without asking permission or the user. It keeps going for hours. If it reports it is still working, call code again with continue and do not message the user. prompt is the task. cwd is optional. model is optional, as provider/model or the model name the user asked for.",
     inputSchema: {
       type: "object",
       properties: {
@@ -794,6 +804,54 @@ export const builtinAgentTools: ConnectorTool[] = [
         },
       },
       required: ["url"],
+    },
+    readOnly: true,
+  },
+  {
+    name: "deep_research",
+    description:
+      "Research a question in depth on the public web and return a cited report. Plans sub-questions, searches, reads many pages, chases gaps, checks claims, and writes the answer with numbered sources. Takes minutes, so use it only when the user asks for research, a deep dive, or a thorough comparison; use web_search for a quick fact. Does not need a computer. Present the returned report to the user as written. Pass overrides only when the user stated them.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        question: { type: "string", description: "The research request in the user's words." },
+        depth: {
+          type: "string",
+          enum: ["low", "high", "ultra"],
+          description:
+            "Leave unset (low) unless the user asked for high or ultra by name. low: about 8 questions, 40 sources, a few minutes. high: about 3x, two rounds, claims need two sources. ultra: about 5x, three rounds, plus a sceptic pass for counter-evidence.",
+        },
+        questions: { type: "number", description: "Override: sub-questions to plan." },
+        sources: { type: "number", description: "Override: pages to read." },
+        rounds: { type: "number", description: "Override: search-and-read rounds (1-4)." },
+        verification: {
+          type: "string",
+          enum: ["none", "two-sources", "skeptic"],
+          description: "Override: how claims are checked.",
+        },
+        minutes: { type: "number", description: "Override: time budget in minutes." },
+        words: { type: "number", description: "Override: target report length in words." },
+        format: {
+          type: "string",
+          enum: ["report", "brief", "table"],
+          description: "Shape of the answer (default report).",
+        },
+        recencyDays: {
+          type: "number",
+          description: "Only use pages from roughly the last N days.",
+        },
+        includeDomains: {
+          type: "array",
+          items: { type: "string" },
+          description: 'Only read these sites, for example ["gov.uk"].',
+        },
+        excludeDomains: {
+          type: "array",
+          items: { type: "string" },
+          description: "Never read these sites.",
+        },
+      },
+      required: ["question"],
     },
     readOnly: true,
   },
@@ -1700,7 +1758,7 @@ export const agentConnectionTools: ConnectorTool[] = [
   {
     name: "connect_agent",
     description:
-      "Request a standing connection to another person's agent by their owner's chat address. The other owner must approve before either agent can message the other. Only for agents whose owner messaged the deployment's chat line.",
+      "Request a standing connection to another person's agent, by their owner's chat address or by the agent's public page link to hire it for work. The other owner must approve before either agent can message the other; then delegate with message_agent. Only for agents whose owner messaged the deployment's chat line.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1709,8 +1767,11 @@ export const agentConnectionTools: ConnectorTool[] = [
           description:
             "The owner's address on the chat surface: an E.164 phone number (e.g. +15551234567) or platform user id.",
         },
+        page: {
+          type: "string",
+          description: "A public bot page link (…/s/<id>) whose owner allows hiring.",
+        },
       },
-      required: ["address"],
     },
   },
   {

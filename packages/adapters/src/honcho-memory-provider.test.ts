@@ -833,10 +833,7 @@ describe("Honcho forget", () => {
       (id) => [{ id, entity: undefined }, "Invalid Honcho conclusion id."] as const,
     ),
     [{ id: "conclusion-1", entity: "bot-bot-2" }, "That memory belongs to another bot or Space."],
-    [
-      { id: "conclusion-1", entity: "argo-shared" },
-      "That memory belongs to another bot or Space.",
-    ],
+    [{ id: "conclusion-1", entity: "argo-shared" }, "That memory belongs to another bot or Space."],
   ] as const)("rejects %o before calling Honcho", async (request, error) => {
     const fetch = honchoFetch();
     await expect(

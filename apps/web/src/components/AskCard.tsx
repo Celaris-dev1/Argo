@@ -1,5 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ChatMarkdown } from "@argo/chat-ui/web";
 import type { LoginFieldInput, ThreadMessage } from "@argo/contracts";
 import {
@@ -15,6 +13,8 @@ import {
   selectedAskActionLabel,
 } from "@argo/core";
 import { Button, Input, Label, Switch, Textarea } from "@argo/ui-web";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Check } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { rpc } from "../lib/rpc";

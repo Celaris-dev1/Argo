@@ -54,6 +54,11 @@ msgstr ""
 msgid "{0, plural, one {# space} other {# spaces}}"
 msgstr ""
 
+#. placeholder {0}: status.data.completed
+#: src/pages/BotStatus.tsx
+msgid "{0, plural, one {# task finished} other {# tasks finished}}"
+msgstr ""
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -136,6 +141,11 @@ msgstr "{0} MB"
 #: src/pages/ExternalConversationSettings.tsx
 msgid "{0} rollup hours"
 msgstr "{0} 彙整時數"
+
+#. placeholder {0}: money(state.spent)
+#: src/pages/shell/bot-panel.tsx
+msgid "{0} spent this month"
+msgstr ""
 
 #. placeholder {0}: parts.amount
 #: src/components/ArtifactFileCard.tsx
@@ -1767,6 +1777,14 @@ msgstr "複製提示詞"
 msgid "Copy rows"
 msgstr "複製列"
 
+#: src/pages/BotStatus.tsx
+msgid "Copy this bot"
+msgstr ""
+
+#: src/pages/CopyBot.tsx
+msgid "Copying"
+msgstr ""
+
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Cost"
 msgstr "費用"
@@ -2040,6 +2058,7 @@ msgstr "無法載入此對話。"
 msgid "Could not load this file."
 msgstr "無法載入此檔案。"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Could not load this page."
 msgstr ""
@@ -2353,6 +2372,10 @@ msgstr "建立空間"
 #: src/pages/Auth.tsx
 msgid "Create your Argo"
 msgstr "建立你的 Argo"
+
+#: src/pages/BotStatus.tsx
+msgid "Create your bot"
+msgstr ""
 
 #: src/components/AskCard.tsx
 msgid "Created"
@@ -2696,6 +2719,7 @@ msgstr "下次續訂時降級"
 
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/SharedRun.tsx
 msgid "Download"
 msgstr "下載"
 
@@ -2753,6 +2777,10 @@ msgstr "編輯資料"
 #: src/pages/Auth.tsx
 msgid "Email"
 msgstr "電子信箱"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Email inbox"
+msgstr ""
 
 #: src/lib/user-error.ts
 msgid "Email is not allowed to register"
@@ -3444,6 +3472,14 @@ msgstr "退出"
 msgid "Let bots use this computer"
 msgstr ""
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Let other bots hire this bot"
+msgstr ""
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Let visitors copy this bot"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Lets bots save and recall facts by meaning, alongside MEMORY.md."
 msgstr "讓機器人在 MEMORY.md 之外，依語意儲存和回想事實。"
@@ -3507,6 +3543,7 @@ msgid "Load web images automatically"
 msgstr "自動載入網路圖片"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "Loading"
 msgstr ""
@@ -3584,6 +3621,11 @@ msgstr "低"
 #: src/components/VaultSettings.tsx
 msgid "Lowercase letters, numbers, hyphens and underscores, starting with a letter."
 msgstr "使用小寫英文字母、數字、連字號與底線，並以字母開頭。"
+
+#: src/pages/BotStatus.tsx
+#: src/pages/SharedRun.tsx
+msgid "Made with Argo"
+msgstr ""
 
 #: src/pages/ModelSettingsOverlay.tsx
 msgid "Main model"
@@ -3892,6 +3934,10 @@ msgstr "每月額度"
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr "每月額度在續訂時到期。單次加值額度不會過期。"
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Monthly spend limit"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4075,6 +4121,10 @@ msgstr "無驗證"
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "沒有符合的機器人"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "No limit"
+msgstr ""
 
 #: src/components/AskCard.tsx
 msgid "No longer active"
@@ -4300,6 +4350,10 @@ msgstr "開啟 {name}"
 #: src/pages/Onboarding.tsx
 msgid "Open <0>{0}</0> and enter this code:"
 msgstr "開啟 <0>{0}</0> 並輸入以下代碼："
+
+#: src/pages/CopyBot.tsx
+msgid "Open Argo"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Open call"
@@ -4576,6 +4630,10 @@ msgstr "上一頁"
 msgid "Previous settings sections"
 msgstr "上一組設定區段"
 
+#: src/pages/SharedRun.tsx
+msgid "Print"
+msgstr ""
+
 #: src/pages/Board.tsx
 msgid "Priority"
 msgstr "優先順序"
@@ -4609,6 +4667,10 @@ msgstr "供應商"
 #: src/pages/model-settings/providers-section.tsx
 msgid "Providers"
 msgstr "供應商"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Public status page"
+msgstr ""
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -4654,6 +4716,10 @@ msgstr "僅回想"
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "最近"
+
+#: src/pages/BotStatus.tsx
+msgid "Recent tasks"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5380,6 +5446,10 @@ msgstr "共享"
 msgid "Shared memory"
 msgstr "共用記憶"
 
+#: src/pages/BotStatus.tsx
+msgid "Shared results"
+msgstr ""
+
 #: src/components/VaultSettings.tsx
 msgid "Show"
 msgstr "顯示"
@@ -5888,6 +5958,10 @@ msgstr "無法讀取此備份。"
 msgid "This bot"
 msgstr "此機器人"
 
+#: src/pages/CopyBot.tsx
+msgid "This bot can no longer be copied."
+msgstr ""
+
 #: src/pages/shell/computer-view.tsx
 msgid "This bot runs on this computer, not a Linux desktop. Shell and files use your home folder."
 msgstr "此機器人執行在這臺電腦上，而不是 Linux 桌面。Shell 和檔案使用你的主目錄。"
@@ -5941,6 +6015,7 @@ msgstr "此檔案不是有效的 UTF-8 文字。"
 msgid "This import was already used. Choose the files again."
 msgstr "此匯入已使用過。請重新選擇檔案。"
 
+#: src/pages/BotStatus.tsx
 #: src/pages/SharedRun.tsx
 msgid "This link is no longer shared."
 msgstr ""
@@ -6511,6 +6586,10 @@ msgstr "工作"
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "工作指示"
+
+#: src/pages/BotStatus.tsx
+msgid "Working now"
+msgstr ""
 
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/roster-status.ts

@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   AgentSkillCatalogEntry,
   Bot,
@@ -36,6 +35,7 @@ import {
   Textarea,
   Toggle,
 } from "@argo/ui-web";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { Download, Settings, X } from "lucide-react";
 import type { ReactNode } from "react";
@@ -46,6 +46,7 @@ import { botProfilePatch } from "../../lib/bot-profile-patch";
 import { thinkingLevelLabel } from "../../lib/model-catalog";
 import { lazyComponent } from "../../lib/preload-recovery";
 import { useSpaceQueries } from "../../lib/query";
+import { useSpaceRpc } from "../../lib/space-rpc";
 import { errorText } from "../../lib/user-error";
 import { AvatarStudioPopover } from "./avatar-studio-popover";
 import { ChatModelPicker } from "./chat-model-picker";
@@ -745,6 +746,9 @@ export function BotSettings({
                   }}
                 />
               </div>
+              <StatusPageRow botId={bot.id} />
+              <BudgetRow botId={bot.id} />
+              <InboxRow botId={bot.id} />
             </SettingsGroup>
             <InstructionSettings key={bot.id} bot={bot} />
             <SettingsGroup label={t`How other bots see it`} plain>
@@ -947,4 +951,219 @@ function SettingsGroup({
 function humanizeTool(name: string) {
   const words = name.replaceAll("_", " ");
   return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** Owner-only monthly spend limit, shown once a wallet is connected. Empty means no limit. */
+/** The bot's own email address, shown only when the deployment can receive mail. */
+function InboxRow({ botId }: { botId: string }) {
+  const { t } = useLingui();
+  const rpc = useSpaceRpc();
+  const id = useId();
+  const [state, setState] = useState<{ available: boolean; address: string | null } | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let live = true;
+    rpc.bots
+      .inbox({ botId })
+      .then((result) => live && setState(result))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [rpc, botId]);
+  if (!state?.available) return null;
+  async function toggle(enabled: boolean) {
+    setBusy(true);
+    try {
+      const { address } = await rpc.bots.setInbox({ botId, enabled });
+      setState({ available: true, address });
+      if (address) await navigator.clipboard?.writeText(address).catch(() => undefined);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+      <label htmlFor={id} className="min-w-0">
+        <Trans>Email inbox</Trans>
+        {state.address ? (
+          <span className="block truncate text-xs text-muted-foreground">{state.address}</span>
+        ) : null}
+      </label>
+      <Switch
+        id={id}
+        aria-label={t`Email inbox`}
+        checked={Boolean(state.address)}
+        disabled={busy}
+        onCheckedChange={(checked) => void toggle(checked)}
+      />
+    </div>
+  );
+}
+
+function BudgetRow({ botId }: { botId: string }) {
+  const { t, i18n } = useLingui();
+  const rpc = useSpaceRpc();
+  const id = useId();
+  const [state, setState] = useState<{
+    limit: string;
+    currency: string;
+    spent: number;
+  } | null>(null);
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      const wallet = await rpc.paymentWallet.status();
+      if (wallet.status !== "connected") return;
+      const budget = await rpc.paymentWallet.botBudget({ botId });
+      if (!live) return;
+      setState({
+        limit: budget.monthlyLimit === null ? "" : String(budget.monthlyLimit / 100),
+        currency: budget.currency,
+        spent: budget.spentThisMonth,
+      });
+    })().catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [rpc, botId]);
+  if (!state) return null;
+  const money = (minor: number) =>
+    i18n.number(minor / 100, { style: "currency", currency: state.currency.toUpperCase() });
+  async function save(value: string) {
+    const amount = value.trim() === "" ? null : Math.round(Number(value) * 100);
+    if (amount !== null && (!Number.isFinite(amount) || amount < 0)) return;
+    await rpc.paymentWallet
+      .setBotBudget({ botId, monthlyLimit: amount, currency: state?.currency ?? "usd" })
+      .catch(() => undefined);
+  }
+  return (
+    <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+      <label htmlFor={id} className="min-w-0">
+        <Trans>Monthly spend limit</Trans>
+        <span className="block text-xs text-muted-foreground">
+          <Trans>{money(state.spent)} spent this month</Trans>
+        </span>
+      </label>
+      <Input
+        id={id}
+        inputMode="decimal"
+        className="w-28 text-right"
+        placeholder={t`No limit`}
+        value={state.limit}
+        onChange={(event) => setState({ ...state, limit: event.target.value })}
+        onBlur={(event) => void save(event.target.value)}
+      />
+    </div>
+  );
+}
+
+/** Owner-only switch for the bot's public page of recently finished task titles. */
+function StatusPageRow({ botId }: { botId: string }) {
+  const { t } = useLingui();
+  const rpc = useSpaceRpc();
+  const id = useId();
+  const copyId = useId();
+  const [url, setUrl] = useState<string | null>(null);
+  const [allowCopy, setAllowCopy] = useState(false);
+  const [allowHire, setAllowHire] = useState(false);
+  const hireId = useId();
+  const [busy, setBusy] = useState(true);
+  useEffect(() => {
+    let live = true;
+    rpc.runs
+      .statusPage({ botId })
+      .then((result) => {
+        if (!live) return;
+        setUrl(result.url);
+        setAllowCopy(result.allowCopy);
+        setAllowHire(result.allowHire);
+      })
+      .catch(() => undefined)
+      .finally(() => live && setBusy(false));
+    return () => {
+      live = false;
+    };
+  }, [rpc, botId]);
+  async function toggle(on: boolean) {
+    setBusy(true);
+    try {
+      if (on) {
+        const link = (await rpc.runs.publishStatus({ botId })).url;
+        setUrl(link);
+        await navigator.clipboard?.writeText(link).catch(() => undefined);
+      } else {
+        await rpc.runs.unpublishStatus({ botId });
+        setUrl(null);
+        setAllowCopy(false);
+        setAllowHire(false);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function setAccess(access: { allowCopy?: boolean; allowHire?: boolean }) {
+    setBusy(true);
+    try {
+      await rpc.runs.setStatusCopy({ botId, ...access });
+      if (access.allowCopy !== undefined) setAllowCopy(access.allowCopy);
+      if (access.allowHire !== undefined) setAllowHire(access.allowHire);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+        <label htmlFor={id} className="min-w-0">
+          <Trans>Public status page</Trans>
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="block truncate text-xs text-muted-foreground underline"
+            >
+              {url}
+            </a>
+          ) : null}
+        </label>
+        <Switch
+          id={id}
+          aria-label={t`Public status page`}
+          checked={Boolean(url)}
+          disabled={busy}
+          onCheckedChange={(checked) => void toggle(checked)}
+        />
+      </div>
+      {url ? (
+        <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+          <label htmlFor={copyId}>
+            <Trans>Let visitors copy this bot</Trans>
+          </label>
+          <Switch
+            id={copyId}
+            aria-label={t`Let visitors copy this bot`}
+            checked={allowCopy}
+            disabled={busy}
+            onCheckedChange={(checked) => void setAccess({ allowCopy: checked })}
+          />
+        </div>
+      ) : null}
+      {url ? (
+        <div className="flex min-h-11 items-center justify-between gap-3 text-sm">
+          <label htmlFor={hireId}>
+            <Trans>Let other bots hire this bot</Trans>
+          </label>
+          <Switch
+            id={hireId}
+            aria-label={t`Let other bots hire this bot`}
+            checked={allowHire}
+            disabled={busy}
+            onCheckedChange={(checked) => void setAccess({ allowHire: checked })}
+          />
+        </div>
+      ) : null}
+    </>
+  );
 }

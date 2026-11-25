@@ -1,7 +1,7 @@
-import { useLingui } from "@lingui/react/macro";
 import type { ReplyPreview, ThreadMessage } from "@argo/contracts";
 import { formatTimeSeparator, isPeerReceiptBlocks, replyLabel } from "@argo/core";
 import { cn } from "@argo/ui-web";
+import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ArtifactTarget } from "../../lib/artifact-open";

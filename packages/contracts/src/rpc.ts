@@ -457,6 +457,15 @@ export const appContract = {
     importCreate: oc.input(AgentImportCreateInput).output(BotSchema),
     importSetupState: oc.input(AgentImportSetupStateInput).output(AgentImportSetupStateSchema),
     duplicate: oc.input(botId).output(BotSchema),
+    /** Copy a bot whose owner published it and allowed copies into the caller's account. */
+    copyPublished: oc.input(z.object({ statusId: z.string().min(6).max(32) })).output(BotSchema),
+    /** The bot's email address; `available` is false when the deployment has no inbox domain. */
+    inbox: oc
+      .input(botId)
+      .output(z.object({ available: z.boolean(), address: z.string().nullable() })),
+    setInbox: oc
+      .input(z.object({ botId: Id, enabled: z.boolean() }))
+      .output(z.object({ address: z.string().nullable() })),
     reorder: oc.input(ReorderBotsInput).output(z.object({ ok: z.literal(true) })),
     update: oc.input(UpdateBotInput).output(BotSchema),
     restoreInstructions: oc
@@ -1287,6 +1296,25 @@ export const appContract = {
     /** Publishes a read-only snapshot of one of the caller's finished runs; repeat calls return the same link. */
     share: oc.input(z.object({ runId: Id })).output(RunShareLinkSchema),
     unshare: oc.input(z.object({ runId: Id })).output(z.object({ ok: z.literal(true) })),
+    /** The bot's public status link, or null while it is not published. */
+    statusPage: oc.input(z.object({ botId: Id })).output(
+      z.object({
+        url: z.string().nullable(),
+        allowCopy: z.boolean().default(false),
+        allowHire: z.boolean().default(false),
+      }),
+    ),
+    setStatusCopy: oc
+      .input(
+        z.object({
+          botId: Id,
+          allowCopy: z.boolean().optional(),
+          allowHire: z.boolean().optional(),
+        }),
+      )
+      .output(z.object({ ok: z.literal(true) })),
+    publishStatus: oc.input(z.object({ botId: Id })).output(RunShareLinkSchema),
+    unpublishStatus: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {
@@ -1294,6 +1322,26 @@ export const appContract = {
     /** Starts a sign-in the user finishes with the provider; `status` then reports it. */
     connect: oc.output(PaymentWalletStatusSchema),
     disconnect: oc.output(PaymentWalletStatusSchema),
+    /** A bot's monthly spend limit and this month's spend, in minor units; null when unlimited. */
+    botBudget: oc.input(z.object({ botId: Id })).output(
+      z.object({
+        monthlyLimit: z.number().int().nonnegative().nullable(),
+        currency: z.string(),
+        spentThisMonth: z.number().int().nonnegative(),
+      }),
+    ),
+    setBotBudget: oc
+      .input(
+        z.object({
+          botId: Id,
+          monthlyLimit: z.number().int().nonnegative().max(100_000_000).nullable(),
+          currency: z
+            .string()
+            .regex(/^[a-z]{3}$/)
+            .default("usd"),
+        }),
+      )
+      .output(z.object({ ok: z.literal(true) })),
   },
   voice: {
     catalog: oc.output(z.array(VoiceCatalogEntrySchema)),

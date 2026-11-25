@@ -1,7 +1,7 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import type { KeyProvider } from "@argo/adapter-kit";
 import { resolveContentEncryption } from "@argo/core";
 import { getLogger } from "@argo/logging";
+import { PrismaPg } from "@prisma/adapter-pg";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 import { withContentEncryption } from "./content-encryption.js";
@@ -73,9 +73,7 @@ export function createDb(
   // Without the configured key manager, new space keys would quietly be wrapped by
   // master keys held on this host.
   if (!options.keyProvider && (process.env.MASTER_KEY_PROVIDER?.trim() || "local") !== "local")
-    throw new Error(
-      "MASTER_KEY_PROVIDER needs createDb(url, { keyProvider }) from @argo/adapters",
-    );
+    throw new Error("MASTER_KEY_PROVIDER needs createDb(url, { keyProvider }) from @argo/adapters");
   const pool = createPool(connectionString, options);
   const keyPool = new Pool({
     connectionString,

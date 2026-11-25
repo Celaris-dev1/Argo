@@ -1,6 +1,3 @@
-import { i18n } from "@lingui/core";
-import { t } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { Bot, BotSection, Group, Me, Space, ThreadSnapshot } from "@argo/contracts";
 import {
   BotAvatar,
@@ -14,6 +11,9 @@ import {
   ContextMenuTrigger,
   GroupAvatar,
 } from "@argo/ui-web";
+import { i18n } from "@lingui/core";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, CircleAlert, Lock, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 import { Suspense } from "react";

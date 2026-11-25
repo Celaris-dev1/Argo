@@ -1,9 +1,6 @@
 import type { AddressInfo } from "node:net";
 import { createServer } from "node:net";
-import {
-  SCREEN_UNCONFIRMED_MAX_MS,
-  sealScreenCapability,
-} from "@argo/core/node/screen-capability";
+import { SCREEN_UNCONFIRMED_MAX_MS, sealScreenCapability } from "@argo/core/node/screen-capability";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ScreenCheck } from "./screen-proxy.js";
 import {
@@ -487,9 +484,9 @@ describe("refusing a screen that wasn't let through", () => {
 
 describe("the status-only probe", () => {
   it("is recognised only by its exact mark, and checks the same screen URL without it", () => {
-    expect(
-      screenProbePath("/novnc/session/view/1.t/vnc.html?autoconnect=true&argo_probe=1"),
-    ).toBe("/novnc/session/view/1.t/vnc.html?autoconnect=true");
+    expect(screenProbePath("/novnc/session/view/1.t/vnc.html?autoconnect=true&argo_probe=1")).toBe(
+      "/novnc/session/view/1.t/vnc.html?autoconnect=true",
+    );
     expect(screenProbePath("/novnc/session/view/1.t/vnc.html?argo_probe=1")).toBe(
       "/novnc/session/view/1.t/vnc.html",
     );
@@ -500,9 +497,9 @@ describe("the status-only probe", () => {
   });
 
   it("removes only the mark, leaving the rest of the URL exactly as sent", () => {
-    expect(
-      screenProbePath("/novnc/session/view/1.t/vnc.html?path=a%2Fb&argo_probe=1&x=%20y"),
-    ).toBe("/novnc/session/view/1.t/vnc.html?path=a%2Fb&x=%20y");
+    expect(screenProbePath("/novnc/session/view/1.t/vnc.html?path=a%2Fb&argo_probe=1&x=%20y")).toBe(
+      "/novnc/session/view/1.t/vnc.html?path=a%2Fb&x=%20y",
+    );
     expect(screenProbePath("/novnc/session/view/1.t/vnc.html?argo_probe=1&a=b+c")).toBe(
       "/novnc/session/view/1.t/vnc.html?a=b+c",
     );

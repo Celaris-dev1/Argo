@@ -1,7 +1,8 @@
 export const APPEARANCE_PREFERENCES = ["system", "light", "dark"] as const;
 
 /** Used until the person picks an appearance. */
-export const DEFAULT_APPEARANCE_PREFERENCE = "dark" satisfies (typeof APPEARANCE_PREFERENCES)[number];
+export const DEFAULT_APPEARANCE_PREFERENCE =
+  "dark" satisfies (typeof APPEARANCE_PREFERENCES)[number];
 
 export type AppearancePreference = (typeof APPEARANCE_PREFERENCES)[number];
 

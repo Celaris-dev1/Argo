@@ -1,7 +1,7 @@
-import type { ConnectedAccountStatus } from "@composio/core";
 import type { AdapterContext, ConnectorEvent } from "@argo/adapter-kit";
 import { ConnectorAuthUnavailableError } from "@argo/adapter-kit";
 import { CONNECTOR_AUTH_UNAVAILABLE } from "@argo/contracts";
+import type { ConnectedAccountStatus } from "@composio/core";
 import { describe, expect, it } from "vitest";
 import { ComposioConnector, createConnectorStack } from "./composio-connector.js";
 import { FakeComposioClient } from "./composio-fake.js";

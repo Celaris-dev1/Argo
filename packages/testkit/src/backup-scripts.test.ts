@@ -668,9 +668,9 @@ PATH=/usr/bin:/bin exec mv "$@"
     if (kind === "missing") {
       rmSync(path.join(snapshot, "homes.tgz"));
     } else if (kind === "skipped") {
-      expect(
-        f.run("scripts/backup.sh", ["example"], { ARGO_BACKUP_SKIP_HOMES: "1" }).status,
-      ).toBe(0);
+      expect(f.run("scripts/backup.sh", ["example"], { ARGO_BACKUP_SKIP_HOMES: "1" }).status).toBe(
+        0,
+      );
     } else {
       const source = path.join(f.root, "empty-snapshot");
       mkdirSync(path.join(source, "data"), { recursive: true });

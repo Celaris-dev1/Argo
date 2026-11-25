@@ -1,6 +1,6 @@
-import { splitMessage, WhatsAppApiError } from "@chat-adapter/whatsapp";
 import type { AdapterContext } from "@argo/adapter-kit";
 import { getLogger } from "@argo/logging";
+import { splitMessage, WhatsAppApiError } from "@chat-adapter/whatsapp";
 import { describe, expect, it, vi } from "vitest";
 import { ChatSdkMessagingSurface } from "./chat-sdk-surface.js";
 import { Domain } from "./lark/thread-id.js";

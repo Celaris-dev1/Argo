@@ -1,8 +1,8 @@
-import type { AssistantMessage, Model } from "@earendil-works/pi-ai";
-import { AssistantMessageEventStream } from "@earendil-works/pi-ai/utils/event-stream";
 import type { AgentRunRequest, AgentRuntimeEvent } from "@argo/adapter-kit";
 import type * as Core from "@argo/core";
 import { MODEL_OUTPUT_CUT_ERROR, MODEL_OUTPUT_LIMIT_ERROR } from "@argo/core";
+import type { AssistantMessage, Model } from "@earendil-works/pi-ai";
+import { AssistantMessageEventStream } from "@earendil-works/pi-ai/utils/event-stream";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const providerState = vi.hoisted(() => ({
@@ -23,7 +23,10 @@ vi.mock("@earendil-works/pi-ai/providers/all", () => ({
   }),
 }));
 
-vi.mock("./pi-local-provider.js", () => ({ registerLocalProvider: (models: unknown) => models }));
+vi.mock("./pi-local-provider.js", () => ({
+  registerLocalProvider: (models: unknown) => models,
+  memberHeaders: (_provider: unknown, _userId: unknown, headers: unknown) => headers,
+}));
 vi.mock("./pi-openai-compatible-provider.js", () => ({
   OPENAI_COMPATIBLE_PROVIDER_ID: "openai-compatible",
   registerOpenAiCompatibleCatalog: (models: unknown) => models,

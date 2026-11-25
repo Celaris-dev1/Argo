@@ -1,4 +1,3 @@
-import { t } from "@lingui/core/macro";
 import {
   cancelResponseBody,
   readJsonObjectWithin,
@@ -6,6 +5,7 @@ import {
   speechLocaleTag,
   withAbort,
 } from "@argo/core";
+import { t } from "@lingui/core/macro";
 import { desktopBridge } from "./desktop.js";
 import { DesktopSpeechRecognition } from "./desktop-speech.js";
 import { getActiveUiLocale } from "./i18n.js";

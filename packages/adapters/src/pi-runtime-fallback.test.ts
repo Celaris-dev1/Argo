@@ -1,3 +1,10 @@
+import type { AgentRunRequest, AgentRuntimeEvent, ModelCallObserver } from "@argo/adapter-kit";
+import type * as Core from "@argo/core";
+import {
+  MODEL_CONTEXT_TOO_SMALL_ERROR,
+  MODEL_REQUEST_LIMIT_ERROR,
+  normalizeRunError,
+} from "@argo/core";
 import type * as AgentCore from "@earendil-works/pi-agent-core";
 import type { AgentMessage, AgentOptions } from "@earendil-works/pi-agent-core";
 import type {
@@ -10,13 +17,6 @@ import type {
 } from "@earendil-works/pi-ai";
 import { clampThinkingLevel } from "@earendil-works/pi-ai";
 import { AssistantMessageEventStream } from "@earendil-works/pi-ai/utils/event-stream";
-import type { AgentRunRequest, AgentRuntimeEvent, ModelCallObserver } from "@argo/adapter-kit";
-import type * as Core from "@argo/core";
-import {
-  MODEL_CONTEXT_TOO_SMALL_ERROR,
-  MODEL_REQUEST_LIMIT_ERROR,
-  normalizeRunError,
-} from "@argo/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const providerState = vi.hoisted(() => ({
@@ -57,7 +57,10 @@ vi.mock("@earendil-works/pi-ai/providers/all", () => ({
   },
 }));
 
-vi.mock("./pi-local-provider.js", () => ({ registerLocalProvider: (models: unknown) => models }));
+vi.mock("./pi-local-provider.js", () => ({
+  registerLocalProvider: (models: unknown) => models,
+  memberHeaders: (_provider: unknown, _userId: unknown, headers: unknown) => headers,
+}));
 vi.mock("./pi-openai-compatible-provider.js", () => ({
   OPENAI_COMPATIBLE_PROVIDER_ID: "openai-compatible",
   registerOpenAiCompatibleCatalog: (models: unknown) => models,

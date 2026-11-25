@@ -16,6 +16,7 @@ import {
   userVisibleMessages,
 } from "@argo/core";
 import { chooseBotAvatar } from "./bot-avatar-choice.js";
+import { newInboxAddress } from "./bot-inbox-address.js";
 import type { Prisma, PrismaClient } from "./client.js";
 import type { ComputerMode } from "./computers.js";
 import { assertBotQuota, ensureComputerRecord, parseComputerMode } from "./computers.js";
@@ -647,6 +648,16 @@ export function createRepos(
               botId: created.id,
               userId: actor.userId,
             },
+          });
+          // Every bot gets its own address; owners can turn it off in bot settings.
+          await tx.botInbox.createMany({
+            data: {
+              botId: created.id,
+              spaceId: actor.spaceId,
+              userId: actor.userId,
+              address: newInboxAddress(created.name),
+            },
+            skipDuplicates: true,
           });
           await tx.memoryDocument.create({
             data: {

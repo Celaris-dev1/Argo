@@ -1,9 +1,9 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
-import { KMSClient } from "@aws-sdk/client-kms";
 import type { KeyProvider } from "@argo/adapter-kit";
 import { LocalKeyProvider, withLocalMasterKeys } from "@argo/db";
+import { KMSClient } from "@aws-sdk/client-kms";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { AwsKmsKeyProvider, awsKmsConfigFromEnv } from "./aws-kms-key-provider.js";
 import { contentKeyProviderFromEnv } from "./key-provider-factory.js";

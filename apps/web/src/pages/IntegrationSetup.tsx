@@ -1,6 +1,6 @@
-import { useLingui } from "@lingui/react/macro";
 import type { Bot } from "@argo/contracts";
 import { NativeSelect, NativeSelectOption, Spinner } from "@argo/ui-web";
+import { useLingui } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IntegrationSetup } from "../components/integrations/IntegrationSetup";
