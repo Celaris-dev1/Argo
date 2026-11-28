@@ -66,6 +66,14 @@ function refusedInput(message: string) {
   return { ok: false, uncertain: false, error: message };
 }
 
+/** Tab name a helper's calls carry; set by the runtime, never by the model. */
+export const HELPER_TAB_ARG = "__helperTab";
+
+function helperTab(args: Record<string, unknown>): { tab?: string } {
+  const tab = args[HELPER_TAB_ARG];
+  return typeof tab === "string" && /^[a-z0-9-]{1,32}$/.test(tab) ? { tab } : {};
+}
+
 export async function browserNavigateFromTool(
   browser: BrowserProvider,
   computer: ComputerRef,
@@ -80,12 +88,16 @@ export async function browserNavigateFromTool(
     return refusedInput(NAVIGATE_URL_REQUIRED);
   }
   try {
-    const result = await browser.navigate(computer, { url, signal: context.signal }, context);
+    const result = await browser.navigate(
+      computer,
+      { url, ...helperTab(args), signal: context.signal },
+      context,
+    );
     if (result.fallback || result.error) return formatBrowserResult(result, options);
     // Return the page with the navigation: reading it is almost always the next step, and
     // a separate snapshot call costs the bot a whole turn.
     const page = await browser
-      .snapshot(computer, { signal: context.signal }, context)
+      .snapshot(computer, { ...helperTab(args), signal: context.signal }, context)
       .catch(() => undefined);
     context.signal.throwIfAborted();
     if (!page || page.fallback || page.error) return result;
@@ -108,7 +120,11 @@ export async function browserSnapshotFromTool(
 ) {
   void args;
   try {
-    const result = await browser.snapshot(computer, { signal: context.signal }, context);
+    const result = await browser.snapshot(
+      computer,
+      { ...helperTab(args), signal: context.signal },
+      context,
+    );
     return formatBrowserResult(result, options);
   } catch (error) {
     context.signal.throwIfAborted();
@@ -221,7 +237,11 @@ export async function browserActFromTool(
         });
       }
     }
-    const result = await browser.act(computer, { actions, signal: context.signal }, context);
+    const result = await browser.act(
+      computer,
+      { actions, ...helperTab(args), signal: context.signal },
+      context,
+    );
     return redactBrowserResult(formatBrowserResult(result, options), options.redactions?.() ?? []);
   } catch (error) {
     context.signal.throwIfAborted();

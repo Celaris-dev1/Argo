@@ -17,6 +17,7 @@ import {
   credentialArgument,
   loginFieldLabelsArgument,
 } from "./bot-secrets.js";
+import { HELPER_TAB_ARG } from "./browser-tools.js";
 import { CAPTCHA_SOLVE_NOTE, isCaptchaTakeover } from "./captcha-policy.js";
 import { shortenToolResultText } from "./context-selection.js";
 import type { PiAgentRuntimeOptions } from "./pi-runtime.js";
@@ -251,6 +252,23 @@ export function prepareRequestSecretArguments(raw: Record<string, unknown>) {
     ...(raw.replace === true ? { replace: true } : {}),
     ...(raw.fields != null ? { fields: loginFieldLabelsArgument(raw.fields) } : {}),
   };
+}
+
+/**
+ * Helpers run at the same time as the bot, so each drives its own browser tab; the bot keeps
+ * its usual tab. Only the runtime sets the tab: a model-supplied value is dropped.
+ */
+export function withHelperTab(
+  host: ToolHost,
+  name: string,
+  args: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!PAGE_BROWSER_TOOL_NAMES.has(name)) return args;
+  const { [HELPER_TAB_ARG]: _ignored, ...rest } = args;
+  if (!host.agentNamespace) return rest;
+  let hash = 5381;
+  for (const char of host.agentNamespace) hash = ((hash * 33) ^ char.charCodeAt(0)) >>> 0;
+  return { ...rest, [HELPER_TAB_ARG]: `helper-${hash.toString(36)}` };
 }
 
 function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): AgentTool {
@@ -489,7 +507,7 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
               if (host.request.executeTool) {
                 const result = await host.request.executeTool(
                   tool.name,
-                  args,
+                  withHelperTab(host, tool.name, args),
                   executionId,
                   tool.route,
                   {
