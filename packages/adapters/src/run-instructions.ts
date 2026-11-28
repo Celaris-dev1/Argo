@@ -155,7 +155,7 @@ export function dockerComputerToolInstruction(
 
 /** Calls made in one step run at the same time; the page browser has only one tab. */
 const PARALLEL_READ =
-  "To read several pages, call web_fetch for all of them in the same step: they run at the same time. Use the browser only for a page that needs a login, JavaScript, or clicks, because it opens one page at a time.";
+  "To read several pages, call web_fetch for all of them in the same step: they run at the same time. Page snapshots show each link's address, so open the links you need that way instead of going back to click each one. Use the browser only for a page that needs a login, JavaScript, or clicks, because it opens one page at a time.";
 
 function webLookupClause(disabled?: ReadonlySet<string>): string | undefined {
   const search = builtinOffered(disabled, "web_search");
