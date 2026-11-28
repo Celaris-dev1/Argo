@@ -1153,7 +1153,7 @@ export const builtinAgentTools: ConnectorTool[] = [
   {
     name: "plan",
     description:
-      "For a request with three or more parts, call this first, before other tools, to write your plan, then update it as you work. Send the whole list each time with each item's status. Mark an item done as soon as it is finished, and blocked if you cannot finish it. Keep to the plan: work that is not on it waits unless the person asks for it.",
+      "For a request with three or more parts, call this first, before other tools, to write your plan, then update it as you work. Send the whole list each time with each item's status. Mark an item done as soon as it is finished, and blocked if you cannot finish it. Keep to the plan: work that is not on it waits unless the person asks for it. Keep working until every item is done or blocked; do not stop to ask whether to continue.",
     inputSchema: {
       type: "object",
       properties: {

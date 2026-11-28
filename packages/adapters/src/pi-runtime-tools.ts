@@ -40,8 +40,6 @@ export interface ToolCallBudget {
   exceeded: boolean;
   limit: number;
   inFlight: number;
-  /** The limit comes from a check-in with the person, not the self-host fuse. */
-  checkIn?: boolean;
 }
 // Optional fuse is process-local. continueRun on another worker starts at zero.
 const toolCallBudgetsByRun = new Map<string, ToolCallBudget>();
@@ -761,8 +759,7 @@ export interface ToolHost {
   pendingShells: Array<Promise<FinishedShellCommand>>;
 }
 
-export function toolCallBudgetExceededMessage(limit: number, checkIn = false) {
-  if (checkIn) return "I've been at this a while, so I paused here. Send a message to continue.";
+export function toolCallBudgetExceededMessage(limit: number) {
   return `I stopped after reaching the limit of ${limit} tool calls in this turn. Send another message to continue.`;
 }
 
@@ -812,9 +809,7 @@ function beginToolCall(host: ToolHost): boolean {
     budget.exceeded = true;
     host.queue.push({
       type: "progress",
-      text: budget.checkIn
-        ? "Paused to check in."
-        : `Stopped: more than ${budget.limit} tool calls in one turn.`,
+      text: `Stopped: more than ${budget.limit} tool calls in one turn.`,
     });
   }
   maybeAbortToolCallBudget(host);
