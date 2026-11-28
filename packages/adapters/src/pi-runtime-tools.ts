@@ -27,6 +27,8 @@ import type { RuntimeModelTarget } from "./pi-runtime-models.js";
 import { executeSubagent } from "./pi-runtime-subagent.js";
 import { parametersFor, prepareFleetArguments } from "./pi-runtime-tool-parameters.js";
 import { recordPiTelemetryContent, withPiTelemetrySpan } from "./pi-telemetry.js";
+import type { RunPlan } from "./run-plan.js";
+import { updateRunPlan } from "./run-plan.js";
 import { PAGE_BROWSER_TOOL_NAMES } from "./run-tool-selection.js";
 import { VERBATIM_TOOL_RESULTS } from "./runtime-context.js";
 import { SCHEDULE_TOOL_NAMES } from "./schedule-tools.js";
@@ -440,6 +442,10 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
                   terminate: true,
                 };
               }
+              if (tool.name === "plan" && host.plan) {
+                const text = updateRunPlan(host.plan, args);
+                return { content: [{ type: "text", text }], details: { plan: text } };
+              }
               if (tool.name === "ask_user") {
                 const options = Array.isArray(args.options)
                   ? args.options.map((option) => String(option).trim())
@@ -740,6 +746,8 @@ export interface ToolHost {
   apiKey: string | undefined;
   nestedAgents: Set<Agent>;
   subagentGate: { acquire(): Promise<void>; release(): void };
+  /** The bot's plan for this run, shared with its helpers. */
+  plan?: RunPlan;
   toolCallBudget: ToolCallBudget;
   /** Shared fallback uniqueness when the model omits toolCallId (nested hosts reuse this). */
   toolCallSeq: { value: number };
