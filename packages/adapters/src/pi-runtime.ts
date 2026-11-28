@@ -72,13 +72,6 @@ import { PiJsonlSessionRecorder } from "./pi-session.js";
 import { withPiTelemetry } from "./pi-telemetry.js";
 import { withPiThinkingActivity } from "./pi-thinking-activity.js";
 import { observedPiStream } from "./pi-usage.js";
-import {
-  CHECK_IN_PROMPT,
-  dueForCheckIn,
-  newCheckIn,
-  requestCheckIn,
-  resetCheckIn,
-} from "./run-check-in.js";
 import { newRunPlan, planDriftPrompt } from "./run-plan.js";
 import type { RuntimeContextDecision } from "./runtime-context.js";
 import { createRuntimeContextPolicy } from "./runtime-context.js";
@@ -452,7 +445,6 @@ export class PiAgentRuntime implements AgentRuntime {
             host.apiKey = target.credentials?.accessToken ?? target.apiKey;
           },
         };
-        const checkIn = newCheckIn(host);
         agent = new Agent({
           sessionId: conversationSessionId(request.threadId, request.botId),
           steeringMode: "all",
@@ -491,14 +483,8 @@ export class PiAgentRuntime implements AgentRuntime {
             const steering = request.claimSteering
               ? await request.claimSteering([...seenSteeringIds])
               : [];
-            if (steering.some((item) => item.origin === "user")) resetCheckIn(checkIn, host);
-            else if (dueForCheckIn(checkIn, Boolean(request.steeringWaiting))) {
-              requestCheckIn(checkIn, host);
-              agent.steer({ role: "user", content: CHECK_IN_PROMPT, timestamp: Date.now() });
-            } else {
-              const drift = planDriftPrompt(runPlan);
-              if (drift) agent.steer({ role: "user", content: drift, timestamp: Date.now() });
-            }
+            const drift = planDriftPrompt(runPlan);
+            if (drift) agent.steer({ role: "user", content: drift, timestamp: Date.now() });
             if (steering.length === 0) return undefined;
             seenSteeringIds.push(...steering.map((item) => item.id));
             for (const item of steering) representedHistoryIds.add(item.messageId);
@@ -644,7 +630,6 @@ export class PiAgentRuntime implements AgentRuntime {
             finishedCalls.delete(event.toolCallId);
             if (host.toolCallBudget.exceeded) return;
             toolCalls += 1;
-            checkIn.steps += 1;
             if (event.toolName !== "plan") runPlan.stepsSinceProgress += 1;
             // Live activity feedback: without this the thread shows a bare
             // "working…" for the whole tool call with nothing actionable.
@@ -971,10 +956,7 @@ export class PiAgentRuntime implements AgentRuntime {
           }
         }
         if (budgetExceeded) {
-          const budgetMessage = toolCallBudgetExceededMessage(
-            host.toolCallBudget.limit,
-            host.toolCallBudget.checkIn,
-          );
+          const budgetMessage = toolCallBudgetExceededMessage(host.toolCallBudget.limit);
           if (streamed.trim()) {
             const suffix = `\n\n${budgetMessage}`;
             queue.push({ type: "text", text: suffix });
