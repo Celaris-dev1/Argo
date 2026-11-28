@@ -204,16 +204,20 @@ describe("narrationStatusLine", () => {
 });
 
 describe("midTaskMessagePrompt", () => {
-  it("asks for a short answer through message_user, then the rest of the task", () => {
-    expect(midTaskMessagePrompt("Still working?", true)).toBe(
-      "The person sent this while you were working:\n\nStill working?\n\nThey are waiting. If they asked something or changed the plan, tell them with message_user before any more shell, computer, or browser command, then continue the task. Do not ignore them.",
-    );
+  it("puts the person first: reply through message_user, stop when asked, follow a new plan", () => {
+    const prompt = midTaskMessagePrompt("Still working?", true);
+    expect(
+      prompt.startsWith("The person sent this while you were working:\n\nStill working?\n\n"),
+    ).toBe(true);
+    expect(prompt).toContain("message_user before any other command");
+    expect(prompt).toContain("If they asked you to stop, pause, or drop the task, stop now");
+    expect(prompt).toContain("follow the new plan");
   });
 
-  it("asks for no plain-text answer, which would end the task, when message_user is off", () => {
+  it("stops or changes course without message_user too", () => {
     const prompt = midTaskMessagePrompt("Still working?", false);
     expect(prompt).toContain("\n\nStill working?\n\n");
-    expect(prompt).toContain("continue the task");
-    expect(prompt).not.toMatch(/reply|answer/);
+    expect(prompt).toContain("stop now");
+    expect(prompt).not.toContain("message_user");
   });
 });

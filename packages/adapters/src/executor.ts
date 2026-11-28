@@ -432,9 +432,23 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           });
       }, 60_000);
       heartbeat.unref?.();
+      // Stop lands within seconds even while a long command is running, not at the next heartbeat.
+      const cancelWatch = setInterval(() => {
+        if (lease.completed) return;
+        void deps.prisma.run
+          .findUnique({ where: { id: runId }, select: { status: true } })
+          .then((current) => {
+            if (lease.completed || current?.status !== "cancelled") return;
+            lease.valid = false;
+            runAbortController?.abort();
+          })
+          .catch(() => undefined);
+      }, 3_000);
+      cancelWatch.unref?.();
       const stopHeartbeatAfterCompletion = () => {
         lease.completed = true;
         clearInterval(heartbeat);
+        clearInterval(cancelWatch);
       };
 
       const runSecrets = [...deps.secrets];
@@ -1719,6 +1733,23 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
                   runSecrets,
                 );
               },
+              // Only the run's own person, writing in the app, cuts a long call short.
+              steeringWaiting: isBackgroundRunTrigger(run.trigger)
+                ? undefined
+                : async () =>
+                    Boolean(
+                      await deps.prisma.steeringMessage.findFirst({
+                        where: {
+                          botId: bot.id,
+                          userId: run.userId,
+                          claimedAt: null,
+                          originTrigger: null,
+                          OR: [{ runId: null }, { runId }],
+                          message: { threadId: thread.id },
+                        },
+                        select: { id: true },
+                      }),
+                    ),
               claimSteering: (seenIds) =>
                 claimRunSteering(
                   deps,
@@ -1841,6 +1872,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         });
         detachShutdown?.();
         clearInterval(heartbeat);
+        clearInterval(cancelWatch);
         if (!lease.retainComputer) {
           if (computerUse.screenRelease) {
             const releaseContext = computerUse.screenRelease.keepWarm

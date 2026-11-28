@@ -153,14 +153,18 @@ export function dockerComputerToolInstruction(
   return parts.join(" ");
 }
 
+/** Calls made in one step run at the same time; the page browser has only one tab. */
+const PARALLEL_READ =
+  "To read several pages, call web_fetch for all of them in the same step: they run at the same time. Page snapshots show each link's address, so open the links you need that way instead of going back to click each one. Use the browser only for a page that needs a login, JavaScript, or clicks, because it opens one page at a time.";
+
 function webLookupClause(disabled?: ReadonlySet<string>): string | undefined {
   const search = builtinOffered(disabled, "web_search");
   const fetch = builtinOffered(disabled, "web_fetch");
   if (search && fetch) {
-    return "Use web_search and web_fetch to look something up or read a page without a computer.";
+    return `Use web_search and web_fetch to look something up or read a page without a computer. ${PARALLEL_READ}`;
   }
   if (search) return "Use web_search to look something up without a computer.";
-  if (fetch) return "Use web_fetch to read a page without a computer.";
+  if (fetch) return `Use web_fetch to read a page without a computer. ${PARALLEL_READ}`;
   return undefined;
 }
 

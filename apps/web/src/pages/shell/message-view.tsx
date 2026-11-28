@@ -234,6 +234,7 @@ export const MessageView = memo(function MessageView({
                       live={isLive}
                       stepCount={toolStepCount(block.steps)}
                       durationMs={block.durationMs}
+                      current={isLive ? block.steps.at(-1)?.label : undefined}
                     >
                       <ToolSteps
                         steps={block.steps}

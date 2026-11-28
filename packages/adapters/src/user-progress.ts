@@ -28,8 +28,8 @@ export function narrationStatusLine(text: string): string {
  */
 export function midTaskMessagePrompt(text: string, canMessageUser: boolean): string {
   const next = canMessageUser
-    ? "They are waiting. If they asked something or changed the plan, tell them with message_user before any more shell, computer, or browser command, then continue the task. Do not ignore them."
-    : "Take it into account before the next command and continue the task. Do not ignore them.";
+    ? "They come first. Reply to them with message_user before any other command. If they asked you to stop, pause, or drop the task, stop now: tell them what you finished and end your turn without another command. If they changed the plan, follow the new plan. Only go back to the old task if their message fits with it."
+    : "They come first. If they asked you to stop, pause, or drop the task, stop now and end your turn with a short note of what you finished. If they changed the plan, follow the new plan. Only go back to the old task if their message fits with it.";
   return `The person sent this while you were working:\n\n${text}\n\n${next}`;
 }
 

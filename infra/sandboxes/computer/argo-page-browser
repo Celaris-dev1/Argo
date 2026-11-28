@@ -937,11 +937,13 @@ EVAL_HELPERS = r"""
     walk(document);
     return found;
   }
+  const MAX_HREF = 200;
   function formatLine(el) {
     const value = el.value !== undefined && el.value !== ""
       ? ` value=${JSON.stringify(el.value.slice(0, MAX_VALUE))}` : "";
     const options = el.options ? ` options: ${describeOptions(el.options, el.optionsTotal, OPTIONS_CHARS)}` : "";
-    return `- ${el.role} ${JSON.stringify(el.name.slice(0, MAX_NAME))} [${el.ref}]${value}${options}`;
+    const href = el.href ? ` -> ${el.href}` : "";
+    return `- ${el.role} ${JSON.stringify(el.name.slice(0, MAX_NAME))} [${el.ref}]${href}${value}${options}`;
   }
   const FRAME_CLICK = "That spot is inside a frame, which the page tools cannot click in.";
   // What a click at (x, y) reaches, looking into shadow trees.
@@ -1006,6 +1008,8 @@ EVAL_HELPERS = r"""
           : ["checkbox", "radio"].includes(el.type) ? (el.checked ? "checked" : "unchecked")
           : "value" in el ? String(el.value ?? "").slice(0, 2000) : undefined,
         tag: el.tagName.toLowerCase(),
+        // A link's address lets the bot open several pages at once instead of clicking back and forth.
+        ...(el instanceof HTMLAnchorElement && /^https?:/.test(el.href) ? { href: el.href.slice(0, MAX_HREF) } : {}),
         ...(el instanceof HTMLSelectElement ? { options: optionsOf(el),
           ...(el.options.length > MAX_OPTIONS ? { optionsTotal: el.options.length } : {}) } : {}),
       });

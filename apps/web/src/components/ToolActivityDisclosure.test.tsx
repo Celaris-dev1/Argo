@@ -92,8 +92,23 @@ describe("ToolActivityDisclosure", () => {
     expect(html).toContain('data-live="true"');
   });
 
-  it("starts open while working", () => {
-    expect(markup({ live: true, stepCount: 2 })).toMatch(OPEN_TRIGGER);
+  it("stays folded while working, naming the step it is on", () => {
+    const html = renderToStaticMarkup(
+      <ToolActivityDisclosure live stepCount={2} current="Running: npm test">
+        <ToolSteps steps={stepsOf(2)} />
+      </ToolActivityDisclosure>,
+    );
+    expect(html).not.toMatch(OPEN_TRIGGER);
+    expect(visibleText(html)).toContain("Working… 2 tools Running: npm test");
+  });
+
+  it("drops the current step once done", () => {
+    const html = renderToStaticMarkup(
+      <ToolActivityDisclosure live={false} stepCount={2} current="Running: npm test">
+        <ToolSteps steps={stepsOf(2)} />
+      </ToolActivityDisclosure>,
+    );
+    expect(html).not.toContain("tool-activity-current");
   });
 
   it("is collapsed once done and expands to the tool rows", () => {
@@ -103,10 +118,10 @@ describe("ToolActivityDisclosure", () => {
     expect(html).toContain("Shell ×2");
   });
 
-  it("folds when the run finishes", () => {
+  it("stays folded when the run finishes", () => {
     const card = mountCard();
     card.render(true);
-    expect(card.details()?.getAttribute("aria-expanded")).toBe("true");
+    expect(card.details()?.getAttribute("aria-expanded")).toBe("false");
 
     card.render(false);
     expect(card.details()?.getAttribute("aria-expanded")).toBe("false");
@@ -114,18 +129,18 @@ describe("ToolActivityDisclosure", () => {
     card.unmount();
   });
 
-  it("keeps a manual collapse while more tools arrive in the same run", () => {
+  it("keeps a manual expand while more tools arrive and after the run ends", () => {
     const card = mountCard();
     card.render(true, 2);
     flushSync(() => card.summary()?.click());
-    expect(card.details()?.getAttribute("aria-expanded")).toBe("false");
+    expect(card.details()?.getAttribute("aria-expanded")).toBe("true");
 
     card.render(true, 3);
-    expect(card.details()?.getAttribute("aria-expanded")).toBe("false");
+    expect(card.details()?.getAttribute("aria-expanded")).toBe("true");
     expect(card.summary()?.textContent).toContain("Working…3 tools");
 
     card.render(false, 3);
-    expect(card.details()?.getAttribute("aria-expanded")).toBe("false");
+    expect(card.details()?.getAttribute("aria-expanded")).toBe("true");
     card.unmount();
   });
 
@@ -203,11 +218,12 @@ describe("StandaloneToolActivity", () => {
     expect(html).not.toContain("rounded-[20px]");
   });
 
-  it("is open with a windowed list while live, and lists every step once done", () => {
+  it("is folded with a windowed list and the current step while live, and lists every step once done", () => {
     const steps = stepsOf(9);
     const live = renderToStaticMarkup(<StandaloneToolActivity live steps={steps} stepCount={9} />);
-    expect(live).toMatch(OPEN_TRIGGER);
+    expect(live).not.toMatch(OPEN_TRIGGER);
     expect(live).toContain("+3 earlier steps");
+    expect(live).toContain('data-testid="tool-activity-current" title="step-8"');
 
     const done = renderToStaticMarkup(
       <StandaloneToolActivity live={false} steps={steps} stepCount={9} />,
@@ -219,17 +235,17 @@ describe("StandaloneToolActivity", () => {
 });
 
 describe("ToolOnlyNarration", () => {
-  it("renders a live tools-only message as an open slim line, not a bubble", () => {
+  it("renders a live tools-only message as a folded slim line, not a bubble", () => {
     const html = renderToStaticMarkup(
       <ToolOnlyNarration live blocks={[{ kind: "steps", steps: stepsOf(2) }]} />,
     );
     expect(html).toContain('data-testid="tool-activity-line"');
     expect(visibleText(html)).toContain("Working… 2 tools");
-    expect(html).toMatch(OPEN_TRIGGER);
+    expect(html).not.toMatch(OPEN_TRIGGER);
     expect(html).not.toContain("bg-muted");
   });
 
-  it("folds each card once the run is done", () => {
+  it("joins every card in the message into one folded line", () => {
     const html = renderToStaticMarkup(
       <ToolOnlyNarration
         live={false}
@@ -239,8 +255,8 @@ describe("ToolOnlyNarration", () => {
         ]}
       />,
     );
-    expect(html.match(/data-testid="tool-activity-line"/g)).toHaveLength(2);
-    expect(visibleText(html)).toContain("Done 3 tools 12s");
+    expect(html.match(/data-testid="tool-activity-line"/g)).toHaveLength(1);
+    expect(visibleText(html)).toContain("Done 4 tools 12s");
     expect(html).not.toMatch(OPEN_TRIGGER);
   });
 });
