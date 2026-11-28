@@ -79,6 +79,7 @@ import {
   requestCheckIn,
   resetCheckIn,
 } from "./run-check-in.js";
+import { newRunPlan, planDriftPrompt } from "./run-plan.js";
 import type { RuntimeContextDecision } from "./runtime-context.js";
 import { createRuntimeContextPolicy } from "./runtime-context.js";
 import { deliverFinishedShells } from "./shell-command-stream.js";
@@ -247,6 +248,7 @@ export class PiAgentRuntime implements AgentRuntime {
           apiKey,
           credentials: selectedModel.credentials,
         };
+        const runPlan = newRunPlan();
         const host: ToolHost = {
           queue,
           context,
@@ -260,6 +262,7 @@ export class PiAgentRuntime implements AgentRuntime {
           apiKey,
           nestedAgents,
           subagentGate: createGate(MAX_PARALLEL_SUBAGENTS),
+          plan: runPlan,
           toolCallBudget: trackedBudget,
           toolCallSeq: { value: 0 },
           abortTurn: () => undefined,
@@ -492,6 +495,9 @@ export class PiAgentRuntime implements AgentRuntime {
             else if (dueForCheckIn(checkIn, Boolean(request.steeringWaiting))) {
               requestCheckIn(checkIn, host);
               agent.steer({ role: "user", content: CHECK_IN_PROMPT, timestamp: Date.now() });
+            } else {
+              const drift = planDriftPrompt(runPlan);
+              if (drift) agent.steer({ role: "user", content: drift, timestamp: Date.now() });
             }
             if (steering.length === 0) return undefined;
             seenSteeringIds.push(...steering.map((item) => item.id));
@@ -639,6 +645,7 @@ export class PiAgentRuntime implements AgentRuntime {
             if (host.toolCallBudget.exceeded) return;
             toolCalls += 1;
             checkIn.steps += 1;
+            if (event.toolName !== "plan") runPlan.stepsSinceProgress += 1;
             // Live activity feedback: without this the thread shows a bare
             // "working…" for the whole tool call with nothing actionable.
             toolActivityShowing = true;

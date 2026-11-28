@@ -110,6 +110,11 @@ import {
 
 loadRootEnv();
 
+/** A helper agent's own page-browser tab; the bot's usual tab when absent. */
+const HELPER_TAB = z
+  .string()
+  .regex(/^[a-z0-9-]{1,32}$/)
+  .optional();
 const dockerSocketPath = resolveDockerSocketPath();
 const docker = dockerSocketPath ? new Docker({ socketPath: dockerSocketPath }) : new Docker();
 const computerContext =
@@ -553,6 +558,7 @@ app.post("/computers/:id/browser", async (c) => {
     .discriminatedUnion("command", [
       z.object({
         command: z.literal("navigate"),
+        tab: HELPER_TAB,
         url: z
           .string()
           .url()
@@ -563,9 +569,10 @@ app.post("/computers/:id/browser", async (c) => {
             return /^https?:$/.test(url.protocol) && !url.username && !url.password;
           }),
       }),
-      z.object({ command: z.literal("snapshot") }),
+      z.object({ command: z.literal("snapshot"), tab: HELPER_TAB }),
       z.object({
         command: z.literal("act"),
+        tab: HELPER_TAB,
         actions: z
           .array(
             z.discriminatedUnion("kind", [

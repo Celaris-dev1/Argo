@@ -1017,6 +1017,8 @@ export interface BrowserCapabilities {
 
 export interface BrowserNavigateRequest {
   url: string;
+  /** A helper's own tab; the bot's tab when absent. */
+  tab?: string;
   signal?: AbortSignal;
 }
 
@@ -1029,6 +1031,7 @@ export interface BrowserNavigateResult {
 }
 
 export interface BrowserSnapshotRequest {
+  tab?: string;
   signal?: AbortSignal;
 }
 
@@ -1096,6 +1099,7 @@ export type BrowserActStep =
 
 export interface BrowserActRequest {
   actions: BrowserActStep[];
+  tab?: string;
   signal?: AbortSignal;
 }
 
@@ -1116,10 +1120,11 @@ export interface BrowserActResult {
 }
 
 /** A sandbox must route these commands through its owned screen, never generic host execution. */
-export type PageBrowserCommand =
+export type PageBrowserCommand = (
   | { command: "navigate"; url: string }
   | { command: "snapshot" }
-  | { command: "act"; actions: BrowserActStep[] };
+  | { command: "act"; actions: BrowserActStep[] }
+) & { tab?: string };
 
 export type PageBrowserResult = Partial<BrowserSnapshotResult & BrowserActResult> & { ok: boolean };
 

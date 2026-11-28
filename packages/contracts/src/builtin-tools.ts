@@ -67,6 +67,7 @@ export const BUILTIN_TOOL_NAMES = [
   "forget_memory",
   "task_catalog",
   "scratchpad_list",
+  "plan",
   "scratchpad_add",
   "scratchpad_update",
   "scratchpad_complete",

@@ -1151,6 +1151,31 @@ export const builtinAgentTools: ConnectorTool[] = [
     },
   },
   {
+    name: "plan",
+    description:
+      "For a request with three or more parts, call this first, before other tools, to write your plan, then update it as you work. Send the whole list each time with each item's status. Mark an item done as soon as it is finished, and blocked if you cannot finish it. Keep to the plan: work that is not on it waits unless the person asks for it.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        items: {
+          type: "array",
+          maxItems: 60,
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "Short id, such as 1 or 3b." },
+              title: { type: "string" },
+              status: { type: "string", enum: ["todo", "doing", "done", "blocked"] },
+            },
+            required: ["title", "status"],
+          },
+        },
+      },
+      required: ["items"],
+    },
+    readOnly: true,
+  },
+  {
     name: "scratchpad_add",
     description:
       "Add an open-work item to this bot's scratchpad. Use for todos or parked work that should outlive this turn. Not a reminder or schedule.",

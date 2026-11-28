@@ -1,7 +1,7 @@
 import type { ToolCallBudget } from "./pi-runtime-tools.js";
 
 /** Steps a bot may take without hearing from its person before it must report back. */
-export const CHECK_IN_STEPS = 40;
+export const CHECK_IN_STEPS = 100;
 /** Time a bot may work without hearing from its person before it must report back. */
 export const CHECK_IN_MS = 20 * 60_000;
 /** Calls still allowed after the check-in, so the bot can finish the step it is on. */

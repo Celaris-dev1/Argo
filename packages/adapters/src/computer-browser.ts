@@ -16,6 +16,8 @@ import type {
 import type { FakeBrowserProviderOptions } from "./fake-browser.js";
 import { FakeBrowserProvider } from "./fake-browser.js";
 
+const tabOf = (request: { tab?: string }) => (request.tab ? { tab: request.tab } : {});
+
 const DETACHED_MESSAGE = "Page browser is not attached to this computer's Chrome.";
 
 type LivePayload = Partial<PageBrowserResult>;
@@ -75,7 +77,11 @@ export class ComputerBrowserProvider implements BrowserProvider {
     if (this.canUseInProcess(computer)) {
       return this.fake.navigate(computer, request, context);
     }
-    const live = await this.runLive(computer, { command: "navigate", url: request.url }, context);
+    const live = await this.runLive(
+      computer,
+      { command: "navigate", url: request.url, ...tabOf(request) },
+      context,
+    );
     if (live?.ok !== true || live.fallback === "computer_act") {
       return {
         url: request.url,
@@ -98,7 +104,7 @@ export class ComputerBrowserProvider implements BrowserProvider {
     if (this.canUseInProcess(computer)) {
       return this.fake.snapshot(computer, request, context);
     }
-    const live = await this.runLive(computer, { command: "snapshot" }, context);
+    const live = await this.runLive(computer, { command: "snapshot", ...tabOf(request) }, context);
     if (live?.ok !== true || live.fallback === "computer_act") {
       return {
         url: "",
@@ -129,7 +135,7 @@ export class ComputerBrowserProvider implements BrowserProvider {
     }
     const live = await this.runLive(
       computer,
-      { command: "act", actions: request.actions },
+      { command: "act", actions: request.actions, ...tabOf(request) },
       context,
     );
     const elements = Array.isArray(live?.elements) ? live.elements : undefined;

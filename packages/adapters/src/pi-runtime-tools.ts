@@ -17,6 +17,7 @@ import {
   credentialArgument,
   loginFieldLabelsArgument,
 } from "./bot-secrets.js";
+import { HELPER_TAB_ARG } from "./browser-tools.js";
 import { CAPTCHA_SOLVE_NOTE, isCaptchaTakeover } from "./captcha-policy.js";
 import { shortenToolResultText } from "./context-selection.js";
 import type { PiAgentRuntimeOptions } from "./pi-runtime.js";
@@ -26,6 +27,8 @@ import type { RuntimeModelTarget } from "./pi-runtime-models.js";
 import { executeSubagent } from "./pi-runtime-subagent.js";
 import { parametersFor, prepareFleetArguments } from "./pi-runtime-tool-parameters.js";
 import { recordPiTelemetryContent, withPiTelemetrySpan } from "./pi-telemetry.js";
+import type { RunPlan } from "./run-plan.js";
+import { updateRunPlan } from "./run-plan.js";
 import { PAGE_BROWSER_TOOL_NAMES } from "./run-tool-selection.js";
 import { VERBATIM_TOOL_RESULTS } from "./runtime-context.js";
 import { SCHEDULE_TOOL_NAMES } from "./schedule-tools.js";
@@ -253,6 +256,23 @@ export function prepareRequestSecretArguments(raw: Record<string, unknown>) {
   };
 }
 
+/**
+ * Helpers run at the same time as the bot, so each drives its own browser tab; the bot keeps
+ * its usual tab. Only the runtime sets the tab: a model-supplied value is dropped.
+ */
+export function withHelperTab(
+  host: ToolHost,
+  name: string,
+  args: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!PAGE_BROWSER_TOOL_NAMES.has(name)) return args;
+  const { [HELPER_TAB_ARG]: _ignored, ...rest } = args;
+  if (!host.agentNamespace) return rest;
+  let hash = 5381;
+  for (const char of host.agentNamespace) hash = ((hash * 33) ^ char.charCodeAt(0)) >>> 0;
+  return { ...rest, [HELPER_TAB_ARG]: `helper-${hash.toString(36)}` };
+}
+
 function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): AgentTool {
   return {
     name: exposedName,
@@ -422,6 +442,10 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
                   terminate: true,
                 };
               }
+              if (tool.name === "plan" && host.plan) {
+                const text = updateRunPlan(host.plan, args);
+                return { content: [{ type: "text", text }], details: { plan: text } };
+              }
               if (tool.name === "ask_user") {
                 const options = Array.isArray(args.options)
                   ? args.options.map((option) => String(option).trim())
@@ -489,7 +513,7 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
               if (host.request.executeTool) {
                 const result = await host.request.executeTool(
                   tool.name,
-                  args,
+                  withHelperTab(host, tool.name, args),
                   executionId,
                   tool.route,
                   {
@@ -722,6 +746,8 @@ export interface ToolHost {
   apiKey: string | undefined;
   nestedAgents: Set<Agent>;
   subagentGate: { acquire(): Promise<void>; release(): void };
+  /** The bot's plan for this run, shared with its helpers. */
+  plan?: RunPlan;
   toolCallBudget: ToolCallBudget;
   /** Shared fallback uniqueness when the model omits toolCallId (nested hosts reuse this). */
   toolCallSeq: { value: number };

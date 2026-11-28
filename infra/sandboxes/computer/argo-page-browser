@@ -13,6 +13,7 @@ from pathlib import Path
 import hashlib
 import json
 import os
+import re
 import socket
 import stat
 import struct
@@ -486,9 +487,43 @@ class CdpClient:
         raise TimeoutError(f"CDP call timed out: {method}")
 
 
-def attach_page(client: CdpClient) -> str:
+HELPER_TAB = re.compile(r"^[a-z0-9-]{1,32}$")
+
+
+def helper_tab(args: Any) -> str:
+    tab = args.get("tab") if isinstance(args, dict) else None
+    return tab if isinstance(tab, str) and HELPER_TAB.match(tab) else ""
+
+
+def helper_tab_path(tab: str) -> Path:
+    return last_target_path().with_name(f"page-browser-tab-{tab}")
+
+
+def attach_helper_tab(client: CdpClient, pages: list, tab: str) -> str:
+    """A helper agent drives its own background tab, so helpers and the bot never load over each other."""
+    path = helper_tab_path(tab)
+    try:
+        target_id = path.read_text(encoding="utf-8").strip()
+    except OSError:
+        target_id = ""
+    if target_id not in {page.get("targetId") for page in pages}:
+        target_id = client.call("Target.createTarget", {"url": "about:blank", "background": True})["targetId"]
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(target_id, encoding="utf-8")
+        except OSError:
+            pass
+    session_id = client.call("Target.attachToTarget", {"targetId": target_id, "flatten": True})["sessionId"]
+    client.call("Page.enable", session_id=session_id)
+    ensure_world(client, session_id)
+    return session_id
+
+
+def attach_page(client: CdpClient, tab: str = "") -> str:
     targets = client.call("Target.getTargets").get("targetInfos") or []
     pages = [t for t in targets if isinstance(t, dict) and t.get("type") == "page"]
+    if tab:
+        return attach_helper_tab(client, pages, tab)
     candidates = []
     for page in pages[:32]:
         attached = client.call("Target.attachToTarget", {
@@ -2352,7 +2387,7 @@ def run(argv: list[str]) -> int:
         client.connect()
         connected = True
         try:
-            session_id = attach_page(client)
+            session_id = attach_page(client, helper_tab(args))
             result = page_command(client, session_id, command, args)
             print(json.dumps(result))
             return 0  # Structured failures preserve partial action progress.

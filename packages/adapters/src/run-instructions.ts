@@ -138,6 +138,11 @@ export function dockerComputerToolInstruction(
     parts.push(
       "Python 3 is installed as `python3`. For ordinary file processing, use `python3 -c` with a quoted script; interpreter heredocs are blocked by the desktop guard. If `python` is not found, retry with `python3`. A command-syntax refusal is not a filesystem permission error; continue ordinary file work with supported tools.",
     );
+    parts.push(
+      builtinOffered(disabled, "run_subagent")
+        ? `${SCRIPT_FIRST} For a list of separate jobs, script the ones you can and hand the jobs that need clicking to run_subagent helpers, several in the same step, so they run at the same time.`
+        : SCRIPT_FIRST,
+    );
   }
   if (navigate && act) {
     parts.push(
@@ -152,6 +157,10 @@ export function dockerComputerToolInstruction(
   parts.push("Never use `--with-token` or inject a token through the environment.");
   return parts.join(" ");
 }
+
+/** Hark-style speed: code beats clicking for collecting data. */
+const SCRIPT_FIRST =
+  "To collect data from many pages or a whole site, save one Python script with write_file that fetches the pages at the same time (urllib or requests with a thread pool) and parses them, then run it: one script finishes in seconds what takes minutes in the browser. For pages that need clicking, typing or a login, use your page browser tools; never install a browser or browser-automation library for that.";
 
 /** Calls made in one step run at the same time; the page browser has only one tab. */
 const PARALLEL_READ =
