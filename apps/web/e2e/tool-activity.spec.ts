@@ -54,23 +54,20 @@ test("tool activity shows for live and finished runs when the user turned it on"
     await expect(liveLine).toHaveCount(1);
     await expect(page.getByTestId("message-bot-bubble")).toHaveCount(0);
     const liveCard = page.getByTestId("tool-activity");
-    await expect(liveCard.locator("button[aria-expanded]")).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    );
-    await expect(liveCard.locator("button[aria-expanded]")).toContainText(/Working…\s*8 tools/);
+    const liveTrigger = liveCard.locator("button[aria-expanded]");
+    // Folded while working, so a long run does not fill the chat; the line names the current step.
+    await expect(liveTrigger).toHaveAttribute("aria-expanded", "false");
+    await expect(liveTrigger).toContainText(/Working…\s*8 tools/);
+    await expect(page.getByTestId("tool-activity-current")).toBeVisible();
+    await expect(page.locator("body")).toHaveJSProperty("scrollWidth", viewport.width);
+    await captureScreenshot(page, testInfo, `default-live-${viewport.name}`);
+
+    await liveTrigger.click();
+    await expect(liveTrigger).toHaveAttribute("aria-expanded", "true");
     await expect(page.getByTestId("tool-rows-hidden")).toHaveText("+2 earlier steps");
     await expect(page.getByTestId("tool-rows")).not.toContainText("Open calendar");
     await expect(page.getByTestId("tool-rows")).toContainText("Check conflicts");
     await expect(page.getByTestId("tool-step-note")).toHaveCount(0);
-    await expect(page.locator("body")).toHaveJSProperty("scrollWidth", viewport.width);
-    await captureScreenshot(page, testInfo, `default-live-${viewport.name}`);
-
-    await liveCard.locator("button[aria-expanded]").click();
-    await expect(liveCard.locator("button[aria-expanded]")).toHaveAttribute(
-      "aria-expanded",
-      "false",
-    );
 
     await openThread(page, "done");
     await expect(page.getByTestId("message-bot-bubble")).toContainText(REPLY_TEXT);

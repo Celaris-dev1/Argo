@@ -36,6 +36,8 @@ export interface ToolCallBudget {
   exceeded: boolean;
   limit: number;
   inFlight: number;
+  /** The limit comes from a check-in with the person, not the self-host fuse. */
+  checkIn?: boolean;
 }
 // Optional fuse is process-local. continueRun on another worker starts at zero.
 const toolCallBudgetsByRun = new Map<string, ToolCallBudget>();
@@ -395,7 +397,7 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
           let result: unknown;
           let failure: unknown;
           try {
-            result = await (async () => {
+            const work = (async () => {
               if (tool.name === "request_takeover") {
                 const reason = String(args.reason ?? "I need you on the screen.");
                 if (isCaptchaTakeover(reason)) {
@@ -521,6 +523,11 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
                 details: { error: "no executor" },
               };
             })();
+            const outcome = UNINTERRUPTIBLE_TOOLS.has(tool.name)
+              ? await work
+              : await untilInterrupted(host, work);
+            if (outcome === STOPPED) host.signal.throwIfAborted();
+            result = outcome === STEERED ? steeredToolResult() : outcome;
             if (VERBATIM_TOOL_RESULTS.has(tool.name)) return result as AgentToolResult<unknown>;
             return boundAgentToolResult(result as AgentToolResult<unknown>);
           } catch (error) {
@@ -557,6 +564,71 @@ function toAgentTool(tool: ConnectorTool, host: ToolHost, exposedName: string): 
           }
         },
       ),
+  };
+}
+
+// Interactive calls pause the run themselves and return at once; helper agents stop with the
+// run and settle their own work.
+const UNINTERRUPTIBLE_TOOLS = new Set([
+  "ask_user",
+  "request_takeover",
+  "request_secret",
+  "message_user",
+  "run_subagent",
+]);
+const INTERRUPT_POLL_MS = 2_000;
+const STOPPED = Symbol("stopped");
+const STEERED = Symbol("steered");
+
+/**
+ * A long call stops holding up the run when the run is stopped or its person writes.
+ * The underlying work may still finish in the background; its result is not waited for.
+ */
+export async function untilInterrupted<T>(
+  host: Pick<ToolHost, "signal" | "depth" | "request">,
+  work: Promise<T>,
+  pollMs = INTERRUPT_POLL_MS,
+): Promise<T | typeof STOPPED | typeof STEERED> {
+  const waiting = host.depth === 0 ? host.request.steeringWaiting : undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let settled = false;
+  let resolveInterrupt: (value: typeof STOPPED | typeof STEERED) => void = () => undefined;
+  const interrupt = new Promise<typeof STOPPED | typeof STEERED>((resolve) => {
+    resolveInterrupt = resolve;
+  });
+  const onAbort = () => resolveInterrupt(STOPPED);
+  if (host.signal.aborted) return STOPPED;
+  host.signal.addEventListener("abort", onAbort, { once: true });
+  const poll = () => {
+    timer = setTimeout(async () => {
+      if (settled) return;
+      const steered = await waiting?.().catch(() => false);
+      if (settled) return;
+      if (steered) resolveInterrupt(STEERED);
+      else poll();
+    }, pollMs);
+  };
+  if (waiting) poll();
+  // A call left running in the background must not surface as an unhandled rejection.
+  work.catch(() => undefined);
+  try {
+    return await Promise.race([work, interrupt]);
+  } finally {
+    settled = true;
+    clearTimeout(timer);
+    host.signal.removeEventListener("abort", onAbort);
+  }
+}
+
+function steeredToolResult(): AgentToolResult<unknown> {
+  return {
+    content: [
+      {
+        type: "text",
+        text: "Interrupted: the person sent a new message. This call was not waited for and may still be finishing.",
+      },
+    ],
+    details: { interrupted: true },
   };
 }
 
@@ -659,7 +731,8 @@ export interface ToolHost {
   pendingShells: Array<Promise<FinishedShellCommand>>;
 }
 
-export function toolCallBudgetExceededMessage(limit: number) {
+export function toolCallBudgetExceededMessage(limit: number, checkIn = false) {
+  if (checkIn) return "I've been at this a while, so I paused here. Send a message to continue.";
   return `I stopped after reaching the limit of ${limit} tool calls in this turn. Send another message to continue.`;
 }
 
@@ -709,7 +782,9 @@ function beginToolCall(host: ToolHost): boolean {
     budget.exceeded = true;
     host.queue.push({
       type: "progress",
-      text: `Stopped: more than ${budget.limit} tool calls in one turn.`,
+      text: budget.checkIn
+        ? "Paused to check in."
+        : `Stopped: more than ${budget.limit} tool calls in one turn.`,
     });
   }
   maybeAbortToolCallBudget(host);

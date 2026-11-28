@@ -71,26 +71,28 @@ export function ToolSteps({
 }
 
 /**
- * The tool-activity card. It starts open while the run is live and folds when the run
- * ends. The keyed default keeps manual toggles until the run changes phase.
+ * The tool-activity card. It stays folded so a long run does not fill the chat; while the
+ * run is live the folded line names the step it is on.
  */
 export function ToolActivityDisclosure({
   live,
   stepCount,
   durationMs,
+  current,
   children,
 }: {
   live: boolean;
   stepCount: number;
   durationMs?: number;
+  /** The step running now, shown on the folded line while live. */
+  current?: string;
   children: ReactNode;
 }) {
   const duration = formatCompactDuration(durationMs);
   const toolCount = stepCount;
   return (
     <Collapsible
-      key={live ? "working" : "actions"}
-      defaultOpen={live}
+      defaultOpen={false}
       data-testid="tool-activity"
       data-live={live || undefined}
       className="group"
@@ -112,6 +114,15 @@ export function ToolActivityDisclosure({
             <Plural value={toolCount} one="# tool" other="# tools" />
           </span>
           {!live && duration ? <span>{duration}</span> : null}
+          {live && current ? (
+            <span
+              className="max-w-[40ch] truncate font-normal text-muted-foreground"
+              data-testid="tool-activity-current"
+              title={current}
+            >
+              {current}
+            </span>
+          ) : null}
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent hiddenUntilFound>
@@ -138,7 +149,12 @@ export function StandaloneToolActivity({
   return (
     <div className="flex justify-start" dir="ltr" data-testid="tool-activity-line">
       <div className="max-w-full min-w-0 ps-1">
-        <ToolActivityDisclosure live={live} stepCount={stepCount} durationMs={durationMs}>
+        <ToolActivityDisclosure
+          live={live}
+          stepCount={stepCount}
+          durationMs={durationMs}
+          current={live ? steps.at(-1)?.label : undefined}
+        >
           <ToolSteps
             steps={steps}
             currentIndex={live ? steps.length - 1 : undefined}
@@ -150,7 +166,7 @@ export function StandaloneToolActivity({
   );
 }
 
-/** A bot message whose only visible blocks are tool cards: one slim line per card, no bubble. */
+/** A bot message whose only visible blocks are tool cards: one slim folded line, no bubble. */
 export function ToolOnlyNarration({
   blocks,
   live,
@@ -158,19 +174,19 @@ export function ToolOnlyNarration({
   blocks: readonly ThreadMessage["blocks"][number][];
   live: boolean;
 }) {
+  const cards = blocks.filter(
+    (block): block is Extract<ThreadMessage["blocks"][number], { kind: "steps" }> =>
+      block.kind === "steps",
+  );
+  if (cards.length === 0) return null;
+  const steps = cards.flatMap((card) => card.steps);
+  const durations = cards.map((card) => card.durationMs).filter((ms) => ms !== undefined);
   return (
-    <>
-      {blocks.map((block, i) =>
-        block.kind === "steps" ? (
-          <StandaloneToolActivity
-            key={i}
-            live={live}
-            steps={block.steps}
-            stepCount={toolStepCount(block.steps)}
-            durationMs={block.durationMs}
-          />
-        ) : null,
-      )}
-    </>
+    <StandaloneToolActivity
+      live={live}
+      steps={steps}
+      stepCount={toolStepCount(steps)}
+      durationMs={durations.length ? durations.reduce((sum, ms) => sum + ms, 0) : undefined}
+    />
   );
 }
