@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@argo/ui-web/components/ui/table";
+import { cn } from "@argo/ui-web/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { RefObject } from "react";
 import { useId, useRef, useState, useSyncExternalStore } from "react";
@@ -571,18 +572,42 @@ function UsageLimitBars({ limits }: { limits: UsageLimit[] }) {
       {limits.map((limit) => {
         const percent = Math.min(100, Math.round((limit.used / limit.limit) * 100));
         const resets = time.format(new Date(limit.resetsAt));
+        const heat = percent >= 90 ? "hot" : percent >= 75 ? "warm" : "cool";
         return (
-          <div key={limit.id} className="rounded-xl border border-border px-4 py-4">
+          <div
+            key={limit.id}
+            data-heat={heat}
+            className={cn(
+              "rounded-xl border px-4 py-4 transition-colors",
+              heat === "hot"
+                ? "border-destructive/50 bg-destructive/5"
+                : heat === "warm"
+                  ? "border-warning/50 bg-warning/5"
+                  : "border-border",
+            )}
+          >
             <div className="flex items-baseline justify-between gap-3">
               <span className="text-[15px] font-medium text-foreground">{limit.label}</span>
-              <span className="text-[13.5px] tabular-nums text-muted-foreground">
+              <span
+                className={cn(
+                  "text-[13.5px] tabular-nums",
+                  heat === "hot" ? "font-medium text-destructive" : "text-muted-foreground",
+                )}
+              >
                 {t`${percent}% used`}
               </span>
             </div>
             <Progress
               value={percent}
               aria-label={limit.label}
-              className="mt-3 [&_[data-slot=progress-indicator]]:bg-primary [&_[data-slot=progress-track]]:h-2"
+              className={cn(
+                "mt-3 [&_[data-slot=progress-track]]:h-2",
+                heat === "hot"
+                  ? "[&_[data-slot=progress-indicator]]:bg-linear-to-r [&_[data-slot=progress-indicator]]:from-warning [&_[data-slot=progress-indicator]]:to-destructive [&_[data-slot=progress-indicator]]:shadow-md [&_[data-slot=progress-indicator]]:shadow-destructive/40 motion-safe:[&_[data-slot=progress-indicator]]:animate-pulse"
+                  : heat === "warm"
+                    ? "[&_[data-slot=progress-indicator]]:bg-warning"
+                    : "[&_[data-slot=progress-indicator]]:bg-primary",
+              )}
             />
             <div className="mt-2 text-[12.5px] text-muted-foreground">{t`Resets at ${resets}`}</div>
           </div>
