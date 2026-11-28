@@ -267,6 +267,10 @@ msgstr "אפשרויות {name}"
 msgid "{name} stopped"
 msgstr "{name} נעצר"
 
+#: src/pages/AccountSettingsOverlay.tsx
+msgid "{percent}% used"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "{provider} can't run this model."
@@ -5017,6 +5021,10 @@ msgstr "איפוס סיסמה"
 #: src/pages/Auth.tsx
 msgid "Reset your password"
 msgstr "איפוס הסיסמה"
+
+#: src/pages/AccountSettingsOverlay.tsx
+msgid "Resets at {resets}"
+msgstr ""
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Resetting…"

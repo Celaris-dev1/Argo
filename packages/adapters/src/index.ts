@@ -132,7 +132,7 @@ export * from "./pi-codex-catalog.js";
 export * from "./pi-credentials.js";
 export * from "./pi-live-catalog.js";
 export * from "./pi-live-model.js";
-export { LOCAL_PROVIDER_ID } from "./pi-local-provider.js";
+export { LOCAL_PROVIDER_ID, localUsageLimits } from "./pi-local-provider.js";
 export * from "./pi-models.js";
 export * from "./pi-oauth.js";
 export * from "./pi-openai-compatible-provider.js";

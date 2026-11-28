@@ -1,6 +1,9 @@
+import type { UsageLimit } from "@argo/contracts";
+import { UsageLimitSchema } from "@argo/contracts";
 import type { Model, MutableModels, Provider } from "@earendil-works/pi-ai";
 import { createProvider } from "@earendil-works/pi-ai";
 import { openAICompletionsApi } from "@earendil-works/pi-ai/api/openai-completions.lazy";
+import { z } from "zod";
 
 import { declaredVisionModelIds, inputModalities } from "./model-modalities.js";
 /**
@@ -112,6 +115,27 @@ export function memberHeaders(
 ): Record<string, string | null> | undefined {
   if (provider !== LOCAL_PROVIDER_ID || !userId) return headers;
   return { ...headers, [MEMBER_HEADER]: userId };
+}
+
+/**
+ * Today's allowances for one member from a keyed deployment endpoint. Undefined when the endpoint is
+ * unkeyed, does not report limits, or does not answer quickly: usage then shows totals only.
+ */
+export async function localUsageLimits(userId: string): Promise<UsageLimit[] | undefined> {
+  if (!process.env.ARGO_LOCAL_MODELS_KEY?.trim() || !process.env.ARGO_LOCAL_MODELS_URL?.trim()) {
+    return undefined;
+  }
+  try {
+    const response = await fetch(`${localBaseUrl().replace(/\/+$/, "")}/usage`, {
+      headers: { authorization: `Bearer ${localApiKey()}`, [MEMBER_HEADER]: userId },
+      signal: AbortSignal.timeout(3_000),
+    });
+    if (!response.ok) return undefined;
+    const parsed = z.object({ limits: z.array(UsageLimitSchema) }).safeParse(await response.json());
+    return parsed.success && parsed.data.limits.length > 0 ? parsed.data.limits : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function registerLocalProvider(models: MutableModels): MutableModels {
