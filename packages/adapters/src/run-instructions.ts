@@ -160,7 +160,7 @@ export function dockerComputerToolInstruction(
 
 /** Hark-style speed: code beats clicking for collecting data. */
 const SCRIPT_FIRST =
-  "To collect data from many pages or a whole site, save one Python script with write_file that fetches the pages at the same time (urllib or requests with a thread pool) and parses them, then run it: one script finishes in seconds what takes minutes in the browser.";
+  "To collect data from many pages or a whole site, save one Python script with write_file that fetches the pages at the same time (urllib or requests with a thread pool) and parses them, then run it: one script finishes in seconds what takes minutes in the browser. For pages that need clicking, typing or a login, use your page browser tools; never install a browser or browser-automation library for that.";
 
 /** Calls made in one step run at the same time; the page browser has only one tab. */
 const PARALLEL_READ =
