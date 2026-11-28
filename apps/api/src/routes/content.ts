@@ -1,5 +1,5 @@
 import type { UsageOperationKind } from "@argo/adapter-kit";
-import { resolveBotWorkspacePath } from "@argo/adapters";
+import { localUsageLimits, resolveBotWorkspacePath } from "@argo/adapters";
 import type { ExportManifest } from "@argo/contracts";
 import { attachmentMaxBytes, resolveBotAvatarSet } from "@argo/contracts";
 import { AttachmentValidationError } from "@argo/core";
@@ -160,7 +160,7 @@ export function contentRoutes(ctx: RouterContext) {
           costUsd: true,
         } as const;
         const counts = { _all: true, ...sums } as const;
-        const [result, modelGroups, runGroups] = await Promise.all([
+        const [result, modelGroups, runGroups, limits] = await Promise.all([
           deps.prisma.usageRecord.aggregate({ where, _sum: sums, _count: counts }),
           deps.prisma.usageRecord.groupBy({
             by: ["provider", "model"],
@@ -169,6 +169,7 @@ export function contentRoutes(ctx: RouterContext) {
             _count: counts,
           }),
           deps.prisma.usageRecord.groupBy({ by: ["runId", "parentRunId"], where }),
+          localUsageLimits(context.actor.userId),
         ]);
         const runs = new Set(runGroups.map((row) => row.parentRunId ?? row.runId).filter(Boolean))
           .size;
@@ -190,6 +191,7 @@ export function contentRoutes(ctx: RouterContext) {
         return {
           ...completeSums(result),
           runs,
+          ...(limits ? { limits } : {}),
           models: modelGroups
             .map((group) => ({
               provider: group.provider,

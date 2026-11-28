@@ -267,6 +267,10 @@ msgstr "{name} options"
 msgid "{name} stopped"
 msgstr "{name} stopped"
 
+#: src/pages/AccountSettingsOverlay.tsx
+msgid "{percent}% used"
+msgstr "{percent}% used"
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "{provider} can't run this model."
@@ -5017,6 +5021,10 @@ msgstr "Reset password"
 #: src/pages/Auth.tsx
 msgid "Reset your password"
 msgstr "Reset your password"
+
+#: src/pages/AccountSettingsOverlay.tsx
+msgid "Resets at {resets}"
+msgstr "Resets at {resets}"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Resetting…"

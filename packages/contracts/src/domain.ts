@@ -1145,8 +1145,18 @@ const UsageTotalsSchema = z.object({
   costUsd: z.number().nullable().optional(),
   modelCalls: z.number().optional(),
 });
+/** A daily allowance the deployment's model endpoint enforces, as of now. */
+export const UsageLimitSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  used: z.number().nonnegative(),
+  limit: z.number().positive(),
+  resetsAt: z.string(),
+});
+export type UsageLimit = z.infer<typeof UsageLimitSchema>;
 export const UsageSummarySchema = UsageTotalsSchema.extend({
   runs: z.number(),
+  limits: z.array(UsageLimitSchema).optional(),
   models: z
     .array(UsageTotalsSchema.required().extend({ provider: z.string(), model: z.string() }))
     .optional(),

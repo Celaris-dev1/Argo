@@ -1,4 +1,4 @@
-import type { AccountSecurity, UsageSummary } from "@argo/contracts";
+import type { AccountSecurity, UsageLimit, UsageSummary } from "@argo/contracts";
 import { accountDisplay, displayName, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "@argo/core";
 import {
   Button,
@@ -14,6 +14,7 @@ import {
   ToggleGroupItem,
 } from "@argo/ui-web";
 import { Disclosure } from "@argo/ui-web/components/ui/disclosure";
+import { Progress } from "@argo/ui-web/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -22,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@argo/ui-web/components/ui/table";
+import { cn } from "@argo/ui-web/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { RefObject } from "react";
 import { useId, useRef, useState, useSyncExternalStore } from "react";
@@ -487,6 +489,13 @@ export function UsageSettingsPanel({
   const cost = (value: number | null | undefined) =>
     value == null ? "—" : value > 0 && value < 0.01 ? `<${usd.format(0.01)}` : usd.format(value);
   const models = usage?.models ?? [];
+  if (usage?.limits?.length) {
+    return (
+      <div ref={panelRef} tabIndex={-1} data-testid="usage-settings" className="outline-none">
+        <UsageLimitBars limits={usage.limits} />
+      </div>
+    );
+  }
   return (
     <div ref={panelRef} tabIndex={-1} data-testid="usage-settings" className="outline-none">
       {usage ? (
@@ -550,6 +559,60 @@ export function UsageSettingsPanel({
           </Table>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/** Each daily allowance as a bar, like a plan meter: how much is used and when it refills. */
+function UsageLimitBars({ limits }: { limits: UsageLimit[] }) {
+  const { t, i18n } = useLingui();
+  const time = new Intl.DateTimeFormat(i18n.locale, { hour: "numeric", minute: "2-digit" });
+  return (
+    <div className="flex flex-col gap-3">
+      {limits.map((limit) => {
+        const percent = Math.min(100, Math.round((limit.used / limit.limit) * 100));
+        const resets = time.format(new Date(limit.resetsAt));
+        const heat = percent >= 90 ? "hot" : percent >= 75 ? "warm" : "cool";
+        return (
+          <div
+            key={limit.id}
+            data-heat={heat}
+            className={cn(
+              "rounded-xl border px-4 py-4 transition-colors",
+              heat === "hot"
+                ? "border-destructive/50 bg-destructive/5"
+                : heat === "warm"
+                  ? "border-warning/50 bg-warning/5"
+                  : "border-border",
+            )}
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[15px] font-medium text-foreground">{limit.label}</span>
+              <span
+                className={cn(
+                  "text-[13.5px] tabular-nums",
+                  heat === "hot" ? "font-medium text-destructive" : "text-muted-foreground",
+                )}
+              >
+                {t`${percent}% used`}
+              </span>
+            </div>
+            <Progress
+              value={percent}
+              aria-label={limit.label}
+              className={cn(
+                "mt-3 [&_[data-slot=progress-track]]:h-2",
+                heat === "hot"
+                  ? "[&_[data-slot=progress-indicator]]:bg-linear-to-r [&_[data-slot=progress-indicator]]:from-warning [&_[data-slot=progress-indicator]]:to-destructive [&_[data-slot=progress-indicator]]:shadow-md [&_[data-slot=progress-indicator]]:shadow-destructive/40 motion-safe:[&_[data-slot=progress-indicator]]:animate-pulse"
+                  : heat === "warm"
+                    ? "[&_[data-slot=progress-indicator]]:bg-warning"
+                    : "[&_[data-slot=progress-indicator]]:bg-primary",
+              )}
+            />
+            <div className="mt-2 text-[12.5px] text-muted-foreground">{t`Resets at ${resets}`}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
